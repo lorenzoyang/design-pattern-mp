@@ -8,10 +8,10 @@ public abstract class Content {
     private final String description; // optional
     private final LocalDate releaseDate; // optional
 
-    protected Content(String title, String description, LocalDate releaseDate) {
-        this.title = title;
-        this.description = description;
-        this.releaseDate = releaseDate;
+    protected Content(ContentBuilder<?> builder) {
+        this.title = builder.title;
+        this.description = builder.description;
+        this.releaseDate = builder.releaseDate;
     }
 
     public String getTitle() {
@@ -26,12 +26,12 @@ public abstract class Content {
         return releaseDate;
     }
 
-    protected abstract static class Builder<T extends Builder<T>> {
-        protected String title;
-        protected String description; // optional
-        protected LocalDate releaseDate; // optional
+    protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
+        private final String title;
+        private String description; // optional
+        private LocalDate releaseDate; // optional
 
-        public Builder(String title) {
+        protected ContentBuilder(String title) {
             if (title == null || title.isBlank()) {
                 throw new IllegalArgumentException("Title cannot be null or blank");
             }

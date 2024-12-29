@@ -2,7 +2,7 @@ package com.github.lorenzoyang.streaming.content;
 
 public class Episode {
     private final int episodeNumber;
-    private final int durationSeconds;
+    private final int durationMinutes;
     private final Video video;
 
     public Episode(int episodeNumber, int durationSeconds, Video video) {
@@ -13,7 +13,7 @@ public class Episode {
             throw new IllegalArgumentException("Duration must be positive and non-zero");
         }
         this.episodeNumber = episodeNumber;
-        this.durationSeconds = durationSeconds;
+        this.durationMinutes = durationSeconds;
         this.video = video;
     }
 
@@ -21,8 +21,8 @@ public class Episode {
         return episodeNumber;
     }
 
-    public int getDurationSeconds() {
-        return durationSeconds;
+    public int getDurationMinutes() {
+        return durationMinutes;
     }
 
     public Video getVideo() {

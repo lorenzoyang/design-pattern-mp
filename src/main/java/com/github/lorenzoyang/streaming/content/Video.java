@@ -2,26 +2,20 @@ package com.github.lorenzoyang.streaming.content;
 
 public class Video {
     private final String filePath;
-    private VideoFormat format;
-    private VideoResolution resolution;
+    private final VideoFormat format;
+    private final VideoResolution resolution;
 
     public Video(String filePath) {
+        this(filePath, VideoFormat.MP4, VideoResolution.HD);
+    }
+
+    public Video(String filePath, VideoFormat format, VideoResolution resolution) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("File path cannot be null or blank");
         }
         this.filePath = filePath;
-        this.format = VideoFormat.MP4;
-        this.resolution = VideoResolution.HD;
-    }
-
-    public Video format(VideoFormat format) {
         this.format = format;
-        return this;
-    }
-
-    public Video resolution(VideoResolution resolution) {
         this.resolution = resolution;
-        return this;
     }
 
     public String getFilePath() {
@@ -35,7 +29,6 @@ public class Video {
     public VideoResolution getResolution() {
         return resolution;
     }
-
 
     @Override
     public String toString() {

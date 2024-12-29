@@ -3,21 +3,19 @@ package com.github.lorenzoyang.streaming.content.model;
 import com.github.lorenzoyang.streaming.content.Content;
 import com.github.lorenzoyang.streaming.content.Video;
 
-import java.time.LocalDate;
-
 public class Movie extends Content {
     private final Video video;
 
-    private Movie(String title, String description, LocalDate releaseDate, Video video) {
-        super(title, description, releaseDate);
-        this.video = video;
+    private Movie(MovieBuilder builder) {
+        super(builder);
+        this.video = builder.video;
     }
 
     public Video getVideo() {
         return video;
     }
 
-    public static class MovieBuilder extends Content.Builder<MovieBuilder> {
+    public static class MovieBuilder extends ContentBuilder<MovieBuilder> {
         private final Video video;
 
         public MovieBuilder(String title, Video video) {
@@ -32,7 +30,7 @@ public class Movie extends Content {
 
         @Override
         public Movie build() {
-            return new Movie(title, description, releaseDate, video);
+            return new Movie(this);
         }
     }
 }
