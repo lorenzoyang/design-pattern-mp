@@ -1,7 +1,6 @@
-package com.github.lorenzoyang.streaming.content.model;
+package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streaming.content.Content;
-import com.github.lorenzoyang.streaming.content.Video;
+import java.util.Objects;
 
 public class Movie extends Content {
     private final Video video;
@@ -14,13 +13,25 @@ public class Movie extends Content {
     public Video getVideo() {
         return video;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return Objects.equals(getVideo(), movie.getVideo());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getVideo());
+    }
 
     public static class MovieBuilder extends ContentBuilder<MovieBuilder> {
         private final Video video;
 
         public MovieBuilder(String title, Video video) {
             super(title);
-            this.video = video;
+            this.video = Objects.requireNonNull(video, "Video cannot be null");
         }
 
         @Override

@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streaming.content;
+package com.github.lorenzoyang.streamingplatform.content;
 
 public enum VideoFormat {
     MP4,

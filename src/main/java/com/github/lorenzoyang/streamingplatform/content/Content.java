@@ -1,7 +1,6 @@
-package com.github.lorenzoyang.streaming.content;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import java.time.LocalDate;
-import java.util.Objects;
 
 public abstract class Content {
     private final String title;
@@ -36,12 +35,16 @@ public abstract class Content {
                 throw new IllegalArgumentException("Title cannot be null or blank");
             }
             this.title = title;
-            this.description = "";
+            // Default values
+            this.description = "Description not provided";
             this.releaseDate = LocalDate.now();
         }
 
         public T withDescription(String description) {
-            this.description = Objects.requireNonNull(description, "Description cannot be null");
+            if (description == null || description.isBlank()) {
+                throw new IllegalArgumentException("Description cannot be null or blank");
+            }
+            this.description = description;
             return self();
         }
 

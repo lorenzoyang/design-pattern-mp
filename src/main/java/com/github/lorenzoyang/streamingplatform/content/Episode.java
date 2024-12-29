@@ -1,4 +1,6 @@
-package com.github.lorenzoyang.streaming.content;
+package com.github.lorenzoyang.streamingplatform.content;
+
+import java.util.Objects;
 
 public class Episode {
     private final int episodeNumber;
@@ -27,5 +29,17 @@ public class Episode {
 
     public Video getVideo() {
         return video;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Episode episode = (Episode) o;
+        return Objects.equals(getVideo(), episode.getVideo());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getVideo());
     }
 }

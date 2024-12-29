@@ -1,11 +1,9 @@
-package com.github.lorenzoyang.streaming.content.model;
-
-import com.github.lorenzoyang.streaming.content.Content;
-import com.github.lorenzoyang.streaming.content.Episode;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class TVSeries extends Content {
     private final int season;
@@ -21,13 +19,25 @@ public class TVSeries extends Content {
         return season;
     }
 
-    public List<Episode> getEpisodes() {
-        return Collections.unmodifiableList(episodes);
+    public Iterator<Episode> getEpisodes() {
+        return episodes.iterator();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        TVSeries tvSeries = (TVSeries) o;
+        return Objects.equals(getEpisodes(), tvSeries.getEpisodes());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getEpisodes());
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
         private final int season;
-        private final List<Episode> episodes = new ArrayList<>();
+        private final List<Episode> episodes = new ArrayList<>(); // empty list by default
 
         public TVSeriesBuilder(String title, int season) {
             super(title);
@@ -38,6 +48,12 @@ public class TVSeries extends Content {
         }
 
         public TVSeriesBuilder addEpisode(Episode episode) {
+            if (episode == null) {
+                throw new IllegalArgumentException("Episode cannot be null");
+            }
+            if (episodes.contains(episode)) {
+                throw new IllegalArgumentException("Episode already added");
+            }
             this.episodes.add(episode);
             return this;
         }
