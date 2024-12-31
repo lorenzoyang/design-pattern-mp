@@ -6,23 +6,29 @@ import java.util.List;
 import java.util.Objects;
 
 public class TVSeries extends Content {
-    private final int season;
     private final List<Episode> episodes;
+    private final VideoResolution requiredResolution;
+    private final int season; // optional
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
-        this.season = builder.season;
         this.episodes = builder.episodes;
+        this.requiredResolution = builder.requiredResolution;
+        this.season = builder.season;
+    }
+
+    public Iterator<Episode> getEpisodes() {
+        return episodes.iterator();
+    }
+
+    public VideoResolution getRequiredResolution() {
+        return requiredResolution;
     }
 
     public int getSeason() {
         return season;
     }
 
-    public Iterator<Episode> getEpisodes() {
-        return episodes.iterator();
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -36,25 +42,35 @@ public class TVSeries extends Content {
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final int season;
         private final List<Episode> episodes = new ArrayList<>(); // empty list by default
+        private final VideoResolution requiredResolution;
+        private int season;
 
-        public TVSeriesBuilder(String title, int season) {
+        public TVSeriesBuilder(String title, VideoResolution requiredResolution) {
             super(title);
-            if (season <= 0) {
-                throw new IllegalArgumentException("Season must be positive and non-zero");
-            }
-            this.season = season;
+            this.requiredResolution = Objects.requireNonNull(requiredResolution, "Required resolution cannot be null");
+            this.season = 1; // default value
         }
 
         public TVSeriesBuilder addEpisode(Episode episode) {
             if (episode == null) {
                 throw new IllegalArgumentException("Episode cannot be null");
             }
+            if (episode.getVideo().getResolution() != requiredResolution) {
+                throw new IllegalArgumentException("Episode resolution does not match the required resolution");
+            }
             if (episodes.contains(episode)) {
                 throw new IllegalArgumentException("Episode already added");
             }
             this.episodes.add(episode);
+            return this;
+        }
+
+        public TVSeriesBuilder withSeason(int season) {
+            if (season <= 0) {
+                throw new IllegalArgumentException("Season must be positive and non-zero");
+            }
+            this.season = season;
             return this;
         }
 
