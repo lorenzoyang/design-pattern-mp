@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.content.video;
 
 public enum VideoResolution {
     SD(640, 480),

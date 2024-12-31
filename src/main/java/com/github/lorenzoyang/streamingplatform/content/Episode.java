@@ -1,12 +1,16 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.content.video.Video;
+
 import java.util.Objects;
 
 public class Episode {
+    private final String title;
     private final int episodeNumber;
     private final Video video;
 
-    public Episode(int episodeNumber, Video video) {
+    public Episode(String title, int episodeNumber, Video video) {
+        this.title = Objects.requireNonNull(title, "Title cannot be null");
         if (episodeNumber <= 0) {
             throw new IllegalArgumentException("Episode number must be positive and non-zero");
         }
@@ -14,10 +18,14 @@ public class Episode {
         this.video = video;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public int getEpisodeNumber() {
         return episodeNumber;
     }
-    
+
     public Video getVideo() {
         return video;
     }
@@ -32,5 +40,14 @@ public class Episode {
     @Override
     public int hashCode() {
         return Objects.hashCode(getVideo());
+    }
+
+    @Override
+    public String toString() {
+        return "Episode{" +
+                "title='" + title + '\'' +
+                ", episodeNumber=" + episodeNumber +
+                ", video=" + video +
+                '}';
     }
 }

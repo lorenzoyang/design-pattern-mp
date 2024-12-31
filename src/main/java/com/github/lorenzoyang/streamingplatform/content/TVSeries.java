@@ -1,9 +1,13 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.content.video.VideoResolution;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+
+import static java.lang.System.lineSeparator;
 
 public class TVSeries extends Content {
     private final List<Episode> episodes;
@@ -30,6 +34,19 @@ public class TVSeries extends Content {
     }
 
     @Override
+    protected String getDetailedContentInfo() {
+        var sb = new StringBuilder();
+        sb.append("\t").append("Season: ").append(season).append(lineSeparator());
+        sb.append("\t").append("Resolution of episodes: ").append(requiredResolution).append(lineSeparator());
+        episodes.forEach(episode -> {
+            sb.append("\t").append("Episode ").append(episode.getEpisodeNumber()).append(": ")
+                    .append(episode.getTitle()).append(lineSeparator());
+        });
+        sb.append("\t").append("Total episodes: ").append(episodes.size());
+        return sb.toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         TVSeries tvSeries = (TVSeries) o;
@@ -40,6 +57,7 @@ public class TVSeries extends Content {
     public int hashCode() {
         return Objects.hashCode(getEpisodes());
     }
+
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
         private final List<Episode> episodes = new ArrayList<>(); // empty list by default

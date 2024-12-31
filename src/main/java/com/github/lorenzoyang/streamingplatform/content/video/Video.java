@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.content.video;
 
 import java.util.Objects;
 
@@ -68,6 +68,7 @@ public class Video {
                 ", filePath='" + filePath + '\'' +
                 ", format=" + format +
                 ", resolution=" + resolution +
+                ", durationMinutes=" + durationMinutes +
                 '}';
     }
 }

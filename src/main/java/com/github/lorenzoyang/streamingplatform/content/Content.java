@@ -1,6 +1,9 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import static java.lang.System.lineSeparator;
 
 public abstract class Content {
     private final String title;
@@ -24,6 +27,18 @@ public abstract class Content {
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
+
+    public String getContentDetails() {
+        var europeanFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return "Title: " + title + lineSeparator() +
+                "Description: " + description + lineSeparator() +
+                ">>>" + lineSeparator() +
+                getDetailedContentInfo() + lineSeparator() +
+                "<<<" + lineSeparator() +
+                "Release date: " + releaseDate.format(europeanFormatter) + lineSeparator();
+    }
+
+    protected abstract String getDetailedContentInfo();
 
     protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
         private final String title;

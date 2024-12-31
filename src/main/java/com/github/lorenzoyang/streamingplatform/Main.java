@@ -1,6 +1,10 @@
 package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.content.*;
+import com.github.lorenzoyang.streamingplatform.content.Episode;
+import com.github.lorenzoyang.streamingplatform.content.Movie;
+import com.github.lorenzoyang.streamingplatform.content.TVSeries;
+import com.github.lorenzoyang.streamingplatform.content.video.Video;
+import com.github.lorenzoyang.streamingplatform.content.video.VideoResolution;
 
 import java.time.LocalDate;
 
@@ -9,7 +13,8 @@ public class Main {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("Naruto", VideoResolution.HD)
                 .withDescription("Naruto is a Japanese manga series written and illustrated by Masashi Kishimoto.")
                 .withReleaseDate(LocalDate.now())
-                .addEpisode(new Episode(1, new Video("video1", 120)))
+                .addEpisode(new Episode("title1", 1, new Video("video1", 120)))
+                .addEpisode(new Episode("title2", 2, new Video("video2", 130)))
                 .build();
         System.out.println(tvSeries);
 
@@ -18,5 +23,12 @@ public class Main {
                 .withReleaseDate(LocalDate.now())
                 .build();
         System.out.println(movie);
+
+        System.out.println("-----------------");
+        System.out.println(tvSeries.getContentDetails());
+        System.out.println("-----------------");
+        System.out.println(movie.getContentDetails());
     }
+
+
 }

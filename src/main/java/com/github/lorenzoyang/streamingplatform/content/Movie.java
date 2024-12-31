@@ -1,6 +1,10 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.content.video.Video;
+
 import java.util.Objects;
+
+import static java.lang.System.lineSeparator;
 
 public class Movie extends Content {
     private final Video video;
@@ -13,7 +17,14 @@ public class Movie extends Content {
     public Video getVideo() {
         return video;
     }
-    
+
+    @Override
+    public String getDetailedContentInfo() {
+        return "\tFilm Resolution: " + getVideo().getResolution() + lineSeparator() +
+                "\tFilm Duration: " + getVideo().getDurationMinutes() + " minutes" + lineSeparator() +
+                "\tFilm Video Info: " + getVideo().toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

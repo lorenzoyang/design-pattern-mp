@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform;
+package com.github.lorenzoyang.streamingplatform.user;
 
 import java.util.Objects;
 
