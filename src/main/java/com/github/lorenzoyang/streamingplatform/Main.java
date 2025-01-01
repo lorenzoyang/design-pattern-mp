@@ -23,11 +23,6 @@ public class Main {
                 .withReleaseDate(LocalDate.now())
                 .build();
         System.out.println(movie);
-
-        System.out.println("-----------------");
-        System.out.println(tvSeries.getContentDetails());
-        System.out.println("-----------------");
-        System.out.println(movie.getContentDetails());
     }
 
 

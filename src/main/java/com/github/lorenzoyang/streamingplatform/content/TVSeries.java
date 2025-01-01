@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.System.lineSeparator;
-
 public class TVSeries extends Content {
     private final List<Episode> episodes;
     private final VideoResolution requiredResolution;
@@ -31,19 +29,6 @@ public class TVSeries extends Content {
 
     public int getSeason() {
         return season;
-    }
-
-    @Override
-    protected String getDetailedContentInfo() {
-        var sb = new StringBuilder();
-        sb.append("\t").append("Season: ").append(season).append(lineSeparator());
-        sb.append("\t").append("Resolution of episodes: ").append(requiredResolution).append(lineSeparator());
-        episodes.forEach(episode -> {
-            sb.append("\t").append("Episode ").append(episode.getEpisodeNumber()).append(": ")
-                    .append(episode.getTitle()).append(lineSeparator());
-        });
-        sb.append("\t").append("Total episodes: ").append(episodes.size());
-        return sb.toString();
     }
 
     @Override
