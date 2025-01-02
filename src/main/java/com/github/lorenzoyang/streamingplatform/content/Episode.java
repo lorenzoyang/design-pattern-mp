@@ -41,13 +41,4 @@ public class Episode {
     public int hashCode() {
         return Objects.hashCode(getVideo());
     }
-
-    @Override
-    public String toString() {
-        return "Episode{" +
-                "title='" + title + '\'' +
-                ", episodeNumber=" + episodeNumber +
-                ", video=" + video +
-                '}';
-    }
 }

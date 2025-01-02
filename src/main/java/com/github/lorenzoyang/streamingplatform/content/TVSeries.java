@@ -7,16 +7,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class TVSeries extends Content {
+public final class TVSeries extends Content {
     private final List<Episode> episodes;
     private final VideoResolution requiredResolution;
-    private final int season; // optional
+    private final int season;
+
+    private final double totalDurationMinutes;
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
         this.episodes = builder.episodes;
         this.requiredResolution = builder.requiredResolution;
         this.season = builder.season;
+        this.totalDurationMinutes = episodes.stream()
+                .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
+                .sum();
     }
 
     public Iterator<Episode> getEpisodes() {
@@ -29,6 +34,29 @@ public class TVSeries extends Content {
 
     public int getSeason() {
         return season;
+    }
+
+    @Override
+    public double getDurationMinutes() {
+        return totalDurationMinutes;
+    }
+
+    @Override
+    protected ContentProgress playContent(ContentProgress currentProgress, double timeToWatch) {
+        int episodeIndex = 0;
+        double totalWatchedMinutes = currentProgress.getTotalWatchedMinutes();
+        while (episodeIndex < episodes.size()) {
+            double episodeDuration = episodes.get(episodeIndex).getVideo().getDurationMinutes();
+            if (totalWatchedMinutes < episodeDuration) {
+                break;
+            }
+            totalWatchedMinutes -= episodeDuration;
+        }
+        totalWatchedMinutes = currentProgress.getTotalWatchedMinutes() + timeToWatch;
+        if (totalWatchedMinutes >= getDurationMinutes()) {
+            totalWatchedMinutes = getDurationMinutes();
+        }
+        return new ContentProgress(episodes.get(episodeIndex).getVideo(), totalWatchedMinutes);
     }
 
     @Override
@@ -45,7 +73,7 @@ public class TVSeries extends Content {
 
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final List<Episode> episodes = new ArrayList<>(); // empty list by default
+        private final List<Episode> episodes = new ArrayList<>();
         private final VideoResolution requiredResolution;
         private int season;
 

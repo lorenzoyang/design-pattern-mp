@@ -7,15 +7,16 @@ public class Video {
 
     private final long id;
     private final String filePath;
+    private final double durationMinutes;
     private final VideoFormat format;
     private final VideoResolution resolution;
-    private final long durationMinutes;
 
-    public Video(String filePath, long durationMinutes) {
-        this(filePath, VideoFormat.MP4, VideoResolution.HD, durationMinutes);
+
+    public Video(String filePath, double durationMinutes) {
+        this(filePath, durationMinutes, VideoFormat.MP4, VideoResolution.HD);
     }
 
-    public Video(String filePath, VideoFormat format, VideoResolution resolution, long durationMinutes) {
+    public Video(String filePath, double durationMinutes, VideoFormat format, VideoResolution resolution) {
         if (filePath == null || filePath.isBlank()) {
             throw new IllegalArgumentException("File path cannot be null or blank");
         }
@@ -24,9 +25,9 @@ public class Video {
         }
         this.id = idCounter++;
         this.filePath = filePath;
+        this.durationMinutes = durationMinutes;
         this.format = format;
         this.resolution = resolution;
-        this.durationMinutes = durationMinutes;
     }
 
     public long getId() {
@@ -45,7 +46,7 @@ public class Video {
         return resolution;
     }
 
-    public long getDurationMinutes() {
+    public double getDurationMinutes() {
         return durationMinutes;
     }
 
@@ -59,16 +60,5 @@ public class Video {
     @Override
     public int hashCode() {
         return Objects.hashCode(getId());
-    }
-
-    @Override
-    public String toString() {
-        return "Video{" +
-                "id=" + id +
-                ", filePath='" + filePath + '\'' +
-                ", format=" + format +
-                ", resolution=" + resolution +
-                ", durationMinutes=" + durationMinutes +
-                '}';
     }
 }
