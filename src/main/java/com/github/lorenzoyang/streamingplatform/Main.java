@@ -15,14 +15,15 @@ public class Main {
                 .withReleaseDate(LocalDate.now())
                 .addEpisode(new Episode("title1", 1, new Video("video1", 120)))
                 .addEpisode(new Episode("title2", 2, new Video("video2", 130)))
+                .requiresSubscription()
                 .build();
-        System.out.println(tvSeries);
+        System.out.println(tvSeries.isFree());
 
         Movie movie = new Movie.MovieBuilder("The Matrix", new Video("video2", 150))
                 .withDescription("A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.")
                 .withReleaseDate(LocalDate.now())
                 .build();
-        System.out.println(movie);
+        System.out.println(movie.isFree());
     }
 
 
