@@ -1,7 +1,10 @@
 package com.github.lorenzoyang.streamingplatform.user;
 
 
-import java.util.Objects;
+import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.content.PlaybackResult;
+
+import java.util.*;
 
 import static com.github.lorenzoyang.streamingplatform.user.UserValidations.*;
 
@@ -14,6 +17,9 @@ public class User {
     private final Gender gender;
     private final boolean hasSubscription;
 
+    private final Map<Content, Double> toWatchList;
+    private final List<Content> watchedList;
+
     private User(UserBuilder builder) {
         this.username = builder.username;
         this.password = builder.password;
@@ -21,6 +27,23 @@ public class User {
         this.age = builder.age;
         this.gender = builder.gender;
         this.hasSubscription = builder.hasSubscription;
+
+        this.toWatchList = new HashMap<>();
+        this.watchedList = new ArrayList<>();
+    }
+
+    public void watch(Content content, double elapsedTime) {
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null");
+        }
+        double progress = toWatchList.getOrDefault(content, 0.0);
+        PlaybackResult playbackResult = content.play(this, progress, elapsedTime);
+        if (playbackResult.getProgress() == content.getDurationMinutes()) {
+            toWatchList.remove(content);
+            watchedList.add(content);
+        } else {
+            toWatchList.put(content, playbackResult.getProgress());
+        }
     }
 
     public String getUsername() {

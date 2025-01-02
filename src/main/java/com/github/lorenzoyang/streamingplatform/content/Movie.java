@@ -4,7 +4,7 @@ import com.github.lorenzoyang.streamingplatform.content.video.Video;
 
 import java.util.Objects;
 
-public class Movie extends Content {
+public final class Movie extends Content {
     private final Video video;
 
     private Movie(MovieBuilder builder) {
@@ -14,6 +14,20 @@ public class Movie extends Content {
 
     public Video getVideo() {
         return video;
+    }
+
+    @Override
+    public double getDurationMinutes() {
+        return video.getDurationMinutes();
+    }
+
+    @Override
+    protected PlaybackResult playContent(double progress, double elapsedTime) {
+        double newProgress = progress + elapsedTime;
+        if (newProgress >= getDurationMinutes()) {
+            newProgress = getDurationMinutes();
+        }
+        return new PlaybackResult(getVideo(), progress, newProgress, newProgress - progress);
     }
 
     @Override

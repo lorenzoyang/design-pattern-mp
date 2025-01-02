@@ -1,5 +1,7 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.user.User;
+
 import java.time.LocalDate;
 
 public abstract class Content {
@@ -29,6 +31,26 @@ public abstract class Content {
 
     public LocalDate getReleaseDate() {
         return releaseDate;
+    }
+
+    public abstract double getDurationMinutes();
+
+    public final PlaybackResult play(User user, double progress, double elapsedTime) {
+        ensureUserHasAccess(user);
+        if (progress < 0 || progress > getDurationMinutes()) {
+            throw new IllegalArgumentException("Progress must be between 0 and " + getDurationMinutes());
+        }
+        return playContent(progress, elapsedTime);
+    }
+
+    protected abstract PlaybackResult playContent(double progress, double elapsedTime);
+
+    private void ensureUserHasAccess(User user) {
+        if (!user.hasSubscription() && !isFree) {
+            throw new IllegalArgumentException(
+                    String.format("User %s does not have access to content '%s'.", user.getUsername(), getTitle())
+            );
+        }
     }
 
     protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
