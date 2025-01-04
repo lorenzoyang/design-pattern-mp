@@ -3,34 +3,46 @@ package com.github.lorenzoyang.streamingplatform.content;
 import com.github.lorenzoyang.streamingplatform.content.video.Video;
 
 public class ContentProgress {
-    private final Video currentVideo;
-    private final double totalWatchedMinutes;
+    private final Video startVideo;
+    private final double watchedTime;
+    private final double totalWatchedTime;
 
-    public ContentProgress(Video currentVideo, double totalWatchedMinutes) {
-        if (totalWatchedMinutes < 0) {
-            throw new IllegalArgumentException("Total watched minutes cannot be negative");
-        }
-        if (currentVideo == null && totalWatchedMinutes != 0) {
-            throw new IllegalArgumentException("Total watched minutes must be 0 if current video is null");
-        }
-        this.currentVideo = currentVideo;
-        this.totalWatchedMinutes = totalWatchedMinutes;
+    public static ContentProgress initial() {
+        return new ContentProgress(null, 0, 0);
     }
 
-    public Video getCurrentVideo() {
-        return currentVideo;
+    public static ContentProgress of(Video startVideo, double watchedTime, double totalWatchedTime) {
+        if (watchedTime < 0 || totalWatchedTime < 0) {
+            throw new IllegalArgumentException("Watched time and total watched time must be positive");
+        }
+        if (watchedTime > totalWatchedTime) {
+            throw new IllegalArgumentException("Watched time cannot be greater than total watched time");
+        }
+        if (startVideo == null && (watchedTime != 0 || totalWatchedTime != 0)) {
+            throw new IllegalArgumentException("Watched time and total watched time must be 0 if start video is null");
+        }
+        return new ContentProgress(startVideo, watchedTime, totalWatchedTime);
     }
 
-    public double getTotalWatchedMinutes() {
-        return totalWatchedMinutes;
+    private ContentProgress(Video startVideo, double watchedTime, double totalWatchedTime) {
+        this.startVideo = startVideo;
+        this.watchedTime = watchedTime;
+        this.totalWatchedTime = totalWatchedTime;
+    }
+
+    public Video getStartVideo() {
+        return startVideo;
+    }
+
+    public double getWatchedTime() {
+        return watchedTime;
+    }
+
+    public double getTotalWatchedTime() {
+        return totalWatchedTime;
     }
 
     public boolean isCompleted(Content content) {
-        return totalWatchedMinutes >= content.getDurationMinutes();
-    }
-
-    // For creating initial progress
-    public static ContentProgress initial() {
-        return new ContentProgress(null, 0);
+        return getTotalWatchedTime() >= content.getDurationMinutes();
     }
 }

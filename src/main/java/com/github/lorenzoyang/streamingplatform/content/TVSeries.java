@@ -44,19 +44,20 @@ public final class TVSeries extends Content {
     @Override
     protected ContentProgress playContent(ContentProgress currentProgress, double timeToWatch) {
         int episodeIndex = 0;
-        double totalWatchedMinutes = currentProgress.getTotalWatchedMinutes();
+        double totalWatchedTime = currentProgress.getTotalWatchedTime();
         while (episodeIndex < episodes.size()) {
             double episodeDuration = episodes.get(episodeIndex).getVideo().getDurationMinutes();
-            if (totalWatchedMinutes < episodeDuration) {
+            if (totalWatchedTime < episodeDuration) {
                 break;
             }
-            totalWatchedMinutes -= episodeDuration;
+            totalWatchedTime -= episodeDuration;
         }
-        totalWatchedMinutes = currentProgress.getTotalWatchedMinutes() + timeToWatch;
-        if (totalWatchedMinutes >= getDurationMinutes()) {
-            totalWatchedMinutes = getDurationMinutes();
+        totalWatchedTime = currentProgress.getTotalWatchedTime() + timeToWatch;
+        if (totalWatchedTime > getDurationMinutes()) {
+            totalWatchedTime = getDurationMinutes();
         }
-        return new ContentProgress(episodes.get(episodeIndex).getVideo(), totalWatchedMinutes);
+        return ContentProgress.of(episodes.get(episodeIndex).getVideo(),
+                totalWatchedTime - currentProgress.getTotalWatchedTime(), totalWatchedTime);
     }
 
     @Override

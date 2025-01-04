@@ -23,11 +23,12 @@ public final class Movie extends Content {
 
     @Override
     protected ContentProgress playContent(ContentProgress currentProgress, double timeToWatch) {
-        double totalWatchedMinutes = currentProgress.getTotalWatchedMinutes() + timeToWatch;
-        if (totalWatchedMinutes >= getDurationMinutes()) {
-            totalWatchedMinutes = getDurationMinutes();
+        double totalWatchedTime = currentProgress.getTotalWatchedTime() + timeToWatch;
+        if (totalWatchedTime > getDurationMinutes()) {
+            totalWatchedTime = getDurationMinutes();
         }
-        return new ContentProgress(getVideo(), totalWatchedMinutes);
+        return ContentProgress
+                .of(getVideo(), totalWatchedTime - currentProgress.getTotalWatchedTime(), totalWatchedTime);
     }
 
     @Override
