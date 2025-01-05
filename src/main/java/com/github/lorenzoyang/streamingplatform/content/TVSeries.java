@@ -19,7 +19,8 @@ public final class TVSeries extends Content {
         this.episodes = builder.episodes;
         this.requiredResolution = builder.requiredResolution;
         this.season = builder.season;
-        this.totalDurationMinutes = episodes.stream()
+        this.totalDurationMinutes = episodes
+                .stream()
                 .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
                 .sum();
     }
@@ -42,36 +43,39 @@ public final class TVSeries extends Content {
     }
 
     @Override
-    protected ContentProgress playContent(ContentProgress currentProgress, double timeToWatch) {
+    protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
         int episodeIndex = 0;
         double totalWatchedTime = currentProgress.getTotalWatchedTime();
-        while (episodeIndex < episodes.size()) {
-            double episodeDuration = episodes.get(episodeIndex).getVideo().getDurationMinutes();
+        for (Episode episode : episodes) {
+            double episodeDuration = episode.getVideo().getDurationMinutes();
             if (totalWatchedTime < episodeDuration) {
                 break;
             }
             totalWatchedTime -= episodeDuration;
+            episodeIndex++;
         }
-        totalWatchedTime = currentProgress.getTotalWatchedTime() + timeToWatch;
-        if (totalWatchedTime > getDurationMinutes()) {
-            totalWatchedTime = getDurationMinutes();
-        }
-        return ContentProgress.of(episodes.get(episodeIndex).getVideo(),
-                totalWatchedTime - currentProgress.getTotalWatchedTime(), totalWatchedTime);
+
+        totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
+
+        return ViewingProgress.of(
+                episodes.get(episodeIndex).getVideo(),
+                totalWatchedTime - currentProgress.getTotalWatchedTime(),
+                totalWatchedTime
+        );
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         TVSeries tvSeries = (TVSeries) o;
-        return Objects.equals(getEpisodes(), tvSeries.getEpisodes());
+        return getSeason() == tvSeries.getSeason();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getEpisodes());
+        return Objects.hash(super.hashCode(), getSeason());
     }
-
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
         private final List<Episode> episodes = new ArrayList<>();
@@ -80,7 +84,8 @@ public final class TVSeries extends Content {
 
         public TVSeriesBuilder(String title, VideoResolution requiredResolution) {
             super(title);
-            this.requiredResolution = Objects.requireNonNull(requiredResolution, "Required resolution cannot be null");
+            this.requiredResolution = Objects.requireNonNull(
+                    requiredResolution, "Required resolution cannot be null");
             this.season = 1; // default value
         }
 

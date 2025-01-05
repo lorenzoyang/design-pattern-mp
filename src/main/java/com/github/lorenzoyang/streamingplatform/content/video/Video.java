@@ -1,16 +1,14 @@
 package com.github.lorenzoyang.streamingplatform.content.video;
 
+import com.github.lorenzoyang.streamingplatform.exceptions.InvalidVideoPathException;
+
 import java.util.Objects;
 
 public class Video {
-    private static long idCounter = 0;
-
-    private final long id;
     private final String filePath;
     private final double durationMinutes;
     private final VideoFormat format;
     private final VideoResolution resolution;
-
 
     public Video(String filePath, double durationMinutes) {
         this(filePath, durationMinutes, VideoFormat.MP4, VideoResolution.HD);
@@ -18,24 +16,23 @@ public class Video {
 
     public Video(String filePath, double durationMinutes, VideoFormat format, VideoResolution resolution) {
         if (filePath == null || filePath.isBlank()) {
-            throw new IllegalArgumentException("File path cannot be null or blank");
+            throw new InvalidVideoPathException("File path cannot be null or blank");
         }
         if (durationMinutes <= 0) {
             throw new IllegalArgumentException("Duration must be positive and non-zero");
         }
-        this.id = idCounter++;
         this.filePath = filePath;
         this.durationMinutes = durationMinutes;
-        this.format = format;
-        this.resolution = resolution;
-    }
-
-    public long getId() {
-        return id;
+        this.format = Objects.requireNonNull(format, "Video format cannot be null");
+        this.resolution = Objects.requireNonNull(resolution, "Video resolution cannot be null");
     }
 
     public String getFilePath() {
         return filePath;
+    }
+
+    public double getDurationMinutes() {
+        return durationMinutes;
     }
 
     public VideoFormat getFormat() {
@@ -45,20 +42,16 @@ public class Video {
     public VideoResolution getResolution() {
         return resolution;
     }
-
-    public double getDurationMinutes() {
-        return durationMinutes;
-    }
-
+    
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Video video = (Video) o;
-        return getId() == video.getId();
+        return Objects.equals(getFilePath(), video.getFilePath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(getFilePath());
     }
 }

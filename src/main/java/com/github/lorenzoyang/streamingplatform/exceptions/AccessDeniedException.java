@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.user;
+package com.github.lorenzoyang.streamingplatform.exceptions;
 
 public class AccessDeniedException extends RuntimeException {
     public AccessDeniedException(String message) {

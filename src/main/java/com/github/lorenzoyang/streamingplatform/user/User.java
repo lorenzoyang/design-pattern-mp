@@ -2,7 +2,8 @@ package com.github.lorenzoyang.streamingplatform.user;
 
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.ContentProgress;
+import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
+import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
 
 import java.util.*;
 
@@ -17,8 +18,8 @@ public class User {
     private final Gender gender;
     private final boolean hasSubscription;
 
-    private final Map<Content, ContentProgress> toWatchList;
-    private final List<Content> watchedList;
+    private final Map<Content, ViewingProgress> toWatchList;
+    private final Set<Content> watchedList;
 
     private User(UserBuilder builder) {
         this.username = builder.username;
@@ -29,16 +30,15 @@ public class User {
         this.hasSubscription = builder.hasSubscription;
 
         this.toWatchList = new HashMap<>();
-        this.watchedList = new ArrayList<>();
+        this.watchedList = new HashSet<>();
     }
 
     public void watch(Content content, double timeToWatch) {
         Objects.requireNonNull(content, "Content cannot be null");
-        if (timeToWatch < 0) {
-            throw new IllegalArgumentException("Time to watch cannot be negative");
-        }
-        ContentProgress currentProgress = toWatchList.getOrDefault(content, ContentProgress.initial());
+
+        ViewingProgress currentProgress = toWatchList.getOrDefault(content, ViewingProgress.initial());
         currentProgress = content.play(this, currentProgress, timeToWatch);
+
         if (currentProgress.isCompleted(content)) {
             toWatchList.remove(content);
             watchedList.add(content);
@@ -92,11 +92,13 @@ public class User {
         private boolean hasSubscription;
 
         public UserBuilder(String username, String password) {
-            if (username == null || username.length() < MIN_USERNAME_LENGTH || username.length() > MAX_USERNAME_LENGTH) {
-                throw new IllegalArgumentException(INVALID_USERNAME_MESSAGE);
+            if (username == null || username.length() < MIN_USERNAME_LENGTH ||
+                    username.length() > MAX_USERNAME_LENGTH) {
+                throw new UserValidationException(INVALID_USERNAME_MESSAGE);
             }
-            if (password == null || password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
-                throw new IllegalArgumentException(INVALID_PASSWORD_MESSAGE);
+            if (password == null || password.length() < MIN_PASSWORD_LENGTH ||
+                    password.length() > MAX_PASSWORD_LENGTH) {
+                throw new UserValidationException(INVALID_PASSWORD_MESSAGE);
             }
             this.username = username;
             this.password = password;
@@ -108,7 +110,7 @@ public class User {
 
         public UserBuilder withEmail(String email) {
             if (email == null || !email.contains("@") || !email.contains(".")) {
-                throw new IllegalArgumentException(INVALID_EMAIL_MESSAGE);
+                throw new UserValidationException(INVALID_EMAIL_MESSAGE);
             }
             this.email = email;
             return this;
@@ -116,7 +118,7 @@ public class User {
 
         public UserBuilder withAge(int age) {
             if (age < MIN_AGE || age > MAX_AGE) {
-                throw new IllegalArgumentException(INVALID_AGE_MESSAGE);
+                throw new UserValidationException(INVALID_AGE_MESSAGE);
             }
             this.age = age;
             return this;

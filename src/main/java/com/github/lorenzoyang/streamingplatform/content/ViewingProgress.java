@@ -2,16 +2,16 @@ package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.content.video.Video;
 
-public class ContentProgress {
+public class ViewingProgress {
     private final Video startVideo;
     private final double watchedTime;
     private final double totalWatchedTime;
 
-    public static ContentProgress initial() {
-        return new ContentProgress(null, 0, 0);
+    public static ViewingProgress initial() {
+        return new ViewingProgress(null, 0, 0);
     }
 
-    public static ContentProgress of(Video startVideo, double watchedTime, double totalWatchedTime) {
+    public static ViewingProgress of(Video startVideo, double watchedTime, double totalWatchedTime) {
         if (watchedTime < 0 || totalWatchedTime < 0) {
             throw new IllegalArgumentException("Watched time and total watched time must be positive");
         }
@@ -21,10 +21,10 @@ public class ContentProgress {
         if (startVideo == null && (watchedTime != 0 || totalWatchedTime != 0)) {
             throw new IllegalArgumentException("Watched time and total watched time must be 0 if start video is null");
         }
-        return new ContentProgress(startVideo, watchedTime, totalWatchedTime);
+        return new ViewingProgress(startVideo, watchedTime, totalWatchedTime);
     }
 
-    private ContentProgress(Video startVideo, double watchedTime, double totalWatchedTime) {
+    private ViewingProgress(Video startVideo, double watchedTime, double totalWatchedTime) {
         this.startVideo = startVideo;
         this.watchedTime = watchedTime;
         this.totalWatchedTime = totalWatchedTime;

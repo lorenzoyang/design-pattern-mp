@@ -15,7 +15,7 @@ public class Episode {
             throw new IllegalArgumentException("Episode number must be positive and non-zero");
         }
         this.episodeNumber = episodeNumber;
-        this.video = video;
+        this.video = Objects.requireNonNull(video, "Video cannot be null");
     }
 
     public String getTitle() {

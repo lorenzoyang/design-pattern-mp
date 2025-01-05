@@ -22,25 +22,13 @@ public final class Movie extends Content {
     }
 
     @Override
-    protected ContentProgress playContent(ContentProgress currentProgress, double timeToWatch) {
-        double totalWatchedTime = currentProgress.getTotalWatchedTime() + timeToWatch;
-        if (totalWatchedTime > getDurationMinutes()) {
-            totalWatchedTime = getDurationMinutes();
-        }
-        return ContentProgress
-                .of(getVideo(), totalWatchedTime - currentProgress.getTotalWatchedTime(), totalWatchedTime);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Movie movie = (Movie) o;
-        return Objects.equals(getVideo(), movie.getVideo());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getVideo());
+    protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
+        double totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
+        return ViewingProgress.of(
+                getVideo(),
+                totalWatchedTime - currentProgress.getTotalWatchedTime(),
+                totalWatchedTime
+        );
     }
 
     public static class MovieBuilder extends ContentBuilder<MovieBuilder> {
