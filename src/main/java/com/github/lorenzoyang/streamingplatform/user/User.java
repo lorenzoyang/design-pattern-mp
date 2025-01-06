@@ -71,6 +71,14 @@ public class User {
         return hasSubscription;
     }
 
+    public Map<Content, ViewingProgress> getToWatchList() {
+        return Collections.unmodifiableMap(toWatchList);
+    }
+
+    public Iterator<Content> getWatchedList() {
+        return watchedList.iterator();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

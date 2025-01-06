@@ -7,23 +7,22 @@ import java.util.Objects;
 public class Video {
     private final String filePath;
     private final double durationMinutes;
-    private final VideoFormat format;
     private final VideoResolution resolution;
 
     public Video(String filePath, double durationMinutes) {
-        this(filePath, durationMinutes, VideoFormat.MP4, VideoResolution.HD);
+        this(filePath, durationMinutes, VideoResolution.HD);
     }
 
-    public Video(String filePath, double durationMinutes, VideoFormat format, VideoResolution resolution) {
+    public Video(String filePath, double durationMinutes, VideoResolution resolution) {
         if (filePath == null || filePath.isBlank()) {
             throw new InvalidVideoPathException("File path cannot be null or blank");
         }
+
         if (durationMinutes <= 0) {
             throw new IllegalArgumentException("Duration must be positive and non-zero");
         }
         this.filePath = filePath;
         this.durationMinutes = durationMinutes;
-        this.format = Objects.requireNonNull(format, "Video format cannot be null");
         this.resolution = Objects.requireNonNull(resolution, "Video resolution cannot be null");
     }
 
@@ -35,14 +34,10 @@ public class Video {
         return durationMinutes;
     }
 
-    public VideoFormat getFormat() {
-        return format;
-    }
-
     public VideoResolution getResolution() {
         return resolution;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

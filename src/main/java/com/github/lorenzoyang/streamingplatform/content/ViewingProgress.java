@@ -18,8 +18,8 @@ public class ViewingProgress {
         if (watchedTime > totalWatchedTime) {
             throw new IllegalArgumentException("Watched time cannot be greater than total watched time");
         }
-        if (startVideo == null && (watchedTime != 0 || totalWatchedTime != 0)) {
-            throw new IllegalArgumentException("Watched time and total watched time must be 0 if start video is null");
+        if (startVideo == null) {
+            watchedTime = totalWatchedTime = 0;
         }
         return new ViewingProgress(startVideo, watchedTime, totalWatchedTime);
     }
