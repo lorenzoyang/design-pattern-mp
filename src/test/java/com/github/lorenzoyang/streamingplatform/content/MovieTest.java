@@ -23,7 +23,7 @@ public class MovieTest {
     @Test
     public void testMovieBuilderCreatesMovieWithValidData() {
         var releaseDate = LocalDate.now();
-        var movie = new Movie.MovieBuilder("movie1", video)
+        Movie movie = new Movie.MovieBuilder("movie1", video)
                 .requiresSubscription()
                 .withDescription("description")
                 .withReleaseDate(releaseDate)
@@ -48,8 +48,15 @@ public class MovieTest {
     }
 
     @Test
+    public void testMovieBuilderThrowsNullPointerExceptionForNullVideo() {
+        assertThatThrownBy(() -> new Movie.MovieBuilder("movie1", null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Video cannot be null");
+    }
+
+    @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForInvalidDescription() {
-        Movie.MovieBuilder builder = new Movie.MovieBuilder("movie1", video);
+        var builder = new Movie.MovieBuilder("movie1", video);
 
         assertThatThrownBy(() -> builder.withDescription(null))
                 .isInstanceOf(InvalidContentException.class)
@@ -63,7 +70,7 @@ public class MovieTest {
 
     @Test
     public void testWithReleaseDateThrowsInvalidContentExceptionForInvalidReleaseDate() {
-        Movie.MovieBuilder builder = new Movie.MovieBuilder("movie1", video);
+        var builder = new Movie.MovieBuilder("movie1", video);
 
         assertThatThrownBy(() -> builder.withReleaseDate(null))
                 .isInstanceOf(InvalidContentException.class)
@@ -75,41 +82,32 @@ public class MovieTest {
     }
 
     @Test
-    public void testMovieBuilderThrowsNullPointerExceptionForNullVideo() {
-        assertThatThrownBy(() -> new Movie.MovieBuilder("movie1", null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Video cannot be null");
-    }
-
-    @Test
     public void testGetDurationMinutesReturnsCorrectDuration() {
-        var movie = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie = new Movie.MovieBuilder("movie1", video).build();
         assertThat(movie.getDurationMinutes()).isEqualTo(120.0);
     }
 
     @Test
     public void testPlayRunsCorrectly() {
-        var movie = new Movie.MovieBuilder("movie1", video)
+        Movie movie = new Movie.MovieBuilder("movie1", video)
                 .requiresSubscription()
-                .withDescription("description")
-                .withReleaseDate(LocalDate.now())
                 .build();
-        var user = new User.UserBuilder("user1", "password")
+        User user = new User.UserBuilder("user1", "password")
                 .subscribe()
                 .build();
 
-        ViewingProgress viewingProgress = movie.play(user, ViewingProgress.initial(), 60);
+        ViewingProgress progress = movie.play(user, ViewingProgress.initial(), 60);
 
-        assertThat(viewingProgress.getStartVideo()).isEqualTo(video);
-        assertThat(viewingProgress.getWatchedTime()).isEqualTo(60);
-        assertThat(viewingProgress.getTotalWatchedTime()).isEqualTo(60);
-        assertThat(viewingProgress.isCompleted(movie)).isFalse();
+        assertThat(progress.getStartVideo()).isEqualTo(video);
+        assertThat(progress.getWatchedTime()).isEqualTo(60);
+        assertThat(progress.getTotalWatchedTime()).isEqualTo(60);
+        assertThat(progress.isCompleted(movie)).isFalse();
     }
 
     @Test
     public void testPlayThrowsNullPointerExceptionForNullArguments() {
-        var movie = new Movie.MovieBuilder("movie1", video).build();
-        var user = new User.UserBuilder("user1", "password")
+        Movie movie = new Movie.MovieBuilder("movie1", video).build();
+        User user = new User.UserBuilder("user1", "password")
                 .subscribe()
                 .build();
 
@@ -124,8 +122,8 @@ public class MovieTest {
 
     @Test
     public void testPlayThrowsIllegalArgumentExceptionForNegativeTimeToWatch() {
-        var movie = new Movie.MovieBuilder("movie1", video).build();
-        var user = new User.UserBuilder("user1", "password")
+        Movie movie = new Movie.MovieBuilder("movie1", video).build();
+        User user = new User.UserBuilder("user1", "password")
                 .subscribe()
                 .build();
 
@@ -136,10 +134,10 @@ public class MovieTest {
 
     @Test
     public void testPlayThrowsAccessDeniedExceptionForNoAccessUser() {
-        var movie = new Movie.MovieBuilder("movie1", video)
+        Movie movie = new Movie.MovieBuilder("movie1", video)
                 .requiresSubscription()
                 .build();
-        var user = new User.UserBuilder("user1", "password")
+        User user = new User.UserBuilder("user1", "password")
                 .build();
 
         assertThatThrownBy(() -> movie.play(user, ViewingProgress.initial(), 60))
@@ -150,25 +148,25 @@ public class MovieTest {
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        var movie1 = new Movie.MovieBuilder("movie1", video).build();
-        var movie2 = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie1 = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie2 = new Movie.MovieBuilder("movie1", video).build();
 
         assertThat(movie1).isEqualTo(movie2);
     }
 
     @Test
     public void testEqualsReturnsFalseForDifferentTitle() {
-        var movie1 = new Movie.MovieBuilder("movie1", video).build();
-        var movie2 = new Movie.MovieBuilder("movie2", video).build();
+        Movie movie1 = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie2 = new Movie.MovieBuilder("movie2", video).build();
 
         assertThat(movie1).isNotEqualTo(movie2);
     }
 
     @Test
     public void testHashCodeIsBasedOnTitle() {
-        var movie1 = new Movie.MovieBuilder("movie1", video).build();
-        var movie2 = new Movie.MovieBuilder("movie1", video).build();
-        var movie3 = new Movie.MovieBuilder("movie2", video).build();
+        Movie movie1 = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie2 = new Movie.MovieBuilder("movie1", video).build();
+        Movie movie3 = new Movie.MovieBuilder("movie2", video).build();
 
         assertThat(movie1.hashCode()).isEqualTo(movie2.hashCode());
         assertThat(movie1.hashCode()).isNotEqualTo(movie3.hashCode());
