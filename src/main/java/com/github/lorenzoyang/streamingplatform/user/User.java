@@ -3,14 +3,16 @@ package com.github.lorenzoyang.streamingplatform.user;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
+import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
+import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 import java.util.*;
 
 import static com.github.lorenzoyang.streamingplatform.user.UserValidations.*;
 
 
-public class User {
+public class User implements PlatformObserver {
     private final String username;
     private final String password;
     private final String email;
@@ -80,6 +82,37 @@ public class User {
     }
 
     @Override
+    public void update(PlatformEvent event) {
+        event.accept(new PlatformEventVisitor() {
+            @Override
+            public void visitAddContent(AddContentEvent event) {
+            }
+
+            @Override
+            public void visitRemoveContent(RemoveContentEvent event) {
+                Content removedContent = event.getRemovedContent();
+                toWatchList.remove(removedContent);
+                watchedList.remove(removedContent);
+            }
+
+            @Override
+            public void visitReplaceContent(ReplaceContentEvent event) {
+                Content oldContent = event.getOldContent();
+                Content newContent = event.getNewContent();
+                if (toWatchList.containsKey(oldContent)) {
+                    ViewingProgress progress = toWatchList.get(oldContent);
+                    toWatchList.remove(oldContent);
+                    toWatchList.put(newContent, progress);
+                }
+                if (watchedList.contains(oldContent)) {
+                    watchedList.remove(oldContent);
+                    watchedList.add(newContent);
+                }
+            }
+        });
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
@@ -89,6 +122,11 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hashCode(getUsername());
+    }
+
+    @Override
+    public String toString() {
+        return "User: " + username;
     }
 
     public static class UserBuilder {

@@ -89,6 +89,14 @@ public final class TVSeries extends Content {
             this.season = 1; // default value
         }
 
+        public TVSeriesBuilder withSeason(int season) {
+            if (season <= 0) {
+                throw new IllegalArgumentException("Season must be positive and non-zero");
+            }
+            this.season = season;
+            return this;
+        }
+
         public TVSeriesBuilder addEpisode(Episode episode) {
             if (episode == null) {
                 throw new IllegalArgumentException("Episode cannot be null");
@@ -100,14 +108,6 @@ public final class TVSeries extends Content {
                 throw new IllegalArgumentException("Episode already added");
             }
             this.episodes.add(episode);
-            return this;
-        }
-
-        public TVSeriesBuilder withSeason(int season) {
-            if (season <= 0) {
-                throw new IllegalArgumentException("Season must be positive and non-zero");
-            }
-            this.season = season;
             return this;
         }
 
