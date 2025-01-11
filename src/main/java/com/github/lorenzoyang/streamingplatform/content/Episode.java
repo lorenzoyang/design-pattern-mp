@@ -10,12 +10,12 @@ public class Episode {
     private final Video video;
 
     public Episode(String title, int episodeNumber, Video video) {
-        this.title = Objects.requireNonNull(title, "Title cannot be null");
         if (episodeNumber <= 0) {
             throw new IllegalArgumentException("Episode number must be positive and non-zero");
         }
-        this.episodeNumber = episodeNumber;
+        this.title = Objects.requireNonNull(title, "Title cannot be null");
         this.video = Objects.requireNonNull(video, "Video cannot be null");
+        this.episodeNumber = episodeNumber;
     }
 
     public String getTitle() {

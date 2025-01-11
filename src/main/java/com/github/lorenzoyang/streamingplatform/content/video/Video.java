@@ -17,13 +17,12 @@ public class Video {
         if (filePath == null || filePath.isBlank()) {
             throw new InvalidVideoPathException("File path cannot be null or blank");
         }
-
         if (durationMinutes <= 0) {
             throw new IllegalArgumentException("Duration must be positive and non-zero");
         }
+        this.resolution = Objects.requireNonNull(resolution, "Video resolution cannot be null");
         this.filePath = filePath;
         this.durationMinutes = durationMinutes;
-        this.resolution = Objects.requireNonNull(resolution, "Video resolution cannot be null");
     }
 
     public String getFilePath() {

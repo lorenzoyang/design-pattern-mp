@@ -89,8 +89,6 @@ public abstract class Content {
                 throw new InvalidContentException("Title cannot be null or blank");
             }
             this.title = title;
-
-            // default values
             this.isFree = true;
             this.description = "Description not provided";
             this.releaseDate = LocalDate.now();

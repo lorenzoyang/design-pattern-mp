@@ -21,22 +21,6 @@ public class MovieTest {
     }
 
     @Test
-    public void testMovieBuilderCreatesMovieWithValidData() {
-        var releaseDate = LocalDate.now();
-        Movie movie = new Movie.MovieBuilder("movie1", video)
-                .requiresSubscription()
-                .withDescription("description")
-                .withReleaseDate(releaseDate)
-                .build();
-
-        assertThat(movie.getTitle()).isEqualTo("movie1");
-        assertThat(movie.getDescription()).isEqualTo("description");
-        assertThat(movie.getReleaseDate()).isEqualTo(releaseDate);
-        assertThat(movie.getVideo()).isEqualTo(video);
-        assertThat(movie.isFree()).isFalse();
-    }
-
-    @Test
     public void testMovieBuilderThrowsInvalidContentExceptionForInvalidTitle() {
         assertThatThrownBy(() -> new Movie.MovieBuilder(null, video))
                 .isInstanceOf(InvalidContentException.class)
@@ -79,6 +63,22 @@ public class MovieTest {
         assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(1)))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Release date cannot be in the future");
+    }
+
+    @Test
+    public void testMovieBuilderCreatesMovieWithValidData() {
+        var releaseDate = LocalDate.now();
+        Movie movie = new Movie.MovieBuilder("movie1", video)
+                .requiresSubscription()
+                .withDescription("description")
+                .withReleaseDate(releaseDate)
+                .build();
+
+        assertThat(movie.getTitle()).isEqualTo("movie1");
+        assertThat(movie.getDescription()).isEqualTo("description");
+        assertThat(movie.getReleaseDate()).isEqualTo(releaseDate);
+        assertThat(movie.getVideo()).isEqualTo(video);
+        assertThat(movie.isFree()).isFalse();
     }
 
     @Test

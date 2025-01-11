@@ -16,8 +16,7 @@ public class EpisodeTest {
         video1 = new Video("path/to/video1.mp4", 120.0);
         video2 = new Video("path/to/video2.mp4", 120.0);
     }
-
-
+    
     @Test
     public void testConstructorThrowsIllegalArgumentExceptionForInvalidEpisodeNumber() {
         assertThatThrownBy(() -> new Episode("Title", 0, video1))

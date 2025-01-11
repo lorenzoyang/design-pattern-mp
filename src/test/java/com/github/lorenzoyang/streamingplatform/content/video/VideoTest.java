@@ -11,7 +11,6 @@ public class VideoTest {
     public void testConstructorCreatesVideoWithDefaultResolution() {
         var filePath = "path/to/video.mp4";
         double duration = 120.0;
-
         var video = new Video(filePath, duration);
 
         assertThat(video.getFilePath()).isEqualTo(filePath);
@@ -25,7 +24,7 @@ public class VideoTest {
                 .isInstanceOf(InvalidVideoPathException.class)
                 .hasMessage("File path cannot be null or blank");
 
-        assertThatThrownBy(() -> new Video("", 120.0))
+        assertThatThrownBy(() -> new Video("   ", 120.0))
                 .isInstanceOf(InvalidVideoPathException.class)
                 .hasMessage("File path cannot be null or blank");
     }

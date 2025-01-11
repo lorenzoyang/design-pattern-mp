@@ -11,7 +11,7 @@ import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 import java.util.*;
 
-public final class StreamPlatform {
+public final class StreamingPlatform {
     private final String name;
 
     private final List<Content> contents;
@@ -19,7 +19,7 @@ public final class StreamPlatform {
 
     private final Collection<PlatformObserver> observers;
 
-    public StreamPlatform(String name, DataProvider<Content> contentProvider, DataProvider<User> userProvider) {
+    public StreamingPlatform(String name, DataProvider<Content> contentProvider, DataProvider<User> userProvider) {
         this.name = name;
         this.contents = new ArrayList<>(contentProvider.fetchData());
         this.users = new ArrayList<>(userProvider.fetchData());
@@ -61,7 +61,7 @@ public final class StreamPlatform {
     public void registerUser(User user) {
         Objects.requireNonNull(user, "User cannot be null");
         if (users.contains(user)) {
-            throw new IllegalArgumentException("User already exists");
+            throw new IllegalArgumentException("User already registered");
         }
         users.add(user);
         observers.add(user);

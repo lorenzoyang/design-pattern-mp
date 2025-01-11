@@ -26,9 +26,9 @@ public class ViewingProgressTest {
     }
 
     @Test
-    public void testOfCreatesViewingProgressWithValidData() {
+    public void testCreateWithCreatesViewingProgressWithValidData() {
         double watchedTime = 60, totalWatchedTime = 120;
-        ViewingProgress progress = ViewingProgress.of(video, watchedTime, totalWatchedTime);
+        ViewingProgress progress = ViewingProgress.createWith(video, watchedTime, totalWatchedTime);
 
         assertThat(progress.getStartVideo()).isEqualTo(video);
         assertThat(progress.getWatchedTime()).isEqualTo(watchedTime);
@@ -36,30 +36,30 @@ public class ViewingProgressTest {
     }
 
     @Test
-    public void testOfThrowsIllegalArgumentExceptionForNegativeWatchedTime() {
-        assertThatThrownBy(() -> ViewingProgress.of(video, -1, 120))
+    public void testCreateWithThrowsIllegalArgumentExceptionForNegativeWatchedTime() {
+        assertThatThrownBy(() -> ViewingProgress.createWith(video, -1, 120))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Watched time and total watched time must be positive");
     }
 
     @Test
-    public void testOfThrowsIllegalArgumentExceptionForNegativeTotalWatchedTime() {
-        assertThatThrownBy(() -> ViewingProgress.of(video, 60, -1))
+    public void testCreateWithThrowsIllegalArgumentExceptionForNegativeTotalWatchedTime() {
+        assertThatThrownBy(() -> ViewingProgress.createWith(video, 60, -1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Watched time and total watched time must be positive");
     }
 
     @Test
     public void testOfThrowsIllegalArgumentExceptionForWatchedTimeGreaterThanTotalWatchedTime() {
-        assertThatThrownBy(() -> ViewingProgress.of(video, 120, 60))
+        assertThatThrownBy(() -> ViewingProgress.createWith(video, 120, 60))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Watched time cannot be greater than total watched time");
     }
 
     @Test
     public void testIsCompletedReturnsTrueForCompletedContent() {
-        ViewingProgress progress1 = ViewingProgress.of(video, 160, VIDEO_DURATION);
-        ViewingProgress progress2 = ViewingProgress.of(video, 10, VIDEO_DURATION);
+        ViewingProgress progress1 = ViewingProgress.createWith(video, 160, VIDEO_DURATION);
+        ViewingProgress progress2 = ViewingProgress.createWith(video, 10, VIDEO_DURATION);
         Content content = new Movie.MovieBuilder("movie1", video).build();
 
         assertThat(progress1.isCompleted(content)).isTrue();
@@ -68,8 +68,8 @@ public class ViewingProgressTest {
 
     @Test
     public void testIsCompletedReturnsFalseForIncompleteContent() {
-        ViewingProgress progress1 = ViewingProgress.of(video, 10, VIDEO_DURATION - 10);
-        ViewingProgress progress2 = ViewingProgress.of(video, 0, VIDEO_DURATION - 20);
+        ViewingProgress progress1 = ViewingProgress.createWith(video, 10, VIDEO_DURATION - 10);
+        ViewingProgress progress2 = ViewingProgress.createWith(video, 0, VIDEO_DURATION - 20);
         Content content = new Movie.MovieBuilder("movie1", video).build();
 
         assertThat(progress1.isCompleted(content)).isFalse();

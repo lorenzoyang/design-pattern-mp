@@ -11,7 +11,7 @@ public class ViewingProgress {
         return new ViewingProgress(null, 0, 0);
     }
 
-    public static ViewingProgress of(Video startVideo, double watchedTime, double totalWatchedTime) {
+    public static ViewingProgress createWith(Video startVideo, double watchedTime, double totalWatchedTime) {
         if (watchedTime < 0 || totalWatchedTime < 0) {
             throw new IllegalArgumentException("Watched time and total watched time must be positive");
         }

@@ -24,7 +24,7 @@ public final class Movie extends Content {
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
         double totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
-        return ViewingProgress.of(
+        return ViewingProgress.createWith(
                 getVideo(),
                 totalWatchedTime - currentProgress.getTotalWatchedTime(),
                 totalWatchedTime

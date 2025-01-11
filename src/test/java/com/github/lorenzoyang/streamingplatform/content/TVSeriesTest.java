@@ -27,32 +27,6 @@ public class TVSeriesTest {
     }
 
     @Test
-    public void testTVSeriesBuilderCreatesTVSeriesWithValidData() {
-        var releaseDate = LocalDate.now();
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
-                .requiresSubscription()
-                .withDescription("description")
-                .withReleaseDate(releaseDate)
-                .withSeason(1)
-                .addEpisode(episodes.get(0))
-                .addEpisode(episodes.get(1))
-                .addEpisode(episodes.get(2))
-                .build();
-
-        assertThat(tvSeries.getTitle()).isEqualTo("tvSeries1");
-        assertThat(tvSeries.getRequiredResolution()).isEqualTo(VideoResolution.HD);
-        assertThat(tvSeries.getDescription()).isEqualTo("description");
-        assertThat(tvSeries.getReleaseDate()).isEqualTo(releaseDate);
-        assertThat(tvSeries.getSeason()).isEqualTo(1);
-        assertThat(tvSeries.isFree()).isFalse();
-
-        assertThat(tvSeries.getEpisodes())
-                .toIterable()
-                .hasSize(3)
-                .isEqualTo(episodes);
-    }
-
-    @Test
     public void testTVSeriesBuilderThrowsInvalidContentExceptionForInvalidTitle() {
         assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(null, VideoResolution.HD))
                 .isInstanceOf(InvalidContentException.class)
@@ -106,7 +80,19 @@ public class TVSeriesTest {
 
         assertThat(tvSeries.getEpisodes())
                 .toIterable()
-                .hasSize(3)
+                .hasSize(episodes.size())
+                .isEqualTo(episodes);
+    }
+
+    @Test
+    public void testWithEpisodesRunsCorrectly() {
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
+                .withEpisodes(episodes)
+                .build();
+
+        assertThat(tvSeries.getEpisodes())
+                .toIterable()
+                .hasSize(episodes.size())
                 .isEqualTo(episodes);
     }
 
@@ -124,14 +110,39 @@ public class TVSeriesTest {
     }
 
     @Test
+    public void testTVSeriesBuilderCreatesTVSeriesWithValidData() {
+        var releaseDate = LocalDate.now();
+        var anotherEpisode = new Episode("episode4", 4, new Video("video4", 120));
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
+                .requiresSubscription()
+                .withDescription("description")
+                .withReleaseDate(releaseDate)
+                .withSeason(1)
+                .withEpisodes(episodes)
+                .addEpisode(anotherEpisode)
+                .build();
+
+        assertThat(tvSeries.getTitle()).isEqualTo("tvSeries1");
+        assertThat(tvSeries.getRequiredResolution()).isEqualTo(VideoResolution.HD);
+        assertThat(tvSeries.getDescription()).isEqualTo("description");
+        assertThat(tvSeries.getReleaseDate()).isEqualTo(releaseDate);
+        assertThat(tvSeries.getSeason()).isEqualTo(1);
+        assertThat(tvSeries.isFree()).isFalse();
+
+        episodes.add(anotherEpisode);
+        assertThat(tvSeries.getEpisodes())
+                .toIterable()
+                .hasSize(4)
+                .isEqualTo(episodes);
+    }
+
+    @Test
     public void testGetDurationMinutesReturnsTotalDurationMinutes() {
         double totalDurationMinutes = episodes.stream()
                 .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
                 .sum();
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
-                .addEpisode(episodes.get(0))
-                .addEpisode(episodes.get(1))
-                .addEpisode(episodes.get(2))
+                .withEpisodes(episodes)
                 .build();
         assertThat(tvSeries.getDurationMinutes()).isEqualTo(totalDurationMinutes);
     }
@@ -140,9 +151,7 @@ public class TVSeriesTest {
     public void testPlayRunsCorrectly() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
                 .requiresSubscription()
-                .addEpisode(episodes.get(0))
-                .addEpisode(episodes.get(1))
-                .addEpisode(episodes.get(2))
+                .withEpisodes(episodes)
                 .build();
         User user = new User.UserBuilder("user1", "password")
                 .subscribe()
@@ -158,7 +167,7 @@ public class TVSeriesTest {
 
         timeToWatch = 60;
         ViewingProgress progress2 = tvSeries.play(user, progress1, timeToWatch);
-        
+
         assertThat(progress2.getStartVideo()).isEqualTo(episodes.get(2).getVideo());
         assertThat(progress2.getWatchedTime()).isEqualTo(timeToWatch);
         assertThat(progress2.getTotalWatchedTime()).isEqualTo(progress1.getTotalWatchedTime() + timeToWatch);
@@ -168,7 +177,7 @@ public class TVSeriesTest {
     @Test
     public void testPlayThrowsNullPointerExceptionForNullArguments() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
-                .addEpisode(episodes.get(0))
+                .withEpisodes(episodes)
                 .build();
         User user = new User.UserBuilder("user1", "password")
                 .subscribe()
@@ -186,7 +195,7 @@ public class TVSeriesTest {
     @Test
     public void testPlayThrowsIllegalArgumentExceptionForNegativeTimeToWatch() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
-                .addEpisode(episodes.get(0))
+                .withEpisodes(episodes)
                 .build();
         User user = new User.UserBuilder("user1", "password")
                 .subscribe()
@@ -201,7 +210,7 @@ public class TVSeriesTest {
     public void testPlayThrowsAccessDeniedExceptionForNoAccessUser() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
                 .requiresSubscription()
-                .addEpisode(episodes.get(0))
+                .withEpisodes(episodes)
                 .build();
         User user = new User.UserBuilder("user1", "password")
                 .build();

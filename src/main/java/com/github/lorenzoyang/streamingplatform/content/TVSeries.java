@@ -57,7 +57,7 @@ public final class TVSeries extends Content {
 
         totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
 
-        return ViewingProgress.of(
+        return ViewingProgress.createWith(
                 episodes.get(episodeIndex).getVideo(),
                 totalWatchedTime - currentProgress.getTotalWatchedTime(),
                 totalWatchedTime
@@ -78,15 +78,16 @@ public final class TVSeries extends Content {
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final List<Episode> episodes = new ArrayList<>();
         private final VideoResolution requiredResolution;
+        private final List<Episode> episodes;
         private int season;
 
         public TVSeriesBuilder(String title, VideoResolution requiredResolution) {
             super(title);
             this.requiredResolution = Objects.requireNonNull(
                     requiredResolution, "Required resolution cannot be null");
-            this.season = 1; // default value
+            this.episodes = new ArrayList<>();
+            this.season = 1;
         }
 
         public TVSeriesBuilder withSeason(int season) {
@@ -98,9 +99,7 @@ public final class TVSeries extends Content {
         }
 
         public TVSeriesBuilder addEpisode(Episode episode) {
-            if (episode == null) {
-                throw new IllegalArgumentException("Episode cannot be null");
-            }
+            Objects.requireNonNull(episode, "Episode cannot be null");
             if (episode.getVideo().getResolution() != requiredResolution) {
                 throw new IllegalArgumentException("Episode resolution does not match the required resolution");
             }
@@ -108,6 +107,12 @@ public final class TVSeries extends Content {
                 throw new IllegalArgumentException("Episode already added");
             }
             this.episodes.add(episode);
+            return this;
+        }
+
+        public TVSeriesBuilder withEpisodes(List<Episode> episodes) {
+            Objects.requireNonNull(episodes, "Episodes cannot be null");
+            episodes.forEach(this::addEpisode);
             return this;
         }
 
