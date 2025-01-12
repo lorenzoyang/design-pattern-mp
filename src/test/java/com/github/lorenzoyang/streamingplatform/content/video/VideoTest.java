@@ -8,34 +8,23 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class VideoTest {
     @Test
-    public void testConstructorCreatesVideoWithDefaultResolution() {
-        var filePath = "path/to/video.mp4";
-        double duration = 120.0;
-        var video = new Video(filePath, duration);
-
-        assertThat(video.getFilePath()).isEqualTo(filePath);
-        assertThat(video.getDurationMinutes()).isEqualTo(duration);
-        assertThat(video.getResolution()).isEqualTo(VideoResolution.HD);
-    }
-
-    @Test
     public void testConstructorThrowsInvalidVideoPathExceptionForInvalidFilePath() {
-        assertThatThrownBy(() -> new Video(null, 120.0))
+        assertThatThrownBy(() -> new Video(null, 120.0, VideoResolution.HD))
                 .isInstanceOf(InvalidVideoPathException.class)
                 .hasMessage("File path cannot be null or blank");
 
-        assertThatThrownBy(() -> new Video("   ", 120.0))
+        assertThatThrownBy(() -> new Video("   ", 120.0, VideoResolution.HD))
                 .isInstanceOf(InvalidVideoPathException.class)
                 .hasMessage("File path cannot be null or blank");
     }
 
     @Test
     public void testConstructorThrowsIllegalArgumentExceptionForInvalidDuration() {
-        assertThatThrownBy(() -> new Video("path/to/video.mp4", 0.0))
+        assertThatThrownBy(() -> new Video("path/to/video.mp4", 0.0, VideoResolution.HD))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Duration must be positive and non-zero");
 
-        assertThatThrownBy(() -> new Video("path/to/video.mp4", -1.0))
+        assertThatThrownBy(() -> new Video("path/to/video.mp4", -1.0, VideoResolution.HD))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Duration must be positive and non-zero");
     }
@@ -45,6 +34,17 @@ public class VideoTest {
         assertThatThrownBy(() -> new Video("path/to/video.mp4", 120.0, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Video resolution cannot be null");
+    }
+
+    @Test
+    public void testConstructorCreatesVideoWithDefaultResolution() {
+        String filePath = "path/to/video.mp4";
+        double duration = 120.0;
+        var video = new Video(filePath, duration);
+
+        assertThat(video.getFilePath()).isEqualTo(filePath);
+        assertThat(video.getDurationMinutes()).isEqualTo(duration);
+        assertThat(video.getResolution()).isEqualTo(VideoResolution.HD);
     }
 
     @Test

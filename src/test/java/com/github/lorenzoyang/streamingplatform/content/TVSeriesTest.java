@@ -137,7 +137,7 @@ public class TVSeriesTest {
     }
 
     @Test
-    public void testGetDurationMinutesReturnsTotalDurationMinutes() {
+    public void testGetDurationMinutesRunsCorrectly() {
         double totalDurationMinutes = episodes.stream()
                 .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
                 .sum();
@@ -145,33 +145,6 @@ public class TVSeriesTest {
                 .withEpisodes(episodes)
                 .build();
         assertThat(tvSeries.getDurationMinutes()).isEqualTo(totalDurationMinutes);
-    }
-
-    @Test
-    public void testPlayRunsCorrectly() {
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
-                .requiresSubscription()
-                .withEpisodes(episodes)
-                .build();
-        User user = new User.UserBuilder("user1", "password")
-                .subscribe()
-                .build();
-
-        double timeToWatch = 240;
-        ViewingProgress progress1 = tvSeries.play(user, ViewingProgress.initial(), timeToWatch);
-
-        assertThat(progress1.getStartVideo()).isEqualTo(episodes.get(0).getVideo());
-        assertThat(progress1.getWatchedTime()).isEqualTo(timeToWatch);
-        assertThat(progress1.getTotalWatchedTime()).isEqualTo(timeToWatch);
-        assertThat(progress1.isCompleted(tvSeries)).isFalse();
-
-        timeToWatch = 60;
-        ViewingProgress progress2 = tvSeries.play(user, progress1, timeToWatch);
-
-        assertThat(progress2.getStartVideo()).isEqualTo(episodes.get(2).getVideo());
-        assertThat(progress2.getWatchedTime()).isEqualTo(timeToWatch);
-        assertThat(progress2.getTotalWatchedTime()).isEqualTo(progress1.getTotalWatchedTime() + timeToWatch);
-
     }
 
     @Test
@@ -183,7 +156,7 @@ public class TVSeriesTest {
                 .subscribe()
                 .build();
 
-        assertThatThrownBy(() -> tvSeries.play(null, ViewingProgress.initial(), 60))
+        assertThatThrownBy(() -> tvSeries.play(null, ViewingProgress.empty(), 60))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("User cannot be null");
 
@@ -201,7 +174,7 @@ public class TVSeriesTest {
                 .subscribe()
                 .build();
 
-        assertThatThrownBy(() -> tvSeries.play(user, ViewingProgress.initial(), -1))
+        assertThatThrownBy(() -> tvSeries.play(user, ViewingProgress.empty(), -1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Time to watch cannot be negative");
     }
@@ -215,10 +188,37 @@ public class TVSeriesTest {
         User user = new User.UserBuilder("user1", "password")
                 .build();
 
-        assertThatThrownBy(() -> tvSeries.play(user, ViewingProgress.initial(), 60))
+        assertThatThrownBy(() -> tvSeries.play(user, ViewingProgress.empty(), 60))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage(String.format("User %s does not have access to content '%s'.",
                         user.getUsername(), tvSeries.getTitle()));
+    }
+
+    @Test
+    public void testPlayRunsCorrectly() {
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1", VideoResolution.HD)
+                .requiresSubscription()
+                .withEpisodes(episodes)
+                .build();
+        User user = new User.UserBuilder("user1", "password")
+                .subscribe()
+                .build();
+
+        double timeToWatch = 240;
+        ViewingProgress progress1 = tvSeries.play(user, ViewingProgress.empty(), timeToWatch);
+
+        assertThat(progress1.getStartingVideo()).isEqualTo(episodes.get(0).getVideo());
+        assertThat(progress1.getCurrentViewingDuration()).isEqualTo(timeToWatch);
+        assertThat(progress1.getTotalViewingDuration()).isEqualTo(timeToWatch);
+        assertThat(progress1.isCompleted(tvSeries)).isFalse();
+
+        timeToWatch = 60;
+        ViewingProgress progress2 = tvSeries.play(user, progress1, timeToWatch);
+
+        assertThat(progress2.getStartingVideo()).isEqualTo(episodes.get(2).getVideo());
+        assertThat(progress2.getCurrentViewingDuration()).isEqualTo(timeToWatch);
+        assertThat(progress2.getTotalViewingDuration()).isEqualTo(progress1.getTotalViewingDuration() + timeToWatch);
+
     }
 
     @Test

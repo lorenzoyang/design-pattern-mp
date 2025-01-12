@@ -82,26 +82,9 @@ public class MovieTest {
     }
 
     @Test
-    public void testGetDurationMinutesReturnsCorrectDuration() {
+    public void testGetDurationMinutesRunsCorrectly() {
         Movie movie = new Movie.MovieBuilder("movie1", video).build();
-        assertThat(movie.getDurationMinutes()).isEqualTo(120.0);
-    }
-
-    @Test
-    public void testPlayRunsCorrectly() {
-        Movie movie = new Movie.MovieBuilder("movie1", video)
-                .requiresSubscription()
-                .build();
-        User user = new User.UserBuilder("user1", "password")
-                .subscribe()
-                .build();
-
-        ViewingProgress progress = movie.play(user, ViewingProgress.initial(), 60);
-
-        assertThat(progress.getStartVideo()).isEqualTo(video);
-        assertThat(progress.getWatchedTime()).isEqualTo(60);
-        assertThat(progress.getTotalWatchedTime()).isEqualTo(60);
-        assertThat(progress.isCompleted(movie)).isFalse();
+        assertThat(movie.getDurationMinutes()).isEqualTo(120);
     }
 
     @Test
@@ -111,7 +94,7 @@ public class MovieTest {
                 .subscribe()
                 .build();
 
-        assertThatThrownBy(() -> movie.play(null, ViewingProgress.initial(), 60))
+        assertThatThrownBy(() -> movie.play(null, ViewingProgress.empty(), 60))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("User cannot be null");
 
@@ -127,7 +110,7 @@ public class MovieTest {
                 .subscribe()
                 .build();
 
-        assertThatThrownBy(() -> movie.play(user, ViewingProgress.initial(), -1))
+        assertThatThrownBy(() -> movie.play(user, ViewingProgress.empty(), -1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Time to watch cannot be negative");
     }
@@ -140,10 +123,27 @@ public class MovieTest {
         User user = new User.UserBuilder("user1", "password")
                 .build();
 
-        assertThatThrownBy(() -> movie.play(user, ViewingProgress.initial(), 60))
+        assertThatThrownBy(() -> movie.play(user, ViewingProgress.empty(), 60))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage(String.format("User %s does not have access to content '%s'.",
                         user.getUsername(), movie.getTitle()));
+    }
+
+    @Test
+    public void testPlayRunsCorrectly() {
+        Movie movie = new Movie.MovieBuilder("movie1", video)
+                .requiresSubscription()
+                .build();
+        User user = new User.UserBuilder("user1", "password")
+                .subscribe()
+                .build();
+
+        ViewingProgress progress = movie.play(user, ViewingProgress.empty(), 60);
+
+        assertThat(progress.getStartingVideo()).isEqualTo(video);
+        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
+        assertThat(progress.getTotalViewingDuration()).isEqualTo(60);
+        assertThat(progress.isCompleted(movie)).isFalse();
     }
 
     @Test

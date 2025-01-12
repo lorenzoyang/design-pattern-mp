@@ -4,7 +4,7 @@ import com.github.lorenzoyang.streamingplatform.content.video.Video;
 
 import java.util.Objects;
 
-public final class Movie extends Content {
+public class Movie extends Content {
     private final Video video;
 
     private Movie(MovieBuilder builder) {
@@ -23,11 +23,15 @@ public final class Movie extends Content {
 
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
-        double totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
-        return ViewingProgress.createWith(
+        double totalViewingDuration = Math.min(
+                currentProgress.getTotalViewingDuration() + timeToWatch,
+                getDurationMinutes()
+        );
+        
+        return ViewingProgress.of(
                 getVideo(),
-                totalWatchedTime - currentProgress.getTotalWatchedTime(),
-                totalWatchedTime
+                totalViewingDuration - currentProgress.getTotalViewingDuration(),
+                totalViewingDuration
         );
     }
 

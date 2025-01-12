@@ -41,4 +41,10 @@ public class Episode {
     public int hashCode() {
         return Objects.hashCode(getVideo());
     }
+
+    @Override
+    public String toString() {
+        // for debugging and testing purposes
+        return "Episode{" + video + "}";
+    }
 }

@@ -9,8 +9,6 @@ import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 import java.util.*;
 
-import static com.github.lorenzoyang.streamingplatform.user.UserValidations.*;
-
 
 public class User implements PlatformObserver {
     private final String username;
@@ -38,7 +36,7 @@ public class User implements PlatformObserver {
     public void watch(Content content, double timeToWatch) {
         Objects.requireNonNull(content, "Content cannot be null");
 
-        ViewingProgress currentProgress = toWatchList.getOrDefault(content, ViewingProgress.initial());
+        ViewingProgress currentProgress = toWatchList.getOrDefault(content, ViewingProgress.empty());
         currentProgress = content.play(this, currentProgress, timeToWatch);
 
         if (currentProgress.isCompleted(content)) {
@@ -126,7 +124,8 @@ public class User implements PlatformObserver {
 
     @Override
     public String toString() {
-        return "User: " + username;
+        // for debugging and testing purposes
+        return "User{" + username + "}";
     }
 
     public static class UserBuilder {
@@ -138,33 +137,31 @@ public class User implements PlatformObserver {
         private boolean hasSubscription;
 
         public UserBuilder(String username, String password) {
-            if (username == null || username.length() < MIN_USERNAME_LENGTH ||
-                    username.length() > MAX_USERNAME_LENGTH) {
-                throw new UserValidationException(INVALID_USERNAME_MESSAGE);
+            if (username == null || username.isBlank()) {
+                throw new UserValidationException("Username cannot be null or blank");
             }
-            if (password == null || password.length() < MIN_PASSWORD_LENGTH ||
-                    password.length() > MAX_PASSWORD_LENGTH) {
-                throw new UserValidationException(INVALID_PASSWORD_MESSAGE);
+            if (password == null || password.contains(" ")) {
+                throw new UserValidationException("Password cannot be null or contain spaces");
             }
             this.username = username;
             this.password = password;
-            this.email = null;
-            this.age = null;
+            this.email = "";
+            this.age = 13;
             this.gender = Gender.UNSPECIFIED;
             this.hasSubscription = false;
         }
 
         public UserBuilder withEmail(String email) {
             if (email == null || !email.contains("@") || !email.contains(".")) {
-                throw new UserValidationException(INVALID_EMAIL_MESSAGE);
+                throw new UserValidationException("Email must be a valid format containing '@' and '.'");
             }
             this.email = email;
             return this;
         }
 
         public UserBuilder withAge(int age) {
-            if (age < MIN_AGE || age > MAX_AGE) {
-                throw new UserValidationException(INVALID_AGE_MESSAGE);
+            if (age < 13 || age > 150) {
+                throw new UserValidationException("Age must be between 13 and 150.");
             }
             this.age = age;
             return this;
@@ -183,5 +180,10 @@ public class User implements PlatformObserver {
         public User build() {
             return new User(this);
         }
+    }
+
+    public static void main(String[] args) {
+        User user = new User.UserBuilder("username", "password").build();
+        System.out.println(user.getAge());
     }
 }

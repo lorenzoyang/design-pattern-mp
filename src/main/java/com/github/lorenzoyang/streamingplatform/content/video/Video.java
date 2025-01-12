@@ -48,4 +48,10 @@ public class Video {
     public int hashCode() {
         return Objects.hashCode(getFilePath());
     }
+
+    @Override
+    public String toString() {
+        // for debugging and testing purposes
+        return "Video{" + filePath + "}";
+    }
 }

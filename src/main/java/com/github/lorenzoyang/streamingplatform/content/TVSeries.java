@@ -19,6 +19,7 @@ public final class TVSeries extends Content {
         this.episodes = builder.episodes;
         this.requiredResolution = builder.requiredResolution;
         this.season = builder.season;
+
         this.totalDurationMinutes = episodes
                 .stream()
                 .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
@@ -45,22 +46,22 @@ public final class TVSeries extends Content {
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
         int episodeIndex = 0;
-        double totalWatchedTime = currentProgress.getTotalWatchedTime();
+        double totalViewingDuration = currentProgress.getTotalViewingDuration();
         for (Episode episode : episodes) {
             double episodeDuration = episode.getVideo().getDurationMinutes();
-            if (totalWatchedTime < episodeDuration) {
+            if (totalViewingDuration < episodeDuration) {
                 break;
             }
-            totalWatchedTime -= episodeDuration;
+            totalViewingDuration -= episodeDuration;
             episodeIndex++;
         }
 
-        totalWatchedTime = Math.min(currentProgress.getTotalWatchedTime() + timeToWatch, getDurationMinutes());
+        totalViewingDuration = Math.min(currentProgress.getTotalViewingDuration() + timeToWatch, getDurationMinutes());
 
-        return ViewingProgress.createWith(
+        return ViewingProgress.of(
                 episodes.get(episodeIndex).getVideo(),
-                totalWatchedTime - currentProgress.getTotalWatchedTime(),
-                totalWatchedTime
+                totalViewingDuration - currentProgress.getTotalViewingDuration(),
+                totalViewingDuration
         );
     }
 
