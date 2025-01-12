@@ -7,9 +7,10 @@ import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
 import java.util.List;
 
 public class MockUserDataProvider implements DataProvider<User> {
-    @Override
-    public List<User> fetchData() {
-        return List.of(
+    private final List<User> users;
+
+    public MockUserDataProvider() {
+        this.users = List.of(
                 new User.UserBuilder("user1", "password1")
                         .withEmail("user1@gmail.com")
                         .withAge(20)
@@ -27,5 +28,10 @@ public class MockUserDataProvider implements DataProvider<User> {
                         .withGender(Gender.MALE)
                         .build()
         );
+    }
+
+    @Override
+    public List<User> fetchData() {
+        return users;
     }
 }

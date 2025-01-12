@@ -1,46 +1,51 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.video.Video;
+import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
+import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
 
 import java.util.Objects;
 
 public class Movie extends Content {
-    private final Video video;
+    private final Episode episode;
 
     private Movie(MovieBuilder builder) {
         super(builder);
-        this.video = builder.video;
+        this.episode = builder.episode;
     }
 
-    public Video getVideo() {
-        return video;
+    public Episode getEpisode() {
+        return episode;
     }
 
     @Override
     public double getDurationMinutes() {
-        return video.getDurationMinutes();
+        return episode.getDurationMinutes();
     }
 
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
         double totalViewingDuration = Math.min(
                 currentProgress.getTotalViewingDuration() + timeToWatch,
-                getDurationMinutes()
+                this.getDurationMinutes()
         );
-        
+
         return ViewingProgress.of(
-                getVideo(),
+                this.getEpisode(),
                 totalViewingDuration - currentProgress.getTotalViewingDuration(),
                 totalViewingDuration
         );
     }
 
     public static class MovieBuilder extends ContentBuilder<MovieBuilder> {
-        private final Video video;
+        private final Episode episode;
 
-        public MovieBuilder(String title, Video video) {
+        public MovieBuilder(String title, Episode episode) {
             super(title);
-            this.video = Objects.requireNonNull(video, "Video cannot be null");
+            Objects.requireNonNull(episode, "Episode cannot be null");
+            if (episode.getEpisodeNumber() != 1) {
+                throw new IllegalArgumentException("Movie can only have one episode");
+            }
+            this.episode = episode;
         }
 
         @Override

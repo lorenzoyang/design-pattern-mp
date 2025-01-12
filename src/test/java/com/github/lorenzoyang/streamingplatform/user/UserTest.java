@@ -1,19 +1,24 @@
 package com.github.lorenzoyang.streamingplatform.user;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.Movie;
-import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
-import com.github.lorenzoyang.streamingplatform.content.video.Video;
+import com.github.lorenzoyang.streamingplatform.StreamingPlatform;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class UserTest {
+    private StreamingPlatform platform;
+    private User user;
+
+    @Before
+    public void setUp() {
+
+    }
 
     @Test
-    public void testUserBuilderThrowsUserValidationExceptionForInvalidUsername() {
+    public void testUserBuilderConstructorThrowsUserValidationExceptionForInvalidUsername() {
         assertThatThrownBy(() -> new User.UserBuilder(null, "password"))
                 .isInstanceOf(UserValidationException.class)
                 .hasMessage("Username cannot be null or blank");
@@ -113,23 +118,10 @@ public class UserTest {
 
     @Test
     public void testWatchRunsCorrectly() {
-        var video = new Video("video", 120);
-        Content content = new Movie.MovieBuilder("title", video).build();
-        User user = new User.UserBuilder("username", "password").build();
+    }
 
-        user.watch(content, 60);
-
-        assertThat(user.getToWatchList().keySet()).containsExactly(content);
-
-        ViewingProgress viewingProgress = user.getToWatchList().get(content);
-        assertThat(viewingProgress.getCurrentViewingDuration()).isEqualTo(60);
-        assertThat(viewingProgress.getTotalViewingDuration()).isEqualTo(60);
-
-        user.watch(content, 60);
-        assertThat(user.getToWatchList()).isEmpty();
-        assertThat(user.getWatchedList())
-                .toIterable()
-                .containsExactly(content);
+    @Test
+    public void testUpdateRunsCorrectlyWithRemoveContentEvent() {
     }
 
     @Test

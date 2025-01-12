@@ -1,41 +1,27 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.video.VideoResolution;
+import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
+import com.github.lorenzoyang.streamingplatform.content.utils.Season;
+import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public final class TVSeries extends Content {
-    private final List<Episode> episodes;
-    private final VideoResolution requiredResolution;
-    private final int season;
+    private final List<Season> seasons;
 
     private final double totalDurationMinutes;
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
-        this.episodes = builder.episodes;
-        this.requiredResolution = builder.requiredResolution;
-        this.season = builder.season;
+        this.seasons = new ArrayList<>();
 
-        this.totalDurationMinutes = episodes
-                .stream()
-                .mapToDouble(episode -> episode.getVideo().getDurationMinutes())
+        builder.seasons.forEach((seasonNumber, episodes) -> {
+            this.seasons.add(new Season(seasonNumber, episodes));
+        });
+
+        this.totalDurationMinutes = seasons.stream()
+                .mapToDouble(Season::getDurationMinutes)
                 .sum();
-    }
-
-    public Iterator<Episode> getEpisodes() {
-        return episodes.iterator();
-    }
-
-    public VideoResolution getRequiredResolution() {
-        return requiredResolution;
-    }
-
-    public int getSeason() {
-        return season;
     }
 
     @Override
@@ -45,75 +31,78 @@ public final class TVSeries extends Content {
 
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
-        int episodeIndex = 0;
         double totalViewingDuration = currentProgress.getTotalViewingDuration();
-        for (Episode episode : episodes) {
-            double episodeDuration = episode.getVideo().getDurationMinutes();
-            if (totalViewingDuration < episodeDuration) {
-                break;
+        Episode startingEpisode = null;
+        for (Season season : seasons) {
+            Iterator<Episode> episodes = season.getEpisodes();
+            while (episodes.hasNext()) {
+                startingEpisode = episodes.next();
+                if (totalViewingDuration < startingEpisode.getDurationMinutes()) {
+                    break;
+                }
+                totalViewingDuration -= startingEpisode.getDurationMinutes();
             }
-            totalViewingDuration -= episodeDuration;
-            episodeIndex++;
         }
 
-        totalViewingDuration = Math.min(currentProgress.getTotalViewingDuration() + timeToWatch, getDurationMinutes());
+        if (startingEpisode == null) {
+            return ViewingProgress.empty();
+        }
+
+        totalViewingDuration = Math.min(totalViewingDuration + timeToWatch, this.getDurationMinutes());
 
         return ViewingProgress.of(
-                episodes.get(episodeIndex).getVideo(),
+                startingEpisode,
                 totalViewingDuration - currentProgress.getTotalViewingDuration(),
                 totalViewingDuration
         );
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        TVSeries tvSeries = (TVSeries) o;
-        return getSeason() == tvSeries.getSeason();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getSeason());
+    // package-private getter for testing purposes
+    List<Season> getSeasons() {
+        return seasons;
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final VideoResolution requiredResolution;
-        private final List<Episode> episodes;
-        private int season;
+        private final Map<Integer, List<Episode>> seasons;
+        private int currentSeason;
 
-        public TVSeriesBuilder(String title, VideoResolution requiredResolution) {
+        public TVSeriesBuilder(String title) {
             super(title);
-            this.requiredResolution = Objects.requireNonNull(
-                    requiredResolution, "Required resolution cannot be null");
-            this.episodes = new ArrayList<>();
-            this.season = 1;
+            this.seasons = new LinkedHashMap<>();
+            this.seasons.put(1, new ArrayList<>());
+            this.currentSeason = 1;
         }
 
-        public TVSeriesBuilder withSeason(int season) {
-            if (season <= 0) {
-                throw new IllegalArgumentException("Season must be positive and non-zero");
+        public TVSeriesBuilder addSeason(int season) {
+            if (season != currentSeason + 1) {
+                throw new IllegalArgumentException("Invalid season number");
             }
-            this.season = season;
+            seasons.put(season, new ArrayList<>());
+            currentSeason = season;
             return this;
         }
 
-        public TVSeriesBuilder addEpisode(Episode episode) {
+        public TVSeriesBuilder addEpisode(int season, Episode episode) {
+            if (!seasons.containsKey(season)) {
+                throw new IllegalArgumentException("Season " + season + " does not exist");
+            }
             Objects.requireNonNull(episode, "Episode cannot be null");
-            if (episode.getVideo().getResolution() != requiredResolution) {
-                throw new IllegalArgumentException("Episode resolution does not match the required resolution");
+
+            List<Episode> episodes = seasons.get(season);
+            if (episodes.stream()
+                    .anyMatch(e -> e.getEpisodeNumber() == episode.getEpisodeNumber())) {
+                throw new IllegalArgumentException("Episode already exists");
             }
-            if (episodes.contains(episode)) {
-                throw new IllegalArgumentException("Episode already added");
+            if (episode.getEpisodeNumber() != episodes.size() + 1) {
+                throw new IllegalArgumentException("Invalid episode number");
             }
-            this.episodes.add(episode);
+            seasons.get(season).add(episode);
+
             return this;
         }
 
-        public TVSeriesBuilder withEpisodes(List<Episode> episodes) {
-            Objects.requireNonNull(episodes, "Episodes cannot be null");
-            episodes.forEach(this::addEpisode);
+        public TVSeriesBuilder addEpisodes(int season, List<Episode> episodes) {
+            episodes.forEach(e -> addEpisode(season, e));
             return this;
         }
 

@@ -20,20 +20,15 @@ public final class StreamingPlatform {
     private final Collection<PlatformObserver> observers;
 
     public StreamingPlatform(String name, DataProvider<Content> contentProvider, DataProvider<User> userProvider) {
-        this.name = name;
-        this.contents = new ArrayList<>(contentProvider.fetchData());
-        this.users = new ArrayList<>(userProvider.fetchData());
-        this.observers = new ArrayList<>(users);
-    }
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
 
-    /**
-     * Returns an iterator over the observers of the platform.
-     * Testing purposes only.
-     *
-     * @return an iterator over the observers of the platform
-     */
-    Collection<PlatformObserver> getObservers() {
-        return observers;
+        Objects.requireNonNull(contentProvider, "Content provider cannot be null");
+        this.contents = new ArrayList<>(contentProvider.fetchData());
+
+        Objects.requireNonNull(userProvider, "User provider cannot be null");
+        this.users = new ArrayList<>(userProvider.fetchData());
+
+        this.observers = new ArrayList<>(users);
     }
 
     public void attach(PlatformObserver observer) {
@@ -44,18 +39,6 @@ public final class StreamingPlatform {
 
     public void detach(PlatformObserver observer) {
         observers.remove(observer);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Iterator<Content> getContents() {
-        return contents.iterator();
-    }
-
-    public Iterator<User> getUsers() {
-        return users.iterator();
     }
 
     public void registerUser(User user) {
@@ -73,6 +56,18 @@ public final class StreamingPlatform {
         }
         users.remove(user);
         observers.remove(user);
+    }
+
+    public Optional<Content> getContentByTitle(String title) {
+        return contents.stream()
+                .filter(content -> content.getTitle().equals(title))
+                .findFirst();
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return users.stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     public void addContent(Content contentToAdd) {
@@ -106,5 +101,19 @@ public final class StreamingPlatform {
 
     private void notifyObservers(PlatformEvent event) {
         observers.forEach(observer -> observer.update(event));
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // package-private getter for testing purposes
+    Collection<PlatformObserver> getObservers() {
+        return observers;
+    }
+
+    // package-private getter for testing purposes
+    List<Content> getContents() {
+        return contents;
     }
 }

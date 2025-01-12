@@ -2,7 +2,7 @@ package com.github.lorenzoyang.streamingplatform.user;
 
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
+import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
 import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
@@ -47,38 +47,6 @@ public class User implements PlatformObserver {
         }
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public boolean hasSubscription() {
-        return hasSubscription;
-    }
-
-    public Map<Content, ViewingProgress> getToWatchList() {
-        return Collections.unmodifiableMap(toWatchList);
-    }
-
-    public Iterator<Content> getWatchedList() {
-        return watchedList.iterator();
-    }
-
     @Override
     public void update(PlatformEvent event) {
         event.accept(new PlatformEventVisitor() {
@@ -110,6 +78,40 @@ public class User implements PlatformObserver {
         });
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public boolean hasSubscription() {
+        return hasSubscription;
+    }
+
+    // package-private getter for testing purposes
+    Map<Content, ViewingProgress> getToWatchList() {
+        return Collections.unmodifiableMap(toWatchList);
+    }
+
+    // package-private getter for testing purposes
+    Set<Content> getWatchedList() {
+        return watchedList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -120,12 +122,6 @@ public class User implements PlatformObserver {
     @Override
     public int hashCode() {
         return Objects.hashCode(getUsername());
-    }
-
-    @Override
-    public String toString() {
-        // for debugging and testing purposes
-        return "User{" + username + "}";
     }
 
     public static class UserBuilder {
@@ -180,10 +176,5 @@ public class User implements PlatformObserver {
         public User build() {
             return new User(this);
         }
-    }
-
-    public static void main(String[] args) {
-        User user = new User.UserBuilder("username", "password").build();
-        System.out.println(user.getAge());
     }
 }
