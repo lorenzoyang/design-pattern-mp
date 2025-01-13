@@ -1,8 +1,9 @@
 package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.content.Episode;
+import com.github.lorenzoyang.streamingplatform.content.Movie;
 import com.github.lorenzoyang.streamingplatform.content.TVSeries;
-import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
 import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
 
 import java.time.LocalDate;
@@ -38,15 +39,9 @@ public class MockContentDataProvider implements DataProvider<Content> {
                                 new Episode("episode3", 3, 26)
                         ))
                         .build(),
-                new TVSeries.TVSeriesBuilder("tvSeries3")
-                        .requiresSubscription()
-                        .withDescription("Description of tvSeries3")
+                new Movie.MovieBuilder("movie1", new Episode("episode1", 1, 26))
+                        .withDescription("Description of movie1")
                         .withReleaseDate(LocalDate.now())
-                        .addEpisodes(1, List.of(
-                                new Episode("episode1", 1, 26),
-                                new Episode("episode2", 2, 26),
-                                new Episode("episode3", 3, 26)
-                        ))
                         .build()
         );
     }

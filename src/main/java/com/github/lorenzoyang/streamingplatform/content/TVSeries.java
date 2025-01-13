@@ -1,9 +1,5 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
-import com.github.lorenzoyang.streamingplatform.content.utils.Season;
-import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
-
 import java.util.*;
 
 public final class TVSeries extends Content {
@@ -13,11 +9,11 @@ public final class TVSeries extends Content {
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
-        this.seasons = new ArrayList<>();
 
-        builder.seasons.forEach((seasonNumber, episodes) -> {
-            this.seasons.add(new Season(seasonNumber, episodes));
-        });
+        this.seasons = new ArrayList<>();
+        builder.seasons.forEach(
+                (seasonNumber, episodes) -> this.seasons.add(new Season(seasonNumber, episodes))
+        );
 
         this.totalDurationMinutes = seasons.stream()
                 .mapToDouble(Season::getDurationMinutes)
@@ -31,30 +27,38 @@ public final class TVSeries extends Content {
 
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
-        double totalViewingDuration = currentProgress.getTotalViewingDuration();
-        Episode startingEpisode = null;
-        for (Season season : seasons) {
-            Iterator<Episode> episodes = season.getEpisodes();
-            while (episodes.hasNext()) {
-                startingEpisode = episodes.next();
-                if (totalViewingDuration < startingEpisode.getDurationMinutes()) {
-                    break;
-                }
-                totalViewingDuration -= startingEpisode.getDurationMinutes();
-            }
-        }
+        Episode startingEpisode = getStartingEpisode(currentProgress.getTotalViewingDuration());
 
+        // When we have empty season
         if (startingEpisode == null) {
             return ViewingProgress.empty();
         }
 
-        totalViewingDuration = Math.min(totalViewingDuration + timeToWatch, this.getDurationMinutes());
+        double totalViewingDuration = Math.min(
+                currentProgress.getTotalViewingDuration() + timeToWatch,
+                this.getDurationMinutes()
+        );
 
         return ViewingProgress.of(
                 startingEpisode,
                 totalViewingDuration - currentProgress.getTotalViewingDuration(),
                 totalViewingDuration
         );
+    }
+
+    private Episode getStartingEpisode(double totalViewingDuration) {
+        Episode startingEpisode = null;
+        for (Season season : seasons) {
+            Iterator<Episode> episodes = season.getEpisodes();
+            while (episodes.hasNext()) {
+                startingEpisode = episodes.next();
+                if (totalViewingDuration < startingEpisode.getDurationMinutes()) {
+                    return startingEpisode;
+                }
+                totalViewingDuration -= startingEpisode.getDurationMinutes();
+            }
+        }
+        return startingEpisode;
     }
 
     // package-private getter for testing purposes
@@ -82,7 +86,7 @@ public final class TVSeries extends Content {
             return this;
         }
 
-        public TVSeriesBuilder addEpisode(int season, Episode episode) {
+        public TVSeriesBuilder addSingleEpisode(int season, Episode episode) {
             if (!seasons.containsKey(season)) {
                 throw new IllegalArgumentException("Season " + season + " does not exist");
             }
@@ -102,7 +106,7 @@ public final class TVSeries extends Content {
         }
 
         public TVSeriesBuilder addEpisodes(int season, List<Episode> episodes) {
-            episodes.forEach(e -> addEpisode(season, e));
+            episodes.forEach(e -> addSingleEpisode(season, e));
             return this;
         }
 

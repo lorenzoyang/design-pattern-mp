@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content.utils;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import org.junit.Test;
 
@@ -15,22 +15,22 @@ public class EpisodeTest {
 
     @Test
     public void testConstructorThrowsIllegalArgumentExceptionForNegativeOrZeroEpisodeNumber() {
-        assertThatThrownBy(() -> new Episode("Title", 0, 60))
+        assertThatThrownBy(() -> new Episode("Title", -1, 60))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Episode number must be positive and non-zero");
 
-        assertThatThrownBy(() -> new Episode("Title", -1, 60))
+        assertThatThrownBy(() -> new Episode("Title", 0, 60))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Episode number must be positive and non-zero");
     }
 
     @Test
     public void testConstructorThrowsIllegalArgumentExceptionForNegativeOrZeroDuration() {
-        assertThatThrownBy(() -> new Episode("Title", 1, 0))
+        assertThatThrownBy(() -> new Episode("Title", 1, -1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Duration must be positive and non-zero");
 
-        assertThatThrownBy(() -> new Episode("Title", 1, -1))
+        assertThatThrownBy(() -> new Episode("Title", 1, 0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Duration must be positive and non-zero");
     }
@@ -47,10 +47,11 @@ public class EpisodeTest {
     public void testEqualsReturnsFalseForDifferentFields() {
         var episode1 = new Episode("Title", 1, 60);
         var episode2 = new Episode("Title", 2, 60);
-        assertThat(episode1).isNotEqualTo(episode2);
+        var episode3 = new Episode("Title", 1, 120);
 
-        episode2 = new Episode("Title", 1, 120);
         assertThat(episode1).isNotEqualTo(episode2);
+        assertThat(episode1).isNotEqualTo(episode3);
+        assertThat(episode2).isNotEqualTo(episode3);
     }
 
     @Test

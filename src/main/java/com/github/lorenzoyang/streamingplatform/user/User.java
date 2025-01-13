@@ -2,7 +2,7 @@ package com.github.lorenzoyang.streamingplatform.user;
 
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
+import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
 import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
@@ -104,7 +104,7 @@ public class User implements PlatformObserver {
 
     // package-private getter for testing purposes
     Map<Content, ViewingProgress> getToWatchList() {
-        return Collections.unmodifiableMap(toWatchList);
+        return toWatchList;
     }
 
     // package-private getter for testing purposes
@@ -133,8 +133,8 @@ public class User implements PlatformObserver {
         private boolean hasSubscription;
 
         public UserBuilder(String username, String password) {
-            if (username == null || username.isBlank()) {
-                throw new UserValidationException("Username cannot be null or blank");
+            if (username == null || username.contains(" ")) {
+                throw new UserValidationException("Username cannot be null or contain spaces");
             }
             if (password == null || password.contains(" ")) {
                 throw new UserValidationException("Password cannot be null or contain spaces");

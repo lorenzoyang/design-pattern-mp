@@ -1,7 +1,5 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
-import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.user.User;
@@ -19,6 +17,22 @@ public class MovieTest {
     @Before
     public void setUp() {
         this.episode = new Episode("episode", 1, 120);
+    }
+
+    @Test
+    public void testMovieBuilderCreatesMovieWithValidArguments() {
+        var releaseDate = LocalDate.now();
+        Movie movie = new Movie.MovieBuilder("movie1", episode)
+                .requiresSubscription()
+                .withDescription("description")
+                .withReleaseDate(releaseDate)
+                .build();
+
+        assertThat(movie.getTitle()).isEqualTo("movie1");
+        assertThat(movie.getDescription()).isEqualTo("description");
+        assertThat(movie.getReleaseDate()).isEqualTo(releaseDate);
+        assertThat(movie.getEpisode()).isEqualTo(episode);
+        assertThat(movie.isFree()).isFalse();
     }
 
     @Test
@@ -67,25 +81,32 @@ public class MovieTest {
     }
 
     @Test
-    public void testMovieBuilderCreatesMovieWithValidData() {
-        var releaseDate = LocalDate.now();
-        Movie movie = new Movie.MovieBuilder("movie1", episode)
-                .requiresSubscription()
-                .withDescription("description")
-                .withReleaseDate(releaseDate)
-                .build();
-
-        assertThat(movie.getTitle()).isEqualTo("movie1");
-        assertThat(movie.getDescription()).isEqualTo("description");
-        assertThat(movie.getReleaseDate()).isEqualTo(releaseDate);
-        assertThat(movie.getEpisode()).isEqualTo(episode);
-        assertThat(movie.isFree()).isFalse();
-    }
-
-    @Test
     public void testGetDurationMinutesRunsCorrectly() {
         Movie movie = new Movie.MovieBuilder("movie1", episode).build();
         assertThat(movie.getDurationMinutes()).isEqualTo(episode.getDurationMinutes());
+    }
+
+    @Test
+    public void testPlayRunsCorrectly() {
+        Movie movie = new Movie.MovieBuilder("movie1", episode)
+                .requiresSubscription()
+                .build();
+        User user = new User.UserBuilder("user1", "password")
+                .subscribe()
+                .build();
+
+        ViewingProgress progress = movie.play(user, ViewingProgress.empty(), 60);
+
+        assertThat(progress.getStartingEpisode()).isEqualTo(episode);
+        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
+        assertThat(progress.getTotalViewingDuration()).isEqualTo(60);
+        assertThat(progress.isCompleted(movie)).isFalse();
+
+        progress = movie.play(user, progress, 60);
+        assertThat(progress.getStartingEpisode()).isEqualTo(episode);
+        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
+        assertThat(progress.getTotalViewingDuration()).isEqualTo(120);
+        assertThat(progress.isCompleted(movie)).isTrue();
     }
 
     @Test
@@ -124,23 +145,6 @@ public class MovieTest {
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage(String.format("User %s does not have access to content '%s'.",
                         user.getUsername(), movie.getTitle()));
-    }
-
-    @Test
-    public void testPlayRunsCorrectly() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode)
-                .requiresSubscription()
-                .build();
-        User user = new User.UserBuilder("user1", "password")
-                .subscribe()
-                .build();
-
-        ViewingProgress progress = movie.play(user, ViewingProgress.empty(), 60);
-
-        assertThat(progress.getStartingEpisode()).isEqualTo(episode);
-        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
-        assertThat(progress.getTotalViewingDuration()).isEqualTo(60);
-        assertThat(progress.isCompleted(movie)).isFalse();
     }
 
     @Test

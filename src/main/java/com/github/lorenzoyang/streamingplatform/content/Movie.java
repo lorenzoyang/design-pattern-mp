@@ -1,8 +1,5 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.utils.Episode;
-import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
-
 import java.util.Objects;
 
 public class Movie extends Content {

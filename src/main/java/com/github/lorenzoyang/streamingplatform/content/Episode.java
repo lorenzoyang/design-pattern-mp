@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content.utils;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import java.util.Objects;
 
@@ -37,11 +37,13 @@ public class Episode {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Episode episode = (Episode) o;
-        return getEpisodeNumber() == episode.getEpisodeNumber() && Double.compare(getDurationMinutes(), episode.getDurationMinutes()) == 0 && Objects.equals(getTitle(), episode.getTitle());
+        return episodeNumber == episode.episodeNumber &&
+                Double.compare(durationMinutes, episode.durationMinutes) == 0 &&
+                Objects.equals(title, episode.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTitle(), getEpisodeNumber(), getDurationMinutes());
+        return Objects.hash(title, episodeNumber, durationMinutes);
     }
 }

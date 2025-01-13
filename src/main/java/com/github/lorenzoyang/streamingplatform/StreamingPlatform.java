@@ -47,7 +47,7 @@ public final class StreamingPlatform {
             throw new IllegalArgumentException("User already registered");
         }
         users.add(user);
-        observers.add(user);
+        detach(user);
     }
 
     public void unregisterUser(User user) {
@@ -55,7 +55,7 @@ public final class StreamingPlatform {
             throw new IllegalArgumentException("User does not exist");
         }
         users.remove(user);
-        observers.remove(user);
+        detach(user);
     }
 
     public Optional<Content> getContentByTitle(String title) {
@@ -116,4 +116,10 @@ public final class StreamingPlatform {
     List<Content> getContents() {
         return contents;
     }
+
+    // package-private getter for testing purposes
+    List<User> getUsers() {
+        return users;
+    }
+    
 }

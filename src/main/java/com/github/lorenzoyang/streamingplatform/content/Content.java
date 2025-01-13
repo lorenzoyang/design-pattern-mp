@@ -1,6 +1,5 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.content.utils.ViewingProgress;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.user.User;
@@ -10,7 +9,6 @@ import java.util.Objects;
 
 public abstract class Content {
     private final String title;
-
     private final boolean isFree;
     private final String description;
     private final LocalDate releaseDate;
@@ -80,7 +78,6 @@ public abstract class Content {
 
     protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
         private final String title;
-
         private boolean isFree;
         private String description;
         private LocalDate releaseDate;
@@ -100,7 +97,7 @@ public abstract class Content {
             return self();
         }
 
-        public T withDescription(String description) {
+        public final T withDescription(String description) {
             if (description == null || description.isBlank()) {
                 throw new InvalidContentException("Description cannot be null or blank");
             }
@@ -108,7 +105,7 @@ public abstract class Content {
             return self();
         }
 
-        public T withReleaseDate(LocalDate releaseDate) {
+        public final T withReleaseDate(LocalDate releaseDate) {
             if (releaseDate == null) {
                 throw new InvalidContentException("Release date cannot be null");
             }

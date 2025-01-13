@@ -1,6 +1,7 @@
 package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.content.MockContent;
 import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
@@ -66,6 +67,20 @@ public class StreamingPlatformTest {
     }
 
     @Test
+    public void testRegisterUserAndUnregisterUserRunCorrectly() {
+        streamingPlatform.registerUser(user);
+        assertThat(streamingPlatform.getUsers()).contains(user);
+        assertThat(streamingPlatform.getUsers())
+                .hasSize(userDataProvider.fetchData().size() + 1);
+
+        streamingPlatform.unregisterUser(user);
+        assertThat(streamingPlatform.getUsers()).doesNotContain(user);
+        assertThat(streamingPlatform.getUsers())
+                .hasSize(userDataProvider.fetchData().size());
+
+    }
+
+    @Test
     public void testRegisterUserThrowsNullPointerExceptionForNullUser() {
         assertThatThrownBy(() -> streamingPlatform.registerUser(null))
                 .isInstanceOf(NullPointerException.class)
@@ -113,6 +128,25 @@ public class StreamingPlatformTest {
                 .isEmpty();
     }
 
+    @Test
+    public void testAddContentAndRemoveContentRunCorrectly() {
+        Content mockContent = new MockContent() {
+            @Override
+            public double getDurationMinutes() {
+                return 60;
+            }
+        };
+
+        streamingPlatform.addContent(mockContent);
+        assertThat(streamingPlatform.getContents()).contains(mockContent);
+        assertThat(streamingPlatform.getContents())
+                .hasSize(contentDataProvider.fetchData().size() + 1);
+
+        streamingPlatform.removeContent(mockContent);
+        assertThat(streamingPlatform.getContents()).doesNotContain(mockContent);
+        assertThat(streamingPlatform.getContents())
+                .hasSize(contentDataProvider.fetchData().size());
+    }
 
     @Test
     public void testAddContentThrowsNullPointerExceptionForNullContent() {
@@ -130,48 +164,21 @@ public class StreamingPlatformTest {
     }
 
     @Test
-    public void testAddContentRunsCorrectly() {
-        Content newContent = new TVSeries.TVSeriesBuilder("StreamingPlatformTest TV Series").build();
-        streamingPlatform.addContent(newContent);
-
-        assertThat(streamingPlatform.getContents()).contains(newContent);
-        assertThat(streamingPlatform.getContents())
-                .hasSize(contentDataProvider.fetchData().size() + 1);
-    }
-
-    @Test
     public void testRemoveContentThrowsIllegalArgumentExceptionForNonExistingContent() {
-        Content newContent = new TVSeries.TVSeriesBuilder("StreamingPlatformTest TV Series").build();
-        assertThatThrownBy(() -> streamingPlatform.removeContent(newContent))
+        Content mockContent = new MockContent();
+
+        assertThatThrownBy(() -> streamingPlatform.removeContent(mockContent))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Content does not exist");
     }
 
     @Test
-    public void testRemoveContentRunsCorrectly() {
-        Content existingContent = contentDataProvider.fetchData().get(0);
-        streamingPlatform.removeContent(existingContent);
-
-        assertThat(streamingPlatform.getContents()).doesNotContain(existingContent);
-        assertThat(streamingPlatform.getContents())
-                .hasSize(contentDataProvider.fetchData().size() - 1);
-    }
-
-    @Test
-    public void testReplaceContentThrowsIllegalArgumentExceptionForNonExistingContent() {
-        Content newContent = new TVSeries.TVSeriesBuilder("StreamingPlatformTest TV Series").build();
-        assertThatThrownBy(() -> streamingPlatform.replaceContent(newContent))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The content to be replaced does not exist in the platform.");
-    }
-
-    @Test
     public void testReplaceContentRunsCorrectly() {
         Content oldContent = contentDataProvider.fetchData().get(0);
-        var releaseDate = LocalDate.now();
+        var newReleaseDate = LocalDate.now();
         Content newContent = new TVSeries.TVSeriesBuilder(oldContent.getTitle())
                 .withDescription("New description")
-                .withReleaseDate(releaseDate)
+                .withReleaseDate(newReleaseDate)
                 .build();
         streamingPlatform.replaceContent(newContent);
 
@@ -181,7 +188,15 @@ public class StreamingPlatformTest {
                 .orElse(null);
         assertThat(content).isNotNull();
         assertThat(content.getDescription()).isEqualTo("New description");
-        assertThat(content.getReleaseDate()).isEqualTo(releaseDate);
+        assertThat(content.getReleaseDate()).isEqualTo(newReleaseDate);
+    }
+
+    @Test
+    public void testReplaceContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        Content mockContent = new MockContent();
+        assertThatThrownBy(() -> streamingPlatform.replaceContent(mockContent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The content to be replaced does not exist in the platform.");
     }
 
     @Test
@@ -189,11 +204,11 @@ public class StreamingPlatformTest {
         var mockObserver = new MockObserver();
         streamingPlatform.attach(mockObserver);
 
-        Content newContent = new TVSeries.TVSeriesBuilder("StreamingPlatformTest TV Series").build();
-        streamingPlatform.addContent(newContent);
+        Content mockNewContent = new MockContent();
+        streamingPlatform.addContent(mockNewContent);
 
         AddContentEvent event = (AddContentEvent) mockObserver.getEvent();
-        assertThat(event.getAddedContent()).isSameAs(newContent);
+        assertThat(event.getAddedContent()).isSameAs(mockNewContent);
     }
 
     @Test

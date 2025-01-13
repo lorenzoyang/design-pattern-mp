@@ -1,6 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content.utils;
-
-import com.github.lorenzoyang.streamingplatform.content.Content;
+package com.github.lorenzoyang.streamingplatform.content;
 
 public class ViewingProgress {
     private final Episode startingEpisode;
