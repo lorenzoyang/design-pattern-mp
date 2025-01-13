@@ -5,5 +5,5 @@ public interface PlatformEventVisitor {
 
     void visitRemoveContent(RemoveContentEvent event);
 
-    void visitReplaceContent(ReplaceContentEvent event);
+    void visitUpdateContent(UpdateContentEvent event);
 }

@@ -2,210 +2,190 @@ package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.MockContent;
-import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
-import com.github.lorenzoyang.streamingplatform.events.ReplaceContentEvent;
-import com.github.lorenzoyang.streamingplatform.user.User;
-import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
+import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class StreamingPlatformTest {
-    private DataProvider<User> userDataProvider;
-    private DataProvider<Content> contentDataProvider;
-    private StreamingPlatform streamingPlatform;
+    private StreamingPlatform platform;
 
     private User user;
 
+    private User registeredUser;
+
     @Before
     public void setUp() {
-        this.userDataProvider = new MockUserDataProvider();
-        this.contentDataProvider = new MockContentDataProvider();
-        this.streamingPlatform = new StreamingPlatform("Streaming Platform", contentDataProvider, userDataProvider);
-        // TODO add check for spaces in username
-        this.user = new User.UserBuilder("StreamingPlatformTest_user", "password").build();
+        this.platform = new StreamingPlatform("Streaming Platform", new MockContentProvider());
+
+        this.user = new User.UserBuilder("username", "password").build();
+
+        this.registeredUser = new User.UserBuilder("registeredUsername", "password").build();
+        this.platform.getUsers().add(registeredUser);
+        this.platform.getObservers().add(registeredUser);
     }
 
     @Test
     public void testConstructorThrowsNullPointerExceptionForNullArguments() {
-        assertThatThrownBy(() -> new StreamingPlatform(null, contentDataProvider, userDataProvider))
+        assertThatThrownBy(() -> new StreamingPlatform(null, List::of))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Name cannot be null");
 
-        assertThatThrownBy(() -> new StreamingPlatform("Streaming Platform", null, userDataProvider))
+        assertThatThrownBy(() -> new StreamingPlatform("Streaming Platform", null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content provider cannot be null");
-
-        assertThatThrownBy(() -> new StreamingPlatform("Streaming Platform", contentDataProvider, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("User provider cannot be null");
     }
 
     @Test
-    public void testAttachAndDetachRunCorrectly() {
+    public void testAddObserverAndRemoveObserverRunCorrectly() {
         PlatformObserver observer = (event) -> {
             // Just for testing
         };
 
-        assertThat(streamingPlatform.getObservers())
-                .hasSize(userDataProvider.fetchData().size());
+        platform.addObserver(observer);
+        assertThat(platform.getObservers()).hasSize(2);
+        assertThat(platform.getObservers()).contains(observer);
 
-        streamingPlatform.attach(observer);
-        assertThat(streamingPlatform.getObservers())
-                .hasSize(userDataProvider.fetchData().size() + 1);
-
-        streamingPlatform.detach(observer);
-        assertThat(streamingPlatform.getObservers())
-                .hasSize(userDataProvider.fetchData().size());
+        platform.removeObserver(observer);
+        assertThat(platform.getObservers()).hasSize(1);
+        assertThat(platform.getObservers()).doesNotContain(observer);
     }
 
     @Test
     public void testRegisterUserAndUnregisterUserRunCorrectly() {
-        streamingPlatform.registerUser(user);
-        assertThat(streamingPlatform.getUsers()).contains(user);
-        assertThat(streamingPlatform.getUsers())
-                .hasSize(userDataProvider.fetchData().size() + 1);
+        platform.registerUser(user);
+        assertThat(platform.getUsers()).hasSize(2);
+        assertThat(platform.getUsers()).contains(user);
 
-        streamingPlatform.unregisterUser(user);
-        assertThat(streamingPlatform.getUsers()).doesNotContain(user);
-        assertThat(streamingPlatform.getUsers())
-                .hasSize(userDataProvider.fetchData().size());
-
+        platform.unregisterUser(user);
+        assertThat(platform.getUsers()).hasSize(1);
+        assertThat(platform.getUsers()).doesNotContain(user);
     }
 
     @Test
     public void testRegisterUserThrowsNullPointerExceptionForNullUser() {
-        assertThatThrownBy(() -> streamingPlatform.registerUser(null))
+        assertThatThrownBy(() -> platform.registerUser(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("User cannot be null");
     }
 
     @Test
     public void testRegisterUserThrowsIllegalArgumentExceptionForExistingUser() {
-        User existingUser = userDataProvider.fetchData().get(0);
-        assertThatThrownBy(() -> streamingPlatform.registerUser(existingUser))
+        assertThatThrownBy(() -> platform.registerUser(registeredUser))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("User already registered");
     }
 
     @Test
     public void testUnregisterUserThrowsIllegalArgumentExceptionForNonExistingUser() {
-        assertThatThrownBy(() -> streamingPlatform.unregisterUser(user))
+        assertThatThrownBy(() -> platform.unregisterUser(user))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("User does not exist");
 
-        assertThatThrownBy(() -> streamingPlatform.unregisterUser(null))
+        assertThatThrownBy(() -> platform.unregisterUser(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("User does not exist");
     }
 
     @Test
     public void testGetContentByTitleRunsCorrectly() {
-        Content existingContent = contentDataProvider.fetchData().get(0);
-        assertThat(streamingPlatform.getContentByTitle(existingContent.getTitle()))
+        Content existingContent = platform.getContents().get(0);
+        assertThat(platform.getContentByTitle(existingContent.getTitle()))
                 .isPresent()
                 .contains(existingContent);
 
-        assertThat(streamingPlatform.getContentByTitle("Non existing title"))
+        assertThat(platform.getContentByTitle("Non existing title"))
                 .isEmpty();
     }
 
     @Test
     public void testGetUserByUsernameRunsCorrectly() {
-        User existingUser = userDataProvider.fetchData().get(0);
-        assertThat(streamingPlatform.getUserByUsername(existingUser.getUsername()))
+        assertThat(platform.getUserByUsername(registeredUser.getUsername()))
                 .isPresent()
-                .contains(existingUser);
+                .contains(registeredUser);
 
-        assertThat(streamingPlatform.getUserByUsername("Non existing username"))
+        assertThat(platform.getUserByUsername("Non existing username"))
                 .isEmpty();
     }
 
     @Test
     public void testAddContentAndRemoveContentRunCorrectly() {
-        Content mockContent = new MockContent() {
-            @Override
-            public double getDurationMinutes() {
-                return 60;
-            }
-        };
+        Content mockContent = new MockContent("Mock Content");
+        int initialSize = platform.getContents().size();
 
-        streamingPlatform.addContent(mockContent);
-        assertThat(streamingPlatform.getContents()).contains(mockContent);
-        assertThat(streamingPlatform.getContents())
-                .hasSize(contentDataProvider.fetchData().size() + 1);
+        platform.addContent(mockContent);
+        assertThat(platform.getContents()).hasSize(initialSize + 1);
+        assertThat(platform.getContents()).contains(mockContent);
 
-        streamingPlatform.removeContent(mockContent);
-        assertThat(streamingPlatform.getContents()).doesNotContain(mockContent);
-        assertThat(streamingPlatform.getContents())
-                .hasSize(contentDataProvider.fetchData().size());
+        platform.removeContent(mockContent);
+        assertThat(platform.getContents()).hasSize(initialSize);
+        assertThat(platform.getContents()).doesNotContain(mockContent);
     }
 
     @Test
     public void testAddContentThrowsNullPointerExceptionForNullContent() {
-        assertThatThrownBy(() -> streamingPlatform.addContent(null))
+        assertThatThrownBy(() -> platform.addContent(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content cannot be null");
     }
 
     @Test
     public void testAddContentThrowsIllegalArgumentExceptionForExistingContent() {
-        Content existingContent = contentDataProvider.fetchData().get(0);
-        assertThatThrownBy(() -> streamingPlatform.addContent(existingContent))
+        Content existingContent = platform.getContents().get(0);
+        assertThatThrownBy(() -> platform.addContent(existingContent))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Content already exists");
     }
 
     @Test
     public void testRemoveContentThrowsIllegalArgumentExceptionForNonExistingContent() {
-        Content mockContent = new MockContent();
+        Content mockContent = new MockContent("Mock Content");
 
-        assertThatThrownBy(() -> streamingPlatform.removeContent(mockContent))
+        assertThatThrownBy(() -> platform.removeContent(mockContent))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Content does not exist");
     }
 
     @Test
-    public void testReplaceContentRunsCorrectly() {
-        Content oldContent = contentDataProvider.fetchData().get(0);
-        var newReleaseDate = LocalDate.now();
-        Content newContent = new TVSeries.TVSeriesBuilder(oldContent.getTitle())
+    public void testUpdateContentRunsCorrectly() {
+        Content oldContent = new MockContent("Old Content Name");
+        platform.getContents().add(oldContent);
+        Content updatedContent = new MockContent.MockContentBuilder(oldContent.getTitle())
                 .withDescription("New description")
-                .withReleaseDate(newReleaseDate)
                 .build();
-        streamingPlatform.replaceContent(newContent);
 
-        Content content = streamingPlatform.getContents().stream()
+        platform.updateContent(updatedContent);
+
+        Content content = platform.getContents().stream()
                 .filter(c -> c.equals(oldContent))
                 .findFirst()
                 .orElse(null);
         assertThat(content).isNotNull();
         assertThat(content.getDescription()).isEqualTo("New description");
-        assertThat(content.getReleaseDate()).isEqualTo(newReleaseDate);
     }
 
     @Test
-    public void testReplaceContentThrowsIllegalArgumentExceptionForNonExistingContent() {
-        Content mockContent = new MockContent();
-        assertThatThrownBy(() -> streamingPlatform.replaceContent(mockContent))
+    public void testUpdateContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        Content mockContent = new MockContent("Mock Content");
+        assertThatThrownBy(() -> platform.updateContent(mockContent))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The content to be replaced does not exist in the platform.");
+                .hasMessage("The content to be updated does not exist in the platform.");
     }
 
     @Test
     public void testAddContentEvent() {
         var mockObserver = new MockObserver();
-        streamingPlatform.attach(mockObserver);
+        platform.addObserver(mockObserver);
 
-        Content mockNewContent = new MockContent();
-        streamingPlatform.addContent(mockNewContent);
+        Content mockNewContent = new MockContent("New Content");
+        platform.addContent(mockNewContent);
 
         AddContentEvent event = (AddContentEvent) mockObserver.getEvent();
         assertThat(event.getAddedContent()).isSameAs(mockNewContent);
@@ -214,28 +194,29 @@ public class StreamingPlatformTest {
     @Test
     public void testRemoveContentEvent() {
         var mockObserver = new MockObserver();
-        streamingPlatform.attach(mockObserver);
+        platform.addObserver(mockObserver);
 
-        Content existingContent = contentDataProvider.fetchData().get(0);
-        streamingPlatform.removeContent(existingContent);
+        Content existingContent = platform.getContents().get(0);
+        platform.removeContent(existingContent);
 
         RemoveContentEvent event = (RemoveContentEvent) mockObserver.getEvent();
         assertThat(event.getRemovedContent()).isSameAs(existingContent);
     }
 
     @Test
-    public void testReplaceContentEvent() {
+    public void testUpdateContentEvent() {
         var mockObserver = new MockObserver();
-        streamingPlatform.attach(mockObserver);
+        platform.addObserver(mockObserver);
 
-        Content oldContent = contentDataProvider.fetchData().get(0);
-        Content newContent = new TVSeries.TVSeriesBuilder(oldContent.getTitle())
+        Content oldContent = new MockContent("Old Content Name");
+        platform.getContents().add(oldContent);
+        Content updatedContent = new MockContent.MockContentBuilder(oldContent.getTitle())
                 .withDescription("New description")
                 .build();
-        streamingPlatform.replaceContent(newContent);
+        platform.updateContent(updatedContent);
 
-        ReplaceContentEvent event = (ReplaceContentEvent) mockObserver.getEvent();
+        UpdateContentEvent event = (UpdateContentEvent) mockObserver.getEvent();
         assertThat(event.getOldContent()).isSameAs(oldContent);
-        assertThat(event.getNewContent()).isSameAs(newContent);
+        assertThat(event.getUpdatedContent()).isSameAs(updatedContent);
     }
 }

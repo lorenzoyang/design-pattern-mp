@@ -66,7 +66,7 @@ public class ViewingProgressTest {
 
     @Test
     public void testIsCompletedReturnsTrueForCompletedViewingProgress() {
-        Content mockContent = new MockContent() {
+        Content mockContent = new MockContent("Mock Content") {
             @Override
             public double getDurationMinutes() {
                 return episode.getDurationMinutes();
@@ -79,7 +79,7 @@ public class ViewingProgressTest {
 
     @Test
     public void testIsCompletedReturnsFalseForIncompleteViewingProgress() {
-        Content mockContent = new MockContent() {
+        Content mockContent = new MockContent("Mock Content") {
             @Override
             public double getDurationMinutes() {
                 return episode.getDurationMinutes();

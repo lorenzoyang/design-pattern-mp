@@ -1,12 +1,12 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
 public class MockContent extends Content {
-    public MockContent() {
-        super(new MockContentBuilder("Mock Content"));
-    }
-
     public MockContent(String title) {
         super(new MockContentBuilder(title));
+    }
+
+    private MockContent(MockContentBuilder builder) {
+        super(builder);
     }
 
     @Override
@@ -19,8 +19,8 @@ public class MockContent extends Content {
         return currentProgress;
     }
 
-    private static class MockContentBuilder extends ContentBuilder<MockContentBuilder> {
-        private MockContentBuilder(String title) {
+    public static class MockContentBuilder extends ContentBuilder<MockContentBuilder> {
+        public MockContentBuilder(String title) {
             super(title);
         }
 
@@ -31,7 +31,7 @@ public class MockContent extends Content {
 
         @Override
         public Content build() {
-            throw new UnsupportedOperationException("MockContentBuilder cannot build Content");
+            return new MockContent(this);
         }
     }
 }

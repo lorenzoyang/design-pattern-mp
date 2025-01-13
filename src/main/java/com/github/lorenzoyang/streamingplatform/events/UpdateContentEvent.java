@@ -2,25 +2,25 @@ package com.github.lorenzoyang.streamingplatform.events;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 
-public class ReplaceContentEvent implements PlatformEvent {
+public class UpdateContentEvent implements PlatformEvent {
     private final Content oldContent;
-    private final Content newContent;
+    private final Content updatedContent;
 
-    public ReplaceContentEvent(Content oldContent, Content newContent) {
+    public UpdateContentEvent(Content oldContent, Content updatedContent) {
         this.oldContent = oldContent;
-        this.newContent = newContent;
+        this.updatedContent = updatedContent;
     }
 
     public Content getOldContent() {
         return oldContent;
     }
 
-    public Content getNewContent() {
-        return newContent;
+    public Content getUpdatedContent() {
+        return updatedContent;
     }
 
     @Override
     public void accept(PlatformEventVisitor visitor) {
-        visitor.visitReplaceContent(this);
+        visitor.visitUpdateContent(this);
     }
 }

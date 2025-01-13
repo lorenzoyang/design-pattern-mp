@@ -4,8 +4,7 @@ import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.PlatformEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
-import com.github.lorenzoyang.streamingplatform.events.ReplaceContentEvent;
-import com.github.lorenzoyang.streamingplatform.user.User;
+import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
 import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
@@ -19,25 +18,23 @@ public final class StreamingPlatform {
 
     private final Collection<PlatformObserver> observers;
 
-    public StreamingPlatform(String name, DataProvider<Content> contentProvider, DataProvider<User> userProvider) {
+    public StreamingPlatform(String name, DataProvider<Content> contentProvider) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
 
         Objects.requireNonNull(contentProvider, "Content provider cannot be null");
         this.contents = new ArrayList<>(contentProvider.fetchData());
 
-        Objects.requireNonNull(userProvider, "User provider cannot be null");
-        this.users = new ArrayList<>(userProvider.fetchData());
-
-        this.observers = new ArrayList<>(users);
+        this.users = new ArrayList<>();
+        this.observers = new ArrayList<>();
     }
 
-    public void attach(PlatformObserver observer) {
+    public void addObserver(PlatformObserver observer) {
         if (!observers.contains(observer)) {
             observers.add(observer);
         }
     }
 
-    public void detach(PlatformObserver observer) {
+    public void removeObserver(PlatformObserver observer) {
         observers.remove(observer);
     }
 
@@ -47,7 +44,7 @@ public final class StreamingPlatform {
             throw new IllegalArgumentException("User already registered");
         }
         users.add(user);
-        detach(user);
+        addObserver(user);
     }
 
     public void unregisterUser(User user) {
@@ -55,7 +52,7 @@ public final class StreamingPlatform {
             throw new IllegalArgumentException("User does not exist");
         }
         users.remove(user);
-        detach(user);
+        removeObserver(user);
     }
 
     public Optional<Content> getContentByTitle(String title) {
@@ -87,16 +84,16 @@ public final class StreamingPlatform {
         notifyObservers(new RemoveContentEvent(contentToRemove));
     }
 
-    public void replaceContent(Content newContent) {
+    public void updateContent(Content updatedContent) {
         Content oldContent = contents.stream()
-                .filter(existingContent -> existingContent.equals(newContent))
+                .filter(existingContent -> existingContent.equals(updatedContent))
                 .findFirst()
                 .orElseThrow(
-                        () -> new IllegalArgumentException("The content to be replaced does not exist in the platform.")
+                        () -> new IllegalArgumentException("The content to be updated does not exist in the platform.")
                 );
         contents.remove(oldContent);
-        contents.add(newContent);
-        notifyObservers(new ReplaceContentEvent(oldContent, newContent));
+        contents.add(updatedContent);
+        notifyObservers(new UpdateContentEvent(oldContent, updatedContent));
     }
 
     private void notifyObservers(PlatformEvent event) {
@@ -121,5 +118,5 @@ public final class StreamingPlatform {
     List<User> getUsers() {
         return users;
     }
-    
+
 }

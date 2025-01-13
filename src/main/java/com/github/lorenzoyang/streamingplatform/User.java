@@ -1,10 +1,11 @@
-package com.github.lorenzoyang.streamingplatform.user;
+package com.github.lorenzoyang.streamingplatform;
 
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
 import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
+import com.github.lorenzoyang.streamingplatform.utils.Gender;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 import java.util.*;
@@ -62,9 +63,9 @@ public class User implements PlatformObserver {
             }
 
             @Override
-            public void visitReplaceContent(ReplaceContentEvent event) {
+            public void visitUpdateContent(UpdateContentEvent event) {
                 Content oldContent = event.getOldContent();
-                Content newContent = event.getNewContent();
+                Content newContent = event.getUpdatedContent();
                 if (toWatchList.containsKey(oldContent)) {
                     ViewingProgress progress = toWatchList.get(oldContent);
                     toWatchList.remove(oldContent);

@@ -1,29 +1,23 @@
-package com.github.lorenzoyang.streamingplatform.user;
+package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.MockContentDataProvider;
-import com.github.lorenzoyang.streamingplatform.MockUserDataProvider;
-import com.github.lorenzoyang.streamingplatform.StreamingPlatform;
 import com.github.lorenzoyang.streamingplatform.content.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
-import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
+import com.github.lorenzoyang.streamingplatform.utils.Gender;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 public class UserTest {
-    private DataProvider<Content> contentDataProvider;
-    private DataProvider<User> userDataProvider;
     private StreamingPlatform platform;
+    private User registeredUser;
 
     @Before
     public void setUp() {
-        this.contentDataProvider = new MockContentDataProvider();
-        this.userDataProvider = new MockUserDataProvider();
-        this.platform = new StreamingPlatform("Streaming Platform", contentDataProvider, userDataProvider);
+        this.platform = new StreamingPlatform("Streaming Platform", new MockContentProvider());
+        this.registeredUser = new User.UserBuilder("username", "password").build();
+        this.platform.registerUser(registeredUser);
     }
 
     @Test
@@ -120,16 +114,16 @@ public class UserTest {
     @Test
     public void testWatchRunsCorrectly() {
         User user = new User.UserBuilder("username", "password").build();
-        Content content = new Movie.MovieBuilder(
-                "movie",
-                new Episode("episode", 1, 120)
-        ).build();
+        Content content = new TVSeries.TVSeriesBuilder("tvSeries")
+                .addSingleEpisode(1, new Episode("episode", 1, 60))
+                .build();
+        double totalDuration = content.getDurationMinutes();
 
-        user.watch(content, 60);
+        user.watch(content, totalDuration / 2);
         assertThat(user.getToWatchList()).hasSize(1);
         assertThat(user.getToWatchList()).containsOnlyKeys(content);
 
-        user.watch(content, 60);
+        user.watch(content, totalDuration / 2);
         assertThat(user.getToWatchList()).isEmpty();
         assertThat(user.getWatchedList()).hasSize(1);
         assertThat(user.getWatchedList()).containsExactly(content);
@@ -145,41 +139,46 @@ public class UserTest {
 
     @Test
     public void testUpdateForRemoveContentEvent() {
-        User registeredUser = userDataProvider.fetchData().get(0);
-        List<Content> contents = contentDataProvider.fetchData();
-        registeredUser.getToWatchList().put(contents.get(0), ViewingProgress.empty());
-        registeredUser.getWatchedList().add(contents.get(1));
+        Content toWatchContent = platform.getContents().get(0);
+        Content watchedContent = platform.getContents().get(1);
 
-        platform.removeContent(contents.get(0));
-        platform.removeContent(contents.get(1));
+        registeredUser.getToWatchList().put(toWatchContent, ViewingProgress.empty());
+        registeredUser.getWatchedList().add(watchedContent);
+
+        platform.removeContent(toWatchContent);
+        platform.removeContent(watchedContent);
 
         assertThat(registeredUser.getToWatchList()).isEmpty();
         assertThat(registeredUser.getWatchedList()).isEmpty();
     }
 
     @Test
-    public void testUpdateForReplaceContentEvent() {
-        User registeredUser = userDataProvider.fetchData().get(0);
-        Content toWatchTvSeries = contentDataProvider.fetchData().get(0);
-        Content watchedTvSeries = contentDataProvider.fetchData().get(1);
-        registeredUser.getToWatchList().put(toWatchTvSeries, ViewingProgress.empty());
-        registeredUser.getWatchedList().add(watchedTvSeries);
+    public void testUpdateForUpdateContentEvent() {
+        Content mockToWatchContent = new MockContent.MockContentBuilder("toWatchContent").build();
+        Content mockWatchedContent = new MockContent.MockContentBuilder("watchedContent").build();
+        platform.addContent(mockToWatchContent);
+        platform.addContent(mockWatchedContent);
 
-        Content newTvSeries = new TVSeries.TVSeriesBuilder(toWatchTvSeries.getTitle())
-                .withDescription("toWatchTvSeries Description")
-                .build();
-        platform.replaceContent(newTvSeries);
-        assertThat(registeredUser.getToWatchList()).containsOnlyKeys(newTvSeries);
-        Content updatedKeyOfToWatchList = registeredUser.getToWatchList().keySet().iterator().next();
-        assertThat(updatedKeyOfToWatchList.getDescription()).isEqualTo("toWatchTvSeries Description");
+        registeredUser.getToWatchList().put(mockToWatchContent, ViewingProgress.empty());
+        registeredUser.getWatchedList().add(mockWatchedContent);
 
-        newTvSeries = new TVSeries.TVSeriesBuilder(watchedTvSeries.getTitle())
-                .withDescription("watchedTvSeries Description")
+        Content mockNewToWatchContent = new MockContent.MockContentBuilder(mockToWatchContent.getTitle())
+                .withDescription("New description")
                 .build();
-        platform.replaceContent(newTvSeries);
-        assertThat(registeredUser.getWatchedList()).containsOnly(newTvSeries);
-        Content updatedKeyOfWatchedList = registeredUser.getWatchedList().iterator().next();
-        assertThat(updatedKeyOfWatchedList.getDescription()).isEqualTo("watchedTvSeries Description");
+        platform.updateContent(mockNewToWatchContent);
+
+        assertThat(registeredUser.getToWatchList()).containsOnlyKeys(mockNewToWatchContent);
+        Content updatedToWatchContent = registeredUser.getToWatchList().keySet().iterator().next();
+        assertThat(updatedToWatchContent.getDescription()).isEqualTo("New description");
+
+        Content mockNewWatchedContent = new MockContent.MockContentBuilder(mockWatchedContent.getTitle())
+                .withDescription("New description")
+                .build();
+        platform.updateContent(mockNewWatchedContent);
+
+        assertThat(registeredUser.getWatchedList()).containsOnly(mockNewWatchedContent);
+        Content updatedWatchedContent = registeredUser.getWatchedList().iterator().next();
+        assertThat(updatedWatchedContent.getDescription()).isEqualTo("New description");
     }
 
     @Test

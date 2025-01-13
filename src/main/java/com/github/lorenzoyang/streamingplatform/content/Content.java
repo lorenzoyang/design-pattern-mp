@@ -1,8 +1,8 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.User;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
-import com.github.lorenzoyang.streamingplatform.user.User;
 
 import java.time.LocalDate;
 import java.util.Objects;
