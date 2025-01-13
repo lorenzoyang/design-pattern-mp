@@ -1,5 +1,7 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
+
 import java.util.Objects;
 
 public class Movie extends Content {
@@ -31,6 +33,11 @@ public class Movie extends Content {
                 totalViewingDuration - currentProgress.getTotalViewingDuration(),
                 totalViewingDuration
         );
+    }
+
+    @Override
+    public <T> T accept(ContentVisitor<T> visitor) {
+        return visitor.visitMovie(this);
     }
 
     public static class MovieBuilder extends ContentBuilder<MovieBuilder> {

@@ -3,6 +3,7 @@ package com.github.lorenzoyang.streamingplatform.content;
 import com.github.lorenzoyang.streamingplatform.User;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
+import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -63,6 +64,8 @@ public abstract class Content {
             );
         }
     }
+
+    public abstract <T> T accept(ContentVisitor<T> visitor);
 
     @Override
     public boolean equals(Object o) {

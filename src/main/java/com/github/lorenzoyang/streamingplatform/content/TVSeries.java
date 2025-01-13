@@ -1,5 +1,7 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
+
 import java.util.*;
 
 public final class TVSeries extends Content {
@@ -18,6 +20,17 @@ public final class TVSeries extends Content {
         this.totalDurationMinutes = seasons.stream()
                 .mapToDouble(Season::getDurationMinutes)
                 .sum();
+    }
+
+    public Iterator<Episode> getEpisodes(int seasonNumber) {
+        if (seasonNumber < 1 || seasonNumber > seasons.size()) {
+            throw new IllegalArgumentException("Invalid season number");
+        }
+        return seasons.get(seasonNumber - 1).getEpisodes();
+    }
+
+    public int getSeasonsCount() {
+        return seasons.size();
     }
 
     @Override
@@ -61,6 +74,11 @@ public final class TVSeries extends Content {
         return startingEpisode;
     }
 
+    @Override
+    public <T> T accept(ContentVisitor<T> visitor) {
+        return visitor.visitTVSeries(this);
+    }
+
     // package-private getter for testing purposes
     List<Season> getSeasons() {
         return seasons;
@@ -77,22 +95,22 @@ public final class TVSeries extends Content {
             this.currentSeason = 1;
         }
 
-        public TVSeriesBuilder addSeason(int season) {
-            if (season != currentSeason + 1) {
+        public TVSeriesBuilder addSeason(int seasonNumber) {
+            if (seasonNumber != currentSeason + 1) {
                 throw new IllegalArgumentException("Invalid season number");
             }
-            seasons.put(season, new ArrayList<>());
-            currentSeason = season;
+            seasons.put(seasonNumber, new ArrayList<>());
+            currentSeason = seasonNumber;
             return this;
         }
 
-        public TVSeriesBuilder addSingleEpisode(int season, Episode episode) {
-            if (!seasons.containsKey(season)) {
-                throw new IllegalArgumentException("Season " + season + " does not exist");
+        public TVSeriesBuilder addSingleEpisode(int seasonNumber, Episode episode) {
+            if (!seasons.containsKey(seasonNumber)) {
+                throw new IllegalArgumentException("Season " + seasonNumber + " does not exist");
             }
             Objects.requireNonNull(episode, "Episode cannot be null");
 
-            List<Episode> episodes = seasons.get(season);
+            List<Episode> episodes = seasons.get(seasonNumber);
             if (episodes.stream()
                     .anyMatch(e -> e.getEpisodeNumber() == episode.getEpisodeNumber())) {
                 throw new IllegalArgumentException("Episode already exists");
@@ -100,13 +118,13 @@ public final class TVSeries extends Content {
             if (episode.getEpisodeNumber() != episodes.size() + 1) {
                 throw new IllegalArgumentException("Invalid episode number");
             }
-            seasons.get(season).add(episode);
+            seasons.get(seasonNumber).add(episode);
 
             return this;
         }
 
-        public TVSeriesBuilder addEpisodes(int season, List<Episode> episodes) {
-            episodes.forEach(e -> addSingleEpisode(season, e));
+        public TVSeriesBuilder addEpisodes(int seasonNumber, List<Episode> episodes) {
+            episodes.forEach(e -> addSingleEpisode(seasonNumber, e));
             return this;
         }
 
