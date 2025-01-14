@@ -1,9 +1,9 @@
 package com.github.lorenzoyang.streamingplatform.utils;
 
 import com.github.lorenzoyang.streamingplatform.User;
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.Movie;
-import com.github.lorenzoyang.streamingplatform.content.TVSeries;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
+import com.github.lorenzoyang.streamingplatform.contents.Movie;
+import com.github.lorenzoyang.streamingplatform.contents.TVSeries;
 
 public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
     private final User user;

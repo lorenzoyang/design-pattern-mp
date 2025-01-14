@@ -1,9 +1,9 @@
 package com.github.lorenzoyang.streamingplatform.utils;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.Episode;
-import com.github.lorenzoyang.streamingplatform.content.Movie;
-import com.github.lorenzoyang.streamingplatform.content.TVSeries;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
+import com.github.lorenzoyang.streamingplatform.contents.Episode;
+import com.github.lorenzoyang.streamingplatform.contents.Movie;
+import com.github.lorenzoyang.streamingplatform.contents.TVSeries;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,16 +62,14 @@ public class DisplayContentVisitorTest {
                 "Description: description\n" +
                 "Release Date: 01 Jan 2025\n" +
                 "Total duration: 80 minutes\n" +
-                "Season 1:\n" +
-                "    Episode Number: 1\n" +
-                "    Episode Duration: 20 minutes\n" +
-                "    Episode Number: 2\n" +
-                "    Episode Duration: 20 minutes\n" +
-                "Season 2:\n" +
-                "    Episode Number: 1\n" +
-                "    Episode Duration: 20 minutes\n" +
-                "    Episode Number: 2\n" +
-                "    Episode Duration: 20 minutes\n";
+                "Season 1:   Episode Number: 1\n" +
+                "  Episode Duration: 20 minutes\n" +
+                "  Episode Number: 2\n" +
+                "  Episode Duration: 20 minutes\n" +
+                "Season 2:   Episode Number: 1\n" +
+                "  Episode Duration: 20 minutes\n" +
+                "  Episode Number: 2\n" +
+                "  Episode Duration: 20 minutes\n";
 
         assertThat(output).isEqualTo(expectedOutput);
     }

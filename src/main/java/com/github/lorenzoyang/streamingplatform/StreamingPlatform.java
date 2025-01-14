@@ -1,6 +1,6 @@
 package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.PlatformEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
@@ -92,7 +92,7 @@ public final class StreamingPlatform {
                 .filter(existingContent -> existingContent.equals(updatedContent))
                 .findFirst()
                 .orElseThrow(
-                        () -> new IllegalArgumentException("The content to be updated does not exist in the platform.")
+                        () -> new IllegalArgumentException("The contents to be updated does not exist in the platform.")
                 );
         contents.remove(oldContent);
         contents.add(updatedContent);

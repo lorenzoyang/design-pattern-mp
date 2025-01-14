@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.contents;
 
 import com.github.lorenzoyang.streamingplatform.User;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
@@ -8,32 +8,31 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.Assert.*;
 
 public class MovieTest {
     private Episode episode;
-    private LocalDate releaseDate;
 
     @Before
     public void setUp() {
         this.episode = new Episode(1, 120);
-        this.releaseDate = LocalDate.of(2025, 1, 1);
     }
 
     @Test
     public void testMovieBuilderCreatesMovieWithValidArguments() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode)
+        LocalDate releaseDate = LocalDate.of(2025, 1, 1);
+        Movie movie = new Movie.MovieBuilder("movie", episode)
                 .requiresSubscription()
                 .withDescription("description")
                 .withReleaseDate(releaseDate)
                 .build();
 
-        assertThat(movie.getTitle()).isEqualTo("movie1");
-        assertThat(movie.getDescription()).isEqualTo("description");
-        assertThat(movie.getReleaseDate()).isEqualTo(releaseDate);
-        assertThat(movie.getEpisode()).isEqualTo(episode);
-        assertThat(movie.isFree()).isFalse();
+        assertEquals("movie", movie.getTitle());
+        assertEquals("description", movie.getDescription());
+        assertEquals(releaseDate, movie.getReleaseDate());
+        assertEquals(episode, movie.getEpisode());
+        assertFalse(movie.isFree());
     }
 
     @Test
@@ -55,36 +54,46 @@ public class MovieTest {
     }
 
     @Test
-    public void testWithDescriptionThrowsInvalidContentExceptionForInvalidDescription() {
+    public void testMovieBuilderConstructorThrowsInvalidContentExceptionForInvalidEpisodeNumber() {
+        var episode = new Episode(2, 120);
+
+        assertThatThrownBy(() -> new Movie.MovieBuilder("movie1", episode))
+                .isInstanceOf(InvalidContentException.class)
+                .hasMessage("Movie can only have one episode");
+    }
+
+    @Test
+    public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
         var builder = new Movie.MovieBuilder("movie1", episode);
 
         assertThatThrownBy(() -> builder.withDescription(null))
-                .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Description cannot be null or blank");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Description cannot be null");
+    }
+
+    @Test
+    public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
+        var builder = new Movie.MovieBuilder("movie1", episode);
 
         assertThatThrownBy(() -> builder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Description cannot be null or blank");
+                .hasMessage("Description cannot be blank");
     }
 
-
     @Test
-    public void testWithReleaseDateThrowsInvalidContentExceptionForInvalidReleaseDate() {
+    public void testWithReleaseDateThrowsNullPointerExceptionForNullReleaseDate() {
         var builder = new Movie.MovieBuilder("movie1", episode);
 
         assertThatThrownBy(() -> builder.withReleaseDate(null))
-                .isInstanceOf(InvalidContentException.class)
+                .isInstanceOf(NullPointerException.class)
                 .hasMessage("Release date cannot be null");
-
-        assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(10)))
-                .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Release date cannot be in the future");
     }
 
     @Test
     public void testGetDurationMinutesRunsCorrectly() {
         Movie movie = new Movie.MovieBuilder("movie1", episode).build();
-        assertThat(movie.getDurationMinutes()).isEqualTo(episode.getDurationMinutes());
+
+        assertEquals(episode.getDurationMinutes(), movie.getDurationMinutes());
     }
 
     @Test
@@ -96,32 +105,17 @@ public class MovieTest {
                 .subscribe()
                 .build();
 
-        ViewingProgress progress = movie.play(user, ViewingProgress.empty(), 60);
-
-        assertThat(progress.getStartingEpisode()).isEqualTo(episode);
-        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
-        assertThat(progress.getTotalViewingDuration()).isEqualTo(60);
-        assertThat(progress.isCompleted(movie)).isFalse();
-
-        progress = movie.play(user, progress, 60);
-        assertThat(progress.getStartingEpisode()).isEqualTo(episode);
-        assertThat(progress.getCurrentViewingDuration()).isEqualTo(60);
-        assertThat(progress.getTotalViewingDuration()).isEqualTo(120);
-        assertThat(progress.isCompleted(movie)).isTrue();
+        String expected = String.format("Playing movie '%s' for %d minutes.", movie.getTitle(), 60);
+        assertEquals(expected, movie.play(user, 60));
     }
 
     @Test
-    public void testPlayThrowsNullPointerExceptionForNullArguments() {
+    public void testPlayThrowsNullPointerExceptionForNullUser() {
         Movie movie = new Movie.MovieBuilder("movie1", episode).build();
-        User user = new User.UserBuilder("user1", "password").build();
 
-        assertThatThrownBy(() -> movie.play(null, ViewingProgress.empty(), 60))
+        assertThatThrownBy(() -> movie.play(null, 60))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("User cannot be null");
-
-        assertThatThrownBy(() -> movie.play(user, null, 60))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Current progress cannot be null");
     }
 
     @Test
@@ -129,7 +123,7 @@ public class MovieTest {
         Movie movie = new Movie.MovieBuilder("movie1", episode).build();
         User user = new User.UserBuilder("user1", "password").build();
 
-        assertThatThrownBy(() -> movie.play(user, ViewingProgress.empty(), -1))
+        assertThatThrownBy(() -> movie.play(user, -1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Time to watch cannot be negative");
     }
@@ -142,9 +136,9 @@ public class MovieTest {
         User user = new User.UserBuilder("user1", "password")
                 .build();
 
-        assertThatThrownBy(() -> movie.play(user, ViewingProgress.empty(), 60))
+        assertThatThrownBy(() -> movie.play(user, 60))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessage(String.format("User %s does not have access to content '%s'.",
+                .hasMessage(String.format("User %s does not have access to contents '%s'.",
                         user.getUsername(), movie.getTitle()));
     }
 
@@ -153,7 +147,7 @@ public class MovieTest {
         Movie movie1 = new Movie.MovieBuilder("movie1", episode).build();
         Movie movie2 = new Movie.MovieBuilder("movie1", episode).build();
 
-        assertThat(movie1).isEqualTo(movie2);
+        assertEquals(movie1, movie2);
     }
 
     @Test
@@ -161,7 +155,7 @@ public class MovieTest {
         Movie movie1 = new Movie.MovieBuilder("movie1", episode).build();
         Movie movie2 = new Movie.MovieBuilder("movie2", episode).build();
 
-        assertThat(movie1).isNotEqualTo(movie2);
+        assertNotEquals(movie1, movie2);
     }
 
     @Test
@@ -170,8 +164,8 @@ public class MovieTest {
         Movie movie2 = new Movie.MovieBuilder("movie1", episode).build();
         Movie movie3 = new Movie.MovieBuilder("movie2", episode).build();
 
-        assertThat(movie1.hashCode()).isEqualTo(movie2.hashCode());
-        assertThat(movie1.hashCode()).isNotEqualTo(movie3.hashCode());
-        assertThat(movie2.hashCode()).isNotEqualTo(movie3.hashCode());
+        assertEquals(movie1.hashCode(), movie2.hashCode());
+        assertNotEquals(movie1.hashCode(), movie3.hashCode());
+        assertNotEquals(movie2.hashCode(), movie3.hashCode());
     }
 }

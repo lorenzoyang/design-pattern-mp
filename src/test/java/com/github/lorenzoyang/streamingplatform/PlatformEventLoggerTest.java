@@ -1,7 +1,7 @@
 package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.MockContent;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
+import com.github.lorenzoyang.streamingplatform.contents.MockContent;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,14 +1,15 @@
 package com.github.lorenzoyang.streamingplatform;
 
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.ViewingProgress;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
 import com.github.lorenzoyang.streamingplatform.events.*;
-import com.github.lorenzoyang.streamingplatform.exceptions.UserValidationException;
+import com.github.lorenzoyang.streamingplatform.exceptions.InvalidUserException;
 import com.github.lorenzoyang.streamingplatform.utils.Gender;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 
 public class User implements PlatformObserver {
@@ -19,7 +20,7 @@ public class User implements PlatformObserver {
     private final Gender gender;
     private final boolean hasSubscription;
 
-    private final Map<Content, ViewingProgress> toWatchList;
+    private final Set<Content> toWatchList;
     private final Set<Content> watchedList;
 
     private User(UserBuilder builder) {
@@ -30,22 +31,15 @@ public class User implements PlatformObserver {
         this.gender = builder.gender;
         this.hasSubscription = builder.hasSubscription;
 
-        this.toWatchList = new HashMap<>();
+        this.toWatchList = new HashSet<>();
         this.watchedList = new HashSet<>();
     }
 
     public void watch(Content content, int timeToWatch) {
         Objects.requireNonNull(content, "Content cannot be null");
-
-        ViewingProgress currentProgress = toWatchList.getOrDefault(content, ViewingProgress.empty());
-        currentProgress = content.play(this, currentProgress, timeToWatch);
-
-        if (currentProgress.isCompleted(content)) {
-            toWatchList.remove(content);
-            watchedList.add(content);
-        } else {
-            toWatchList.put(content, currentProgress);
-        }
+        content.play(this, timeToWatch);
+        toWatchList.add(content);
+        watchedList.remove(content);
     }
 
     @Override
@@ -53,6 +47,7 @@ public class User implements PlatformObserver {
         event.accept(new PlatformEventVisitor() {
             @Override
             public void visitAddContent(AddContentEvent event) {
+                // do nothing
             }
 
             @Override
@@ -65,15 +60,14 @@ public class User implements PlatformObserver {
             @Override
             public void visitUpdateContent(UpdateContentEvent event) {
                 Content oldContent = event.getOldContent();
-                Content newContent = event.getUpdatedContent();
-                if (toWatchList.containsKey(oldContent)) {
-                    ViewingProgress progress = toWatchList.get(oldContent);
+                Content updatedContent = event.getUpdatedContent();
+                if (toWatchList.contains(oldContent)) {
                     toWatchList.remove(oldContent);
-                    toWatchList.put(newContent, progress);
+                    toWatchList.add(updatedContent);
                 }
                 if (watchedList.contains(oldContent)) {
                     watchedList.remove(oldContent);
-                    watchedList.add(newContent);
+                    watchedList.add(updatedContent);
                 }
             }
         });
@@ -104,7 +98,7 @@ public class User implements PlatformObserver {
     }
 
     // package-private getter for testing purposes
-    Map<Content, ViewingProgress> getToWatchList() {
+    Set<Content> getToWatchList() {
         return toWatchList;
     }
 
@@ -135,10 +129,10 @@ public class User implements PlatformObserver {
 
         public UserBuilder(String username, String password) {
             if (username == null || username.contains(" ")) {
-                throw new UserValidationException("Username cannot be null or contain spaces");
+                throw new InvalidUserException("Username cannot be null or contain spaces");
             }
             if (password == null || password.contains(" ")) {
-                throw new UserValidationException("Password cannot be null or contain spaces");
+                throw new InvalidUserException("Password cannot be null or contain spaces");
             }
             this.username = username;
             this.password = password;
@@ -150,7 +144,7 @@ public class User implements PlatformObserver {
 
         public UserBuilder withEmail(String email) {
             if (email == null || !email.contains("@") || !email.contains(".")) {
-                throw new UserValidationException("Email must be a valid format containing '@' and '.'");
+                throw new InvalidUserException("Email must be a valid format containing '@' and '.'");
             }
             this.email = email;
             return this;
@@ -158,7 +152,7 @@ public class User implements PlatformObserver {
 
         public UserBuilder withAge(int age) {
             if (age < 13 || age > 150) {
-                throw new UserValidationException("Age must be between 13 and 150.");
+                throw new InvalidUserException("Age must be between 13 and 150.");
             }
             this.age = age;
             return this;

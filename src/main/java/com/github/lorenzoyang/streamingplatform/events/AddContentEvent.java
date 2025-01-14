@@ -1,6 +1,6 @@
 package com.github.lorenzoyang.streamingplatform.events;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
 
 public class AddContentEvent implements PlatformEvent {
     private final Content addedContent;

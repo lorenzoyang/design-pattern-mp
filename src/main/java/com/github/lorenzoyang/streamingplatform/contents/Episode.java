@@ -1,4 +1,6 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.contents;
+
+import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
 
 import java.util.Objects;
 
@@ -8,12 +10,12 @@ public class Episode {
 
     public Episode(int episodeNumber, int durationMinutes) {
         if (episodeNumber <= 0) {
-            throw new IllegalArgumentException("Episode number must be positive and non-zero");
+            throw new InvalidEpisodeException("Episode number must be a positive integer greater than 0.");
         }
         this.episodeNumber = episodeNumber;
 
         if (durationMinutes <= 0) {
-            throw new IllegalArgumentException("Duration must be positive and non-zero");
+            throw new InvalidEpisodeException("Duration must be a positive integer greater than 0.");
         }
         this.durationMinutes = durationMinutes;
     }

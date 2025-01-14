@@ -1,8 +1,8 @@
 package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.MockContent;
-import com.github.lorenzoyang.streamingplatform.content.TVSeries;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
+import com.github.lorenzoyang.streamingplatform.contents.MockContent;
+import com.github.lorenzoyang.streamingplatform.contents.TVSeries;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
@@ -180,7 +180,7 @@ public class StreamingPlatformTest {
         Content mockContent = new MockContent("Mock Content");
         assertThatThrownBy(() -> platform.updateContent(mockContent))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The content to be updated does not exist in the platform.");
+                .hasMessage("The contents to be updated does not exist in the platform.");
     }
 
     @Test

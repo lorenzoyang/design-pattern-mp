@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.contents;
 
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
@@ -17,8 +17,8 @@ public class MockContent extends Content {
     }
 
     @Override
-    protected ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch) {
-        return currentProgress;
+    protected String playContent(int timeToWatch) {
+        return "Playing mock contents '" + getTitle() + "' for " + timeToWatch + " minutes.";
     }
 
     @Override

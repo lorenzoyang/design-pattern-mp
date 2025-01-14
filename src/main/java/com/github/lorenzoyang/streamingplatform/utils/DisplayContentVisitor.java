@@ -1,8 +1,9 @@
 package com.github.lorenzoyang.streamingplatform.utils;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
-import com.github.lorenzoyang.streamingplatform.content.Movie;
-import com.github.lorenzoyang.streamingplatform.content.TVSeries;
+import com.github.lorenzoyang.streamingplatform.contents.Content;
+import com.github.lorenzoyang.streamingplatform.contents.Movie;
+import com.github.lorenzoyang.streamingplatform.contents.Season;
+import com.github.lorenzoyang.streamingplatform.contents.TVSeries;
 
 import java.time.format.DateTimeFormatter;
 
@@ -25,17 +26,17 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
 
     @Override
     public String visitTVSeries(TVSeries tvSeries) {
-        var builder = new StringBuilder();
-        builder.append(displayContent(tvSeries)).append("\n");
+        var sb = new StringBuilder();
+        sb.append(displayContent(tvSeries)).append("\n");
 
-        for (int seasonNumber = 1; seasonNumber <= tvSeries.getSeasonsCount(); seasonNumber++) {
-            builder.append("Season ").append(seasonNumber).append(":\n");
-            tvSeries.getEpisodes(seasonNumber).forEachRemaining(episode -> {
-                builder.append("    Episode Number: ").append(episode.getEpisodeNumber()).append("\n")
-                        .append("    Episode Duration: ").append(episode.getDurationMinutes()).append(" minutes\n");
+        for (Season season : tvSeries.getSeasons()) {
+            sb.append("Season ").append(season.getSeasonNumber()).append(": ");
+            season.getEpisodes().forEachRemaining(episode -> {
+                sb.append("  Episode Number: ").append(episode.getEpisodeNumber()).append("\n")
+                        .append("  Episode Duration: ").append(episode.getDurationMinutes()).append(" minutes\n");
             });
         }
-        return builder.toString();
+        return sb.toString();
     }
 
     private String displayContent(Content content) {

@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.contents;
 
 import com.github.lorenzoyang.streamingplatform.User;
 import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
@@ -39,28 +39,24 @@ public abstract class Content {
 
     public abstract int getDurationMinutes();
 
-    public final ViewingProgress play(User user, ViewingProgress currentProgress, int timeToWatch) {
+    public final String play(User user, int timeToWatch) {
         Objects.requireNonNull(user, "User cannot be null");
-        Objects.requireNonNull(currentProgress, "Current progress cannot be null");
+
         if (timeToWatch < 0) {
             throw new IllegalArgumentException("Time to watch cannot be negative");
         }
 
         ensureUserHasAccess(user);
 
-        if (currentProgress.isCompleted(this)) {
-            throw new IllegalArgumentException("Content has already been completed");
-        }
-
-        return playContent(currentProgress, timeToWatch);
+        return playContent(timeToWatch);
     }
 
-    protected abstract ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch);
+    protected abstract String playContent(int timeToWatch);
 
     private void ensureUserHasAccess(User user) {
         if (!user.hasSubscription() && !isFree()) {
             throw new AccessDeniedException(
-                    String.format("User %s does not have access to content '%s'.", user.getUsername(), getTitle())
+                    String.format("User %s does not have access to contents '%s'.", user.getUsername(), getTitle())
             );
         }
     }
@@ -102,21 +98,16 @@ public abstract class Content {
         }
 
         public final T withDescription(String description) {
-            if (description == null || description.isBlank()) {
-                throw new InvalidContentException("Description cannot be null or blank");
+            Objects.requireNonNull(description, "Description cannot be null");
+            if (description.isBlank()) {
+                throw new InvalidContentException("Description cannot be blank");
             }
             this.description = description;
             return self();
         }
 
         public final T withReleaseDate(LocalDate releaseDate) {
-            if (releaseDate == null) {
-                throw new InvalidContentException("Release date cannot be null");
-            }
-            if (releaseDate.isAfter(LocalDate.now())) {
-                throw new InvalidContentException("Release date cannot be in the future");
-            }
-            this.releaseDate = releaseDate;
+            this.releaseDate = Objects.requireNonNull(releaseDate, "Release date cannot be null");
             return self();
         }
 
