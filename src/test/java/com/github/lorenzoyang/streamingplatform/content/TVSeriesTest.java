@@ -166,6 +166,27 @@ public class TVSeriesTest {
     }
 
     @Test
+    public void testGetEpisodesRunsCorrectly() {
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
+                .addEpisodes(1, episodes)
+                .build();
+        assertThat(tvSeries.getEpisodes(1))
+                .toIterable()
+                .isEqualTo(episodes);
+    }
+
+    @Test
+    public void testGetEpisodesThrowsIllegalArgumentExceptionForNonExistingSeason() {
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
+                .addEpisodes(1, episodes)
+                .build();
+
+        assertThatThrownBy(() -> tvSeries.getEpisodes(2))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Season 2 does not exist");
+    }
+
+    @Test
     public void testPlayRunsCorrectly() {
         var episode = new Episode("episode", 1, EPISODE_DURATION);
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")

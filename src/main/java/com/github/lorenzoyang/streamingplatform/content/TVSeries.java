@@ -24,7 +24,7 @@ public final class TVSeries extends Content {
 
     public Iterator<Episode> getEpisodes(int seasonNumber) {
         if (seasonNumber < 1 || seasonNumber > seasons.size()) {
-            throw new IllegalArgumentException("Invalid season number");
+            throw new IllegalArgumentException("Season " + seasonNumber + " does not exist");
         }
         return seasons.get(seasonNumber - 1).getEpisodes();
     }

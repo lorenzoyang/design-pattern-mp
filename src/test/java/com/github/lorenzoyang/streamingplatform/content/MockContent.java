@@ -1,5 +1,7 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
+import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
+
 public class MockContent extends Content {
     public MockContent(String title) {
         super(new MockContentBuilder(title));
@@ -17,6 +19,11 @@ public class MockContent extends Content {
     @Override
     protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
         return currentProgress;
+    }
+
+    @Override
+    public <T> T accept(ContentVisitor<T> visitor) {
+        return null;
     }
 
     public static class MockContentBuilder extends ContentBuilder<MockContentBuilder> {
