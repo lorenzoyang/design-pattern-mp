@@ -15,15 +15,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class DisplayContentVisitorTest {
     private DisplayContentVisitor displayContentVisitor;
+    private LocalDate releaseDate;
 
     @Before
     public void setUp() {
         displayContentVisitor = new DisplayContentVisitor();
+        this.releaseDate = LocalDate.of(2025, 1, 1);
     }
 
     @Test
     public void testVisitMovieRunsCorrectly() {
-        LocalDate releaseDate = LocalDate.now();
         Content content = new Movie.MovieBuilder("movie", new Episode("episode", 1, 120))
                 .withDescription("description")
                 .withReleaseDate(releaseDate)
@@ -33,7 +34,7 @@ public class DisplayContentVisitorTest {
         String output = content.accept(displayContentVisitor);
         String expectedOutput = "Title: movie\n" +
                 "Description: description\n" +
-                "Release Date: 2025-01-14\n" +
+                "Release Date: 01 Jan 2025\n" +
                 "Total duration: 120.0 minutes\n" +
                 "Episode Title: episode";
 
@@ -42,7 +43,6 @@ public class DisplayContentVisitorTest {
 
     @Test
     public void testVisitTVSeriesRunsCorrectly() {
-        LocalDate releaseDate = LocalDate.now();
         Content content = new TVSeries.TVSeriesBuilder("tvSeries")
                 .withDescription("description")
                 .withReleaseDate(releaseDate)
@@ -60,7 +60,7 @@ public class DisplayContentVisitorTest {
         String output = content.accept(displayContentVisitor);
         String expectedOutput = "Title: tvSeries\n" +
                 "Description: description\n" +
-                "Release Date: 2025-01-14\n" +
+                "Release Date: 01 Jan 2025\n" +
                 "Total duration: 80.0 minutes\n" +
                 "Season 1:\n" +
                 "    Episode Number: 1\n" +

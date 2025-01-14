@@ -2,9 +2,11 @@ package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.MockContent;
+import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
+import com.github.lorenzoyang.streamingplatform.utils.DownloadResult;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +29,9 @@ public class StreamingPlatformTest {
 
         this.user = new User.UserBuilder("username", "password").build();
 
-        this.registeredUser = new User.UserBuilder("registeredUsername", "password").build();
+        this.registeredUser = new User.UserBuilder("registeredUsername", "password")
+                .subscribe()
+                .build();
         this.platform.getUsers().add(registeredUser);
         this.platform.getObservers().add(registeredUser);
     }
@@ -218,5 +222,87 @@ public class StreamingPlatformTest {
         UpdateContentEvent event = (UpdateContentEvent) mockObserver.getEvent();
         assertThat(event.getOldContent()).isSameAs(oldContent);
         assertThat(event.getUpdatedContent()).isSameAs(updatedContent);
+    }
+
+    @Test
+    public void testDisplayContentRunsCorrectly() {
+        Content existingContent = platform.getContents().get(0);
+
+        String expectedMsg = "Title: movie1\n" +
+                "Description: Description of movie1\n" +
+                "Release Date: 01 Jan 2025\n" +
+                "Total duration: 120.0 minutes\n" +
+                "Episode Title: episode1";
+        assertThat(platform.displayContent(existingContent)).isEqualTo(expectedMsg);
+    }
+
+    @Test
+    public void testDisplayContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        Content mockContent = new MockContent("Mock Content");
+        assertThatThrownBy(() -> platform.displayContent(mockContent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Content does not exist in the platform");
+    }
+
+    @Test
+    public void testDownloadContentRunsCorrectly() {
+        Content notFreeExistignContent = new TVSeries.TVSeriesBuilder("testDownloadContentRunsCorrectlyTvSeries")
+                .requiresSubscription()
+                .build();
+        platform.getContents().add(notFreeExistignContent);
+
+        DownloadResult result = platform.downloadContent(registeredUser, notFreeExistignContent);
+
+        String expectedMsg = "Downloading TV series: testDownloadContentRunsCorrectlyTvSeries\n";
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getMessage()).isEqualTo(expectedMsg);
+
+        assertThat(platform.getDownloadHistory()).hasSize(1);
+        assertThat(platform.getDownloadHistory().keySet()).containsExactly(registeredUser);
+        assertThat(platform.getDownloadHistory().get(registeredUser)).containsExactly(result);
+
+        User notSubscribed = this.user;
+        platform.getUsers().add(notSubscribed);
+        DownloadResult notSubscribedResult = platform.downloadContent(notSubscribed, notFreeExistignContent);
+
+        expectedMsg = "You need a subscription to download this TV series";
+        assertThat(notSubscribedResult.isSuccess()).isFalse();
+        assertThat(notSubscribedResult.getMessage()).isEqualTo(expectedMsg);
+
+        assertThat(platform.getDownloadHistory()).hasSize(2);
+        assertThat(platform.getDownloadHistory().keySet()).containsExactly(registeredUser, notSubscribed);
+        assertThat(platform.getDownloadHistory().get(notSubscribed)).containsExactly(notSubscribedResult);
+    }
+
+    @Test
+    public void testDownloadContentThrowsIllegalArgumentExceptionForNonExistingUser() {
+        Content existingContent = platform.getContents().get(0);
+        assertThatThrownBy(() -> platform.downloadContent(user, existingContent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User not yet registered");
+    }
+
+    @Test
+    public void testDownloadContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        assertThatThrownBy(() -> platform.downloadContent(registeredUser, new MockContent("Mock Content")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Content does not exist in the platform");
+    }
+
+    @Test
+    public void testGetDownloadHistoryRunsCorrectly() {
+        Content existingContent = platform.getContents().get(0);
+        DownloadResult result = platform.downloadContent(registeredUser, existingContent);
+
+        assertThat(platform.getDownloadHistory(registeredUser))
+                .toIterable()
+                .containsExactly(result);
+    }
+
+    @Test
+    public void testGetDownloadHistoryThrowsIllegalArgumentExceptionForNonExistingUser() {
+        assertThatThrownBy(() -> platform.getDownloadHistory(user))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User not yet registered");
     }
 }

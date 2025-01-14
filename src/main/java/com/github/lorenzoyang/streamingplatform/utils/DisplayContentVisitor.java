@@ -4,7 +4,19 @@ import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.Movie;
 import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 
+import java.time.format.DateTimeFormatter;
+
 public class DisplayContentVisitor implements ContentVisitor<String> {
+    private final DateTimeFormatter DATE_FORMATTER;
+
+    public DisplayContentVisitor() {
+        this(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+    }
+
+    public DisplayContentVisitor(DateTimeFormatter DATE_FORMATTER) {
+        this.DATE_FORMATTER = DATE_FORMATTER;
+    }
+
     @Override
     public String visitMovie(Movie movie) {
         return displayContent(movie) + "\n" +
@@ -30,7 +42,7 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
     private String displayContent(Content content) {
         return "Title: " + content.getTitle() + "\n" +
                 "Description: " + content.getDescription() + "\n" +
-                "Release Date: " + content.getReleaseDate() + "\n" +
+                "Release Date: " + content.getReleaseDate().format(DATE_FORMATTER) + "\n" +
                 "Total duration: " + content.getDurationMinutes() + " minutes";
     }
 }

@@ -13,15 +13,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class MovieTest {
     private Episode episode;
+    private LocalDate releaseDate;
 
     @Before
     public void setUp() {
         this.episode = new Episode("episode", 1, 120);
+        this.releaseDate = LocalDate.of(2025, 1, 1);
     }
 
     @Test
     public void testMovieBuilderCreatesMovieWithValidArguments() {
-        var releaseDate = LocalDate.now();
         Movie movie = new Movie.MovieBuilder("movie1", episode)
                 .requiresSubscription()
                 .withDescription("description")
@@ -75,7 +76,7 @@ public class MovieTest {
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Release date cannot be null");
 
-        assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(1)))
+        assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(10)))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Release date cannot be in the future");
     }

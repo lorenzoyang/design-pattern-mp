@@ -5,8 +5,7 @@ import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.PlatformEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
-import com.github.lorenzoyang.streamingplatform.utils.DataProvider;
-import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
+import com.github.lorenzoyang.streamingplatform.utils.*;
 
 import java.util.*;
 
@@ -18,6 +17,8 @@ public final class StreamingPlatform {
 
     private final Collection<PlatformObserver> observers;
 
+    private final Map<User, List<DownloadResult>> downloadHistory;
+
     public StreamingPlatform(String name, DataProvider<Content> contentProvider) {
         this.name = Objects.requireNonNull(name, "Name cannot be null");
 
@@ -26,6 +27,8 @@ public final class StreamingPlatform {
 
         this.users = new ArrayList<>();
         this.observers = new ArrayList<>();
+
+        this.downloadHistory = new HashMap<>();
     }
 
     public void addObserver(PlatformObserver observer) {
@@ -100,8 +103,39 @@ public final class StreamingPlatform {
         observers.forEach(observer -> observer.update(event));
     }
 
+    public String displayContent(Content content) {
+        if (!contents.contains(content)) {
+            throw new IllegalArgumentException("Content does not exist in the platform");
+        }
+        return content.accept(new DisplayContentVisitor());
+    }
+
+    public DownloadResult downloadContent(User user, Content content) {
+        if (!users.contains(user)) {
+            throw new IllegalArgumentException("User not yet registered");
+        }
+        if (!contents.contains(content)) {
+            throw new IllegalArgumentException("Content does not exist in the platform");
+        }
+        DownloadResult result = content.accept(new DownloadContentVisitor(user));
+        downloadHistory.computeIfAbsent(user, k -> new ArrayList<>()).add(result);
+        return result;
+    }
+
+    public Iterator<DownloadResult> getDownloadHistory(User user) {
+        if (!users.contains(user)) {
+            throw new IllegalArgumentException("User not yet registered");
+        }
+        return downloadHistory.getOrDefault(user, Collections.emptyList()).iterator();
+    }
+
     public String getName() {
         return name;
+    }
+
+    // package-private getter for testing purposes
+    Map<User, List<DownloadResult>> getDownloadHistory() {
+        return downloadHistory;
     }
 
     // package-private getter for testing purposes

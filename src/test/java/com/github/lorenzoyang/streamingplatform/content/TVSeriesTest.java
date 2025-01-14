@@ -16,10 +16,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class TVSeriesTest {
     private final double EPISODE_DURATION = 20;
 
+    private LocalDate releaseDate;
     private List<Episode> episodes;
 
     @Before
     public void setUp() {
+        this.releaseDate = LocalDate.of(2025, 1, 1);
         this.episodes = new ArrayList<>(List.of(
                 new Episode("episode1", 1, EPISODE_DURATION),
                 new Episode("episode2", 2, EPISODE_DURATION),
@@ -31,7 +33,6 @@ public class TVSeriesTest {
     public void testTVSeriesBuilderCreatesTVSeriesWithValidArguments() {
         var episode1 = new Episode("episode1", episodes.size() + 1, EPISODE_DURATION);
         var episode2 = new Episode("episode2", 1, EPISODE_DURATION);
-        var releaseDate = LocalDate.now();
 
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
                 .requiresSubscription()
@@ -101,7 +102,7 @@ public class TVSeriesTest {
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Release date cannot be null");
 
-        assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(1)))
+        assertThatThrownBy(() -> builder.withReleaseDate(LocalDate.now().plusDays(10)))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Release date cannot be in the future");
     }

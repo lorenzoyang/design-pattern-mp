@@ -13,19 +13,20 @@ public class MockContentProvider implements DataProvider<Content> {
     private final List<Content> contents;
 
     public MockContentProvider() {
+        LocalDate releaseDate = LocalDate.of(2025, 1, 1);
         this.contents = List.of(
                 new Movie.MovieBuilder("movie1", new Episode("episode1", 1, 120))
                         .withDescription("Description of movie1")
-                        .withReleaseDate(LocalDate.now())
+                        .withReleaseDate(releaseDate)
                         .build(),
                 new Movie.MovieBuilder("movie2", new Episode("episode1", 1, 120))
                         .withDescription("Description of movie2")
-                        .withReleaseDate(LocalDate.now())
+                        .withReleaseDate(releaseDate)
                         .build(),
                 new TVSeries.TVSeriesBuilder("tvSeries1")
                         .requiresSubscription()
                         .withDescription("Description of tvSeries1")
-                        .withReleaseDate(LocalDate.now())
+                        .withReleaseDate(releaseDate)
                         .addEpisodes(1, List.of(
                                 new Episode("episode1", 1, 26),
                                 new Episode("episode2", 2, 26)

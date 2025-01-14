@@ -92,7 +92,8 @@ public abstract class Content {
             this.title = title;
             this.isFree = true;
             this.description = "Description not provided";
-            this.releaseDate = LocalDate.now();
+            // to avoid to use LocalDate.now() as default value
+            this.releaseDate = LocalDate.of(2000, 1, 1);
         }
 
         public T requiresSubscription() {
