@@ -34,7 +34,7 @@ public class User implements PlatformObserver {
         this.watchedList = new HashSet<>();
     }
 
-    public void watch(Content content, double timeToWatch) {
+    public void watch(Content content, int timeToWatch) {
         Objects.requireNonNull(content, "Content cannot be null");
 
         ViewingProgress currentProgress = toWatchList.getOrDefault(content, ViewingProgress.empty());

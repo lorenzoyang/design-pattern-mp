@@ -117,7 +117,7 @@ public class UserTest {
         Content content = new TVSeries.TVSeriesBuilder("tvSeries")
                 .addSingleEpisode(1, new Episode("episode", 1, 60))
                 .build();
-        double totalDuration = content.getDurationMinutes();
+        int totalDuration = content.getDurationMinutes();
 
         user.watch(content, totalDuration / 2);
         assertThat(user.getToWatchList()).hasSize(1);

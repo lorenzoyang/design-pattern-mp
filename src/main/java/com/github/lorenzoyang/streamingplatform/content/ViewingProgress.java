@@ -2,14 +2,14 @@ package com.github.lorenzoyang.streamingplatform.content;
 
 public class ViewingProgress {
     private final Episode startingEpisode;
-    private final double currentViewingDuration;
-    private final double totalViewingDuration;
+    private final int currentViewingDuration;
+    private final int totalViewingDuration;
 
     public static ViewingProgress empty() {
         return new ViewingProgress(null, 0, 0);
     }
 
-    public static ViewingProgress of(Episode startingEpisode, double currentViewingDuration, double totalViewingDuration) {
+    public static ViewingProgress of(Episode startingEpisode, int currentViewingDuration, int totalViewingDuration) {
         if (currentViewingDuration < 0 || totalViewingDuration < 0) {
             throw new IllegalArgumentException("Viewing durations cannot be negative.");
         }
@@ -20,7 +20,7 @@ public class ViewingProgress {
                 : new ViewingProgress(startingEpisode, currentViewingDuration, totalViewingDuration);
     }
 
-    private ViewingProgress(Episode startingEpisode, double currentViewingDuration, double totalViewingDuration) {
+    private ViewingProgress(Episode startingEpisode, int currentViewingDuration, int totalViewingDuration) {
         this.startingEpisode = startingEpisode;
         this.currentViewingDuration = currentViewingDuration;
         this.totalViewingDuration = totalViewingDuration;
@@ -30,11 +30,11 @@ public class ViewingProgress {
         return startingEpisode;
     }
 
-    public double getCurrentViewingDuration() {
+    public int getCurrentViewingDuration() {
         return currentViewingDuration;
     }
 
-    public double getTotalViewingDuration() {
+    public int getTotalViewingDuration() {
         return totalViewingDuration;
     }
 

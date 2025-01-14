@@ -231,7 +231,7 @@ public class StreamingPlatformTest {
         String expectedMsg = "Title: movie1\n" +
                 "Description: Description of movie1\n" +
                 "Release Date: 01 Jan 2025\n" +
-                "Total duration: 120.0 minutes\n" +
+                "Total duration: 120 minutes\n" +
                 "Episode Title: episode1";
         assertThat(platform.displayContent(existingContent)).isEqualTo(expectedMsg);
     }

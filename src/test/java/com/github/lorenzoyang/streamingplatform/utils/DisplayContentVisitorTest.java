@@ -35,7 +35,7 @@ public class DisplayContentVisitorTest {
         String expectedOutput = "Title: movie\n" +
                 "Description: description\n" +
                 "Release Date: 01 Jan 2025\n" +
-                "Total duration: 120.0 minutes\n" +
+                "Total duration: 120 minutes\n" +
                 "Episode Title: episode";
 
         assertThat(output).isEqualTo(expectedOutput);
@@ -61,21 +61,21 @@ public class DisplayContentVisitorTest {
         String expectedOutput = "Title: tvSeries\n" +
                 "Description: description\n" +
                 "Release Date: 01 Jan 2025\n" +
-                "Total duration: 80.0 minutes\n" +
+                "Total duration: 80 minutes\n" +
                 "Season 1:\n" +
                 "    Episode Number: 1\n" +
                 "    Episode Title: episode1\n" +
-                "    Episode Duration: 20.0 minutes\n" +
+                "    Episode Duration: 20 minutes\n" +
                 "    Episode Number: 2\n" +
                 "    Episode Title: episode2\n" +
-                "    Episode Duration: 20.0 minutes\n" +
+                "    Episode Duration: 20 minutes\n" +
                 "Season 2:\n" +
                 "    Episode Number: 1\n" +
                 "    Episode Title: episode3\n" +
-                "    Episode Duration: 20.0 minutes\n" +
+                "    Episode Duration: 20 minutes\n" +
                 "    Episode Number: 2\n" +
                 "    Episode Title: episode4\n" +
-                "    Episode Duration: 20.0 minutes\n";
+                "    Episode Duration: 20 minutes\n";
 
         assertThat(output).isEqualTo(expectedOutput);
     }

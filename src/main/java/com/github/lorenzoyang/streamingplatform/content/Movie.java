@@ -17,13 +17,13 @@ public class Movie extends Content {
     }
 
     @Override
-    public double getDurationMinutes() {
+    public int getDurationMinutes() {
         return episode.getDurationMinutes();
     }
 
     @Override
-    protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
-        double totalViewingDuration = Math.min(
+    protected ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch) {
+        int totalViewingDuration = Math.min(
                 currentProgress.getTotalViewingDuration() + timeToWatch,
                 this.getDurationMinutes()
         );

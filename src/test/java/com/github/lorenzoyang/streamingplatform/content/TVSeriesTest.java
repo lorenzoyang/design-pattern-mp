@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TVSeriesTest {
-    private final double EPISODE_DURATION = 20;
+    private final int EPISODE_DURATION = 20;
 
     private LocalDate releaseDate;
     private List<Episode> episodes;
@@ -160,8 +160,8 @@ public class TVSeriesTest {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
                 .addEpisodes(1, episodes)
                 .build();
-        double totalDuration = episodes.stream()
-                .mapToDouble(Episode::getDurationMinutes)
+        int totalDuration = episodes.stream()
+                .mapToInt(Episode::getDurationMinutes)
                 .sum();
         assertThat(tvSeries.getDurationMinutes()).isEqualTo(totalDuration);
     }

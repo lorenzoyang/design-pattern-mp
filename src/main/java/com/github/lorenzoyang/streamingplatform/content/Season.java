@@ -11,14 +11,14 @@ class Season {
     private final int seasonNumber;
     private final List<Episode> episodes;
 
-    private final double totalDurationMinutes;
+    private final int totalDurationMinutes;
 
     public Season(int seasonNumber, List<Episode> episodes) {
         this.seasonNumber = seasonNumber;
         this.episodes = Objects.requireNonNull(episodes, "Episodes cannot be null");
 
         this.totalDurationMinutes = episodes.stream()
-                .mapToDouble(Episode::getDurationMinutes)
+                .mapToInt(Episode::getDurationMinutes)
                 .sum();
     }
 
@@ -30,7 +30,7 @@ class Season {
         return episodes.iterator();
     }
 
-    public double getDurationMinutes() {
+    public int getDurationMinutes() {
         return totalDurationMinutes;
     }
 
@@ -39,7 +39,7 @@ class Season {
         if (o == null || getClass() != o.getClass()) return false;
         Season season = (Season) o;
         return seasonNumber == season.seasonNumber &&
-                Double.compare(totalDurationMinutes, season.totalDurationMinutes) == 0 &&
+                totalDurationMinutes == season.totalDurationMinutes &&
                 Objects.equals(episodes, season.episodes);
     }
 

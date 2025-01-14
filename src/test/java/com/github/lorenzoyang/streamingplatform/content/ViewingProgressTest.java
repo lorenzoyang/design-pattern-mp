@@ -16,7 +16,7 @@ public class ViewingProgressTest {
 
     @Test
     public void testOfCreatesViewingProgressWithValidArguments() {
-        double currentViewingDuration = 30, totalViewingDuration = 50;
+        int currentViewingDuration = 30, totalViewingDuration = 50;
         ViewingProgress viewingProgress = ViewingProgress.of(episode, currentViewingDuration, totalViewingDuration);
 
         assertThat(viewingProgress.getStartingEpisode()).isEqualTo(episode);
@@ -68,7 +68,7 @@ public class ViewingProgressTest {
     public void testIsCompletedReturnsTrueForCompletedViewingProgress() {
         Content mockContent = new MockContent("Mock Content") {
             @Override
-            public double getDurationMinutes() {
+            public int getDurationMinutes() {
                 return episode.getDurationMinutes();
             }
         };
@@ -81,7 +81,7 @@ public class ViewingProgressTest {
     public void testIsCompletedReturnsFalseForIncompleteViewingProgress() {
         Content mockContent = new MockContent("Mock Content") {
             @Override
-            public double getDurationMinutes() {
+            public int getDurationMinutes() {
                 return episode.getDurationMinutes();
             }
         };

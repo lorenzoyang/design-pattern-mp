@@ -37,9 +37,9 @@ public abstract class Content {
         return releaseDate;
     }
 
-    public abstract double getDurationMinutes();
+    public abstract int getDurationMinutes();
 
-    public final ViewingProgress play(User user, ViewingProgress currentProgress, double timeToWatch) {
+    public final ViewingProgress play(User user, ViewingProgress currentProgress, int timeToWatch) {
         Objects.requireNonNull(user, "User cannot be null");
         Objects.requireNonNull(currentProgress, "Current progress cannot be null");
         if (timeToWatch < 0) {
@@ -55,7 +55,7 @@ public abstract class Content {
         return playContent(currentProgress, timeToWatch);
     }
 
-    protected abstract ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch);
+    protected abstract ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch);
 
     private void ensureUserHasAccess(User user) {
         if (!user.hasSubscription() && !isFree()) {

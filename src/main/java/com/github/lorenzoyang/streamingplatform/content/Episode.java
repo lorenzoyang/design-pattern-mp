@@ -5,9 +5,9 @@ import java.util.Objects;
 public class Episode {
     private final String title;
     private final int episodeNumber;
-    private final double durationMinutes;
+    private final int durationMinutes;
 
-    public Episode(String title, int episodeNumber, double durationMinutes) {
+    public Episode(String title, int episodeNumber, int durationMinutes) {
         this.title = Objects.requireNonNull(title, "Title cannot be null");
 
         if (episodeNumber <= 0) {
@@ -29,7 +29,7 @@ public class Episode {
         return episodeNumber;
     }
 
-    public double getDurationMinutes() {
+    public int getDurationMinutes() {
         return durationMinutes;
     }
 
@@ -38,7 +38,7 @@ public class Episode {
         if (o == null || getClass() != o.getClass()) return false;
         Episode episode = (Episode) o;
         return episodeNumber == episode.episodeNumber &&
-                Double.compare(durationMinutes, episode.durationMinutes) == 0 &&
+                durationMinutes == episode.durationMinutes &&
                 Objects.equals(title, episode.title);
     }
 

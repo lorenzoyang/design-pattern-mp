@@ -7,7 +7,7 @@ import java.util.*;
 public final class TVSeries extends Content {
     private final List<Season> seasons;
 
-    private final double totalDurationMinutes;
+    private final int totalDurationMinutes;
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
@@ -18,7 +18,7 @@ public final class TVSeries extends Content {
         );
 
         this.totalDurationMinutes = seasons.stream()
-                .mapToDouble(Season::getDurationMinutes)
+                .mapToInt(Season::getDurationMinutes)
                 .sum();
     }
 
@@ -34,12 +34,12 @@ public final class TVSeries extends Content {
     }
 
     @Override
-    public double getDurationMinutes() {
+    public int getDurationMinutes() {
         return totalDurationMinutes;
     }
 
     @Override
-    protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
+    protected ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch) {
         Episode startingEpisode = getStartingEpisode(currentProgress.getTotalViewingDuration());
 
         // When we have empty season
@@ -47,7 +47,7 @@ public final class TVSeries extends Content {
             return ViewingProgress.empty();
         }
 
-        double totalViewingDuration = Math.min(
+        int totalViewingDuration = Math.min(
                 currentProgress.getTotalViewingDuration() + timeToWatch,
                 this.getDurationMinutes()
         );
@@ -59,7 +59,7 @@ public final class TVSeries extends Content {
         );
     }
 
-    private Episode getStartingEpisode(double totalViewingDuration) {
+    private Episode getStartingEpisode(int totalViewingDuration) {
         Episode startingEpisode = null;
         for (Season season : seasons) {
             Iterator<Episode> episodes = season.getEpisodes();

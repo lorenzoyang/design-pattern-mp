@@ -12,12 +12,12 @@ public class MockContent extends Content {
     }
 
     @Override
-    public double getDurationMinutes() {
+    public int getDurationMinutes() {
         return 0;
     }
 
     @Override
-    protected ViewingProgress playContent(ViewingProgress currentProgress, double timeToWatch) {
+    protected ViewingProgress playContent(ViewingProgress currentProgress, int timeToWatch) {
         return currentProgress;
     }
 
