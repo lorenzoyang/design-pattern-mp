@@ -232,7 +232,7 @@ public class StreamingPlatformTest {
                 "Description: Description of movie1\n" +
                 "Release Date: 01 Jan 2025\n" +
                 "Total duration: 120 minutes\n" +
-                "Episode Title: episode1";
+                "Episode 1";
         assertThat(platform.displayContent(existingContent)).isEqualTo(expectedMsg);
     }
 

@@ -32,8 +32,6 @@ public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
             tvSeries.getEpisodes(seasonNumber).forEachRemaining(episode ->
                     sb.append("    Downloading episode ")
                             .append(episode.getEpisodeNumber())
-                            .append(": ")
-                            .append(episode.getTitle())
                             .append("\n")
             );
         }

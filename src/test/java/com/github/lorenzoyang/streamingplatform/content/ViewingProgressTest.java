@@ -11,7 +11,7 @@ public class ViewingProgressTest {
 
     @Before
     public void setUp() {
-        this.episode = new Episode("episode", 1, 60);
+        this.episode = new Episode(1, 60);
     }
 
     @Test

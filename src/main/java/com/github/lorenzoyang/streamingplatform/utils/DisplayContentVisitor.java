@@ -20,7 +20,7 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
     @Override
     public String visitMovie(Movie movie) {
         return displayContent(movie) + "\n" +
-                "Episode Title: " + movie.getEpisode().getTitle();
+                "Episode " + movie.getEpisode().getEpisodeNumber();
     }
 
     @Override
@@ -32,7 +32,6 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
             builder.append("Season ").append(seasonNumber).append(":\n");
             tvSeries.getEpisodes(seasonNumber).forEachRemaining(episode -> {
                 builder.append("    Episode Number: ").append(episode.getEpisodeNumber()).append("\n")
-                        .append("    Episode Title: ").append(episode.getTitle()).append("\n")
                         .append("    Episode Duration: ").append(episode.getDurationMinutes()).append(" minutes\n");
             });
         }

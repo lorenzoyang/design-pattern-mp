@@ -115,7 +115,7 @@ public class UserTest {
     public void testWatchRunsCorrectly() {
         User user = new User.UserBuilder("username", "password").build();
         Content content = new TVSeries.TVSeriesBuilder("tvSeries")
-                .addSingleEpisode(1, new Episode("episode", 1, 60))
+                .addSingleEpisode(1, new Episode(1, 60))
                 .build();
         int totalDuration = content.getDurationMinutes();
 

@@ -28,7 +28,7 @@ public class DownloadContentVisitorTest {
                 .build();
         Content content = new Movie.MovieBuilder(
                 "movie",
-                new Episode("episode", 1, 120)
+                new Episode(1, 120)
         )
                 .requiresSubscription()
                 .build();
@@ -47,13 +47,13 @@ public class DownloadContentVisitorTest {
                 .build();
         Content content = new TVSeries.TVSeriesBuilder("tvSeries")
                 .addEpisodes(1, List.of(
-                        new Episode("episode1", 1, 20),
-                        new Episode("episode2", 2, 20)
+                        new Episode(1, 20),
+                        new Episode(2, 20)
                 ))
                 .addSeason(2)
                 .addEpisodes(2, List.of(
-                        new Episode("episode3", 1, 20),
-                        new Episode("episode4", 2, 20)
+                        new Episode(1, 20),
+                        new Episode(2, 20)
                 ))
                 .requiresSubscription()
                 .build();
@@ -61,10 +61,10 @@ public class DownloadContentVisitorTest {
         DownloadResult result = content.accept(downloadContentVisitor);
 
         String expectedMsg = "Downloading TV series: tvSeries\n" +
-                "    Downloading episode 1: episode1\n" +
-                "    Downloading episode 2: episode2\n" +
-                "    Downloading episode 1: episode3\n" +
-                "    Downloading episode 2: episode4\n";
+                "    Downloading episode 1\n" +
+                "    Downloading episode 2\n" +
+                "    Downloading episode 1\n" +
+                "    Downloading episode 2\n";
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getMessage()).isEqualTo(expectedMsg);
     }

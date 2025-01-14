@@ -17,8 +17,8 @@ public class SeasonTest {
 
     @Test
     public void testTotalDurationMinutesRunsCorrectly() {
-        var episode1 = new Episode("Title1", 1, 60);
-        var episode2 = new Episode("Title2", 2, 30);
+        var episode1 = new Episode(1, 60);
+        var episode2 = new Episode(2, 30);
         var season = new Season(1, List.of(episode1, episode2));
 
         assertThat(season.getDurationMinutes())
@@ -27,8 +27,8 @@ public class SeasonTest {
 
     @Test
     public void testEqualsReturnsTrueForSameFields() {
-        var episode1 = new Episode("Title1", 1, 60);
-        var episode2 = new Episode("Title2", 2, 30);
+        var episode1 = new Episode(1, 60);
+        var episode2 = new Episode(2, 30);
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(1, List.of(episode1, episode2));
 
@@ -37,8 +37,8 @@ public class SeasonTest {
 
     @Test
     public void testEqualsReturnsFalseForDifferentFields() {
-        var episode1 = new Episode("Title1", 1, 60);
-        var episode2 = new Episode("Title2", 2, 30);
+        var episode1 = new Episode(1, 60);
+        var episode2 = new Episode(2, 30);
 
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(2, List.of(episode1, episode2));
@@ -50,8 +50,8 @@ public class SeasonTest {
 
     @Test
     public void testHashCodeIsBasedOnAllFields() {
-        var episode1 = new Episode("Title1", 1, 60);
-        var episode2 = new Episode("Title2", 2, 30);
+        var episode1 = new Episode(1, 60);
+        var episode2 = new Episode(2, 30);
 
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(1, List.of(episode1, episode2));

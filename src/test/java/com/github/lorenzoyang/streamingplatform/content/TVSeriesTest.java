@@ -23,16 +23,16 @@ public class TVSeriesTest {
     public void setUp() {
         this.releaseDate = LocalDate.of(2025, 1, 1);
         this.episodes = new ArrayList<>(List.of(
-                new Episode("episode1", 1, EPISODE_DURATION),
-                new Episode("episode2", 2, EPISODE_DURATION),
-                new Episode("episode3", 3, EPISODE_DURATION)
+                new Episode(1, EPISODE_DURATION),
+                new Episode(2, EPISODE_DURATION),
+                new Episode(3, EPISODE_DURATION)
         ));
     }
 
     @Test
     public void testTVSeriesBuilderCreatesTVSeriesWithValidArguments() {
-        var episode1 = new Episode("episode1", episodes.size() + 1, EPISODE_DURATION);
-        var episode2 = new Episode("episode2", 1, EPISODE_DURATION);
+        var episode1 = new Episode(episodes.size() + 1, EPISODE_DURATION);
+        var episode2 = new Episode(1, EPISODE_DURATION);
 
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
                 .requiresSubscription()
@@ -110,7 +110,7 @@ public class TVSeriesTest {
     @Test
     public void testAddSingleEpisodeThrowsIllegalArgumentExceptionForNonExistingSeason() {
         var builder = new TVSeries.TVSeriesBuilder("tvSeries1");
-        var episode = new Episode("episode", 1, EPISODE_DURATION);
+        var episode = new Episode(1, EPISODE_DURATION);
 
         assertThatThrownBy(() -> builder.addSingleEpisode(2, episode))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -133,7 +133,7 @@ public class TVSeriesTest {
     @Test
     public void testAddSingleEpisodeThrowsIllegalArgumentExceptionForExistingEpisode() {
         var builder = new TVSeries.TVSeriesBuilder("tvSeries1");
-        var episode = new Episode("episode", 1, EPISODE_DURATION);
+        var episode = new Episode(1, EPISODE_DURATION);
 
         builder.addSingleEpisode(1, episode);
 
@@ -145,8 +145,8 @@ public class TVSeriesTest {
     @Test
     public void testAddSingleEpisodeThrowsIllegalArgumentExceptionForInvalidEpisodeNumber() {
         var builder = new TVSeries.TVSeriesBuilder("tvSeries1");
-        var episode1 = new Episode("episode1", 1, EPISODE_DURATION);
-        var episode2 = new Episode("episode2", 3, EPISODE_DURATION);
+        var episode1 = new Episode(1, EPISODE_DURATION);
+        var episode2 = new Episode(3, EPISODE_DURATION);
 
         builder.addSingleEpisode(1, episode1);
 
@@ -189,7 +189,7 @@ public class TVSeriesTest {
 
     @Test
     public void testPlayRunsCorrectly() {
-        var episode = new Episode("episode", 1, EPISODE_DURATION);
+        var episode = new Episode(1, EPISODE_DURATION);
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries1")
                 .addEpisodes(1, episodes)
                 .addSeason(2)

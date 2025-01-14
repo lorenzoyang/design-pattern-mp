@@ -17,7 +17,7 @@ public class MovieTest {
 
     @Before
     public void setUp() {
-        this.episode = new Episode("episode", 1, 120);
+        this.episode = new Episode(1, 120);
         this.releaseDate = LocalDate.of(2025, 1, 1);
     }
 
