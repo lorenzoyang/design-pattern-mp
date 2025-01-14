@@ -22,7 +22,7 @@ public class DisplayContentVisitorTest {
     }
 
     @Test
-    public void testVisitMovie() {
+    public void testVisitMovieRunsCorrectly() {
         LocalDate releaseDate = LocalDate.now();
         Content content = new Movie.MovieBuilder("movie", new Episode("episode", 1, 120))
                 .withDescription("description")
@@ -41,7 +41,7 @@ public class DisplayContentVisitorTest {
     }
 
     @Test
-    public void testVisitTVSeries() {
+    public void testVisitTVSeriesRunsCorrectly() {
         LocalDate releaseDate = LocalDate.now();
         Content content = new TVSeries.TVSeriesBuilder("tvSeries")
                 .withDescription("description")
@@ -52,8 +52,8 @@ public class DisplayContentVisitorTest {
                 ))
                 .addSeason(2)
                 .addEpisodes(2, List.of(
-                        new Episode("episode1", 1, 20),
-                        new Episode("episode2", 2, 20)
+                        new Episode("episode3", 1, 20),
+                        new Episode("episode4", 2, 20)
                 ))
                 .build();
 
@@ -71,10 +71,10 @@ public class DisplayContentVisitorTest {
                 "    Episode Duration: 20.0 minutes\n" +
                 "Season 2:\n" +
                 "    Episode Number: 1\n" +
-                "    Episode Title: episode1\n" +
+                "    Episode Title: episode3\n" +
                 "    Episode Duration: 20.0 minutes\n" +
                 "    Episode Number: 2\n" +
-                "    Episode Title: episode2\n" +
+                "    Episode Title: episode4\n" +
                 "    Episode Duration: 20.0 minutes\n";
 
         assertThat(output).isEqualTo(expectedOutput);
