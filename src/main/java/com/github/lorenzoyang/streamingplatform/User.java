@@ -35,12 +35,12 @@ public class User implements PlatformObserver {
         this.watchedList = new HashSet<>();
     }
 
-    public void watch(Content content, int timeToWatch) {
-        Objects.requireNonNull(content, "Content cannot be null");
-        content.play(this, timeToWatch);
-        toWatchList.add(content);
-        watchedList.remove(content);
-    }
+//    public void watch(Content content, int timeToWatch) {
+//        Objects.requireNonNull(content, "Content cannot be null");
+//        content.play(this, timeToWatch);
+//        toWatchList.add(content);
+//        watchedList.remove(content);
+//    }
 
     @Override
     public void update(PlatformEvent event) {

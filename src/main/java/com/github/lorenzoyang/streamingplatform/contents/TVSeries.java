@@ -6,21 +6,23 @@ import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
 import java.util.*;
 
-public final class TVSeries extends Content {
+public class TVSeries extends Content {
     private final List<Season> seasons;
-    private final int totalDurationMinutes;
+    private final int durationInMinutes;
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
-
         this.seasons = new ArrayList<>();
         builder.seasons.forEach(
                 (seasonNumber, episodes) -> this.seasons.add(new Season(seasonNumber, episodes))
         );
-
-        this.totalDurationMinutes = seasons.stream()
-                .mapToInt(Season::getDurationMinutes)
+        this.durationInMinutes = seasons.stream()
+                .mapToInt(Season::getDurationInMinutes)
                 .sum();
+    }
+
+    public int getSeasonsCount() {
+        return seasons.size();
     }
 
     public Iterator<Episode> getEpisodes(int seasonNumber) {
@@ -30,35 +32,14 @@ public final class TVSeries extends Content {
         return seasons.get(seasonNumber - 1).getEpisodes();
     }
 
-    public int getSeasonsCount() {
-        return seasons.size();
-    }
-
     @Override
-    public int getDurationMinutes() {
-        return totalDurationMinutes;
-    }
-
-    @Override
-    protected String playContent(int timeToWatch) {
-        var sb = new StringBuilder();
-        sb.append("Playing TV series '").append(getTitle()).append("' for ").append(timeToWatch).append(" minutes.\n")
-                .append("Watchable Episodes: ");
-        for (Season season : seasons) {
-            sb.append("Season ").append(season.getSeasonNumber()).append(": ");
-            season.getEpisodes().forEachRemaining(e -> sb.append(e.getEpisodeNumber()).append(", "));
-            sb.append("\n");
-        }
-        return sb.toString();
+    public int getDurationInMinutes() {
+        return durationInMinutes;
     }
 
     @Override
     public <T> T accept(ContentVisitor<T> visitor) {
         return visitor.visitTVSeries(this);
-    }
-
-    public List<Season> getSeasons() {
-        return Collections.unmodifiableList(seasons);
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
@@ -88,13 +69,10 @@ public final class TVSeries extends Content {
             Objects.requireNonNull(episode, "Episode cannot be null");
 
             List<Episode> episodes = seasons.get(seasonNumber);
-            if (episodes.stream()
-                    .anyMatch(e -> e.getEpisodeNumber() == episode.getEpisodeNumber())) {
-                throw new InvalidContentException("Episode already exists");
-            }
             if (episode.getEpisodeNumber() != episodes.size() + 1) {
                 throw new InvalidContentException("Episode number must be consecutive");
             }
+
             seasons.get(seasonNumber).add(episode);
 
             return this;

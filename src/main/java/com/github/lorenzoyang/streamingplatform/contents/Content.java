@@ -1,12 +1,11 @@
 package com.github.lorenzoyang.streamingplatform.contents;
 
-import com.github.lorenzoyang.streamingplatform.User;
-import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class Content {
     private final String title;
@@ -29,37 +28,15 @@ public abstract class Content {
         return isFree;
     }
 
-    public String getDescription() {
-        return description;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
-    public LocalDate getReleaseDate() {
-        return releaseDate;
+    public Optional<LocalDate> getReleaseDate() {
+        return Optional.ofNullable(releaseDate);
     }
 
-    public abstract int getDurationMinutes();
-
-    public final String play(User user, int timeToWatch) {
-        Objects.requireNonNull(user, "User cannot be null");
-
-        if (timeToWatch < 0) {
-            throw new IllegalArgumentException("Time to watch cannot be negative");
-        }
-
-        ensureUserHasAccess(user);
-
-        return playContent(timeToWatch);
-    }
-
-    protected abstract String playContent(int timeToWatch);
-
-    private void ensureUserHasAccess(User user) {
-        if (!user.hasSubscription() && !isFree()) {
-            throw new AccessDeniedException(
-                    String.format("User %s does not have access to contents '%s'.", user.getUsername(), getTitle())
-            );
-        }
-    }
+    public abstract int getDurationInMinutes();
 
     public abstract <T> T accept(ContentVisitor<T> visitor);
 
@@ -87,9 +64,8 @@ public abstract class Content {
             }
             this.title = title;
             this.isFree = true;
-            this.description = "Description not provided";
-            // to avoid to use LocalDate.now() as default value
-            this.releaseDate = LocalDate.of(2000, 1, 1);
+            this.description = null;
+            this.releaseDate = null;
         }
 
         public T requiresSubscription() {
@@ -98,11 +74,10 @@ public abstract class Content {
         }
 
         public final T withDescription(String description) {
-            Objects.requireNonNull(description, "Description cannot be null");
-            if (description.isBlank()) {
+            this.description = Objects.requireNonNull(description, "Description cannot be null");
+            if (this.description.isBlank()) {
                 throw new InvalidContentException("Description cannot be blank");
             }
-            this.description = description;
             return self();
         }
 

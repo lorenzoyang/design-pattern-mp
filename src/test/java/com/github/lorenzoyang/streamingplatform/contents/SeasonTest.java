@@ -29,29 +29,29 @@ public class SeasonTest {
     }
 
     @Test
-    public void testConstructorThrowsInvalidSeasonExceptionForEpisodesOutOfOrder() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(3, 30);
+    public void testConstructorThrowsInvalidSeasonExceptionForEpisodesNotInOrder() {
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(3, 10);
+
         assertThatThrownBy(() -> new Season(1, List.of(episode1, episode2)))
                 .isInstanceOf(InvalidSeasonException.class)
                 .hasMessage("Episodes must be in order");
     }
 
     @Test
-    public void testTotalDurationMinutesRunsCorrectly() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(2, 30);
+    public void testGetDurationInMinutesRunsCorrectly() {
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(2, 20);
         var season = new Season(1, List.of(episode1, episode2));
 
-        int expectedDuration = episode1.getDurationMinutes() + episode2.getDurationMinutes();
-        assertEquals(expectedDuration, season.getDurationMinutes());
+        int expected = episode1.getDurationInMinutes() + episode2.getDurationInMinutes();
+        assertEquals(expected, season.getDurationInMinutes());
     }
 
     @Test
     public void testEqualsReturnsTrueForSameFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(2, 30);
-
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(2, 20);
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(1, List.of(episode1, episode2));
 
@@ -60,8 +60,8 @@ public class SeasonTest {
 
     @Test
     public void testEqualsReturnsFalseForDifferentFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(2, 30);
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(2, 20);
 
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(2, List.of(episode1, episode2));
@@ -73,8 +73,8 @@ public class SeasonTest {
 
     @Test
     public void testHashCodeIsBasedOnAllFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(2, 30);
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(2, 20);
 
         var season1 = new Season(1, List.of(episode1, episode2));
         var season2 = new Season(1, List.of(episode1, episode2));

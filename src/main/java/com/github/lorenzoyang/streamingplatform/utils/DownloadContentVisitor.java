@@ -28,13 +28,13 @@ public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
         StringBuilder sb = new StringBuilder("Downloading TV series: ")
                 .append(tvSeries.getTitle()).append("\n");
 
-        for (int seasonNumber = 1; seasonNumber <= tvSeries.getSeasonsCount(); seasonNumber++) {
-            tvSeries.getEpisodes(seasonNumber).forEachRemaining(episode ->
-                    sb.append("    Downloading episode ")
-                            .append(episode.getEpisodeNumber())
-                            .append("\n")
-            );
-        }
+//        for (int seasonNumber = 1; seasonNumber <= tvSeries.getSeasonsCount(); seasonNumber++) {
+//            tvSeries.getEpisodes(seasonNumber).forEachRemaining(episode ->
+//                    sb.append("    Downloading episode ")
+//                            .append(episode.getEpisodeNumber())
+//                            .append("\n")
+//            );
+//        }
         return new DownloadResult(true, sb.toString());
     }
 

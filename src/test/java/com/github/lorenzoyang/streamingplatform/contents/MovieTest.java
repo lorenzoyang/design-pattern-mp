@@ -1,15 +1,15 @@
 package com.github.lorenzoyang.streamingplatform.contents;
 
-import com.github.lorenzoyang.streamingplatform.User;
-import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDate;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class MovieTest {
     private Episode episode;
@@ -29,10 +29,10 @@ public class MovieTest {
                 .build();
 
         assertEquals("movie", movie.getTitle());
-        assertEquals("description", movie.getDescription());
-        assertEquals(releaseDate, movie.getReleaseDate());
         assertEquals(episode, movie.getEpisode());
-        assertFalse(movie.isFree());
+        assertThat(movie.getDescription()).contains("description");
+        assertThat(movie.getReleaseDate()).contains(releaseDate);
+        assertEquals(120, movie.getDurationInMinutes());
     }
 
     @Test
@@ -48,23 +48,23 @@ public class MovieTest {
 
     @Test
     public void testMovieBuilderConstructorThrowsNullPointerExceptionForNullEpisode() {
-        assertThatThrownBy(() -> new Movie.MovieBuilder("movie1", null))
+        assertThatThrownBy(() -> new Movie.MovieBuilder("movie", null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Episode cannot be null");
     }
 
     @Test
-    public void testMovieBuilderConstructorThrowsInvalidContentExceptionForInvalidEpisodeNumber() {
+    public void testMovieBuilderConstructorThrowsInvalidContentExceptionForInvalidEpisode() {
         var episode = new Episode(2, 120);
 
-        assertThatThrownBy(() -> new Movie.MovieBuilder("movie1", episode))
+        assertThatThrownBy(() -> new Movie.MovieBuilder("movie", episode))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Movie can only have one episode");
     }
 
     @Test
     public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
-        var builder = new Movie.MovieBuilder("movie1", episode);
+        var builder = new Movie.MovieBuilder("movie", episode);
 
         assertThatThrownBy(() -> builder.withDescription(null))
                 .isInstanceOf(NullPointerException.class)
@@ -73,7 +73,7 @@ public class MovieTest {
 
     @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
-        var builder = new Movie.MovieBuilder("movie1", episode);
+        var builder = new Movie.MovieBuilder("movie", episode);
 
         assertThatThrownBy(() -> builder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
@@ -82,7 +82,7 @@ public class MovieTest {
 
     @Test
     public void testWithReleaseDateThrowsNullPointerExceptionForNullReleaseDate() {
-        var builder = new Movie.MovieBuilder("movie1", episode);
+        var builder = new Movie.MovieBuilder("movie", episode);
 
         assertThatThrownBy(() -> builder.withReleaseDate(null))
                 .isInstanceOf(NullPointerException.class)
@@ -90,62 +90,16 @@ public class MovieTest {
     }
 
     @Test
-    public void testGetDurationMinutesRunsCorrectly() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode).build();
+    public void testGetDurationInMinutesRunsCorrectly() {
+        Movie movie = new Movie.MovieBuilder("movie", episode).build();
 
-        assertEquals(episode.getDurationMinutes(), movie.getDurationMinutes());
-    }
-
-    @Test
-    public void testPlayRunsCorrectly() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode)
-                .requiresSubscription()
-                .build();
-        User user = new User.UserBuilder("user1", "password")
-                .subscribe()
-                .build();
-
-        String expected = String.format("Playing movie '%s' for %d minutes.", movie.getTitle(), 60);
-        assertEquals(expected, movie.play(user, 60));
-    }
-
-    @Test
-    public void testPlayThrowsNullPointerExceptionForNullUser() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode).build();
-
-        assertThatThrownBy(() -> movie.play(null, 60))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("User cannot be null");
-    }
-
-    @Test
-    public void testPlayThrowsIllegalArgumentExceptionForNegativeTimeToWatch() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode).build();
-        User user = new User.UserBuilder("user1", "password").build();
-
-        assertThatThrownBy(() -> movie.play(user, -1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Time to watch cannot be negative");
-    }
-
-    @Test
-    public void testPlayThrowsAccessDeniedExceptionForNoAccessUser() {
-        Movie movie = new Movie.MovieBuilder("movie1", episode)
-                .requiresSubscription()
-                .build();
-        User user = new User.UserBuilder("user1", "password")
-                .build();
-
-        assertThatThrownBy(() -> movie.play(user, 60))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessage(String.format("User %s does not have access to contents '%s'.",
-                        user.getUsername(), movie.getTitle()));
+        assertEquals(episode.getDurationInMinutes(), movie.getDurationInMinutes());
     }
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        Movie movie1 = new Movie.MovieBuilder("movie1", episode).build();
-        Movie movie2 = new Movie.MovieBuilder("movie1", episode).build();
+        Movie movie1 = new Movie.MovieBuilder("movie", episode).build();
+        Movie movie2 = new Movie.MovieBuilder("movie", episode).build();
 
         assertEquals(movie1, movie2);
     }

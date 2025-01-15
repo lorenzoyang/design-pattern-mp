@@ -12,13 +12,8 @@ public class MockContent extends Content {
     }
 
     @Override
-    public int getDurationMinutes() {
+    public int getDurationInMinutes() {
         return 0;
-    }
-
-    @Override
-    protected String playContent(int timeToWatch) {
-        return "Playing mock contents '" + getTitle() + "' for " + timeToWatch + " minutes.";
     }
 
     @Override

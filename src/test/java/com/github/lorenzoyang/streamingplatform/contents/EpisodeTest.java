@@ -9,18 +9,18 @@ import static org.junit.Assert.assertNotEquals;
 
 public class EpisodeTest {
     @Test
-    public void testConstructorThrowsIllegalArgumentExceptionForInvalidEpisodeNumber() {
-        assertThatThrownBy(() -> new Episode(-1, 60))
+    public void testConstructorThrowsInvalidEpisodeExceptionForInvalidEpisodeNumber() {
+        assertThatThrownBy(() -> new Episode(-1, 10))
                 .isInstanceOf(InvalidEpisodeException.class)
                 .hasMessage("Episode number must be a positive integer greater than 0.");
 
-        assertThatThrownBy(() -> new Episode(0, 60))
+        assertThatThrownBy(() -> new Episode(0, 10))
                 .isInstanceOf(InvalidEpisodeException.class)
                 .hasMessage("Episode number must be a positive integer greater than 0.");
     }
 
     @Test
-    public void testConstructorThrowsIllegalArgumentExceptionForInvalidDurationMinutes() {
+    public void testConstructorThrowsInvalidEpisodeExceptionForInvalidDurationInMinutes() {
         assertThatThrownBy(() -> new Episode(1, -1))
                 .isInstanceOf(InvalidEpisodeException.class)
                 .hasMessage("Duration must be a positive integer greater than 0.");
@@ -32,17 +32,17 @@ public class EpisodeTest {
 
     @Test
     public void testEqualsReturnsTrueForSameFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(1, 60);
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(1, 10);
 
         assertEquals(episode1, episode2);
     }
 
     @Test
     public void testEqualsReturnsFalseForDifferentFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(2, 60);
-        var episode3 = new Episode(1, 120);
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(2, 10);
+        var episode3 = new Episode(1, 20);
 
         assertNotEquals(episode1, episode2);
         assertNotEquals(episode1, episode3);
@@ -51,9 +51,9 @@ public class EpisodeTest {
 
     @Test
     public void testHashCodeIsBasedOnAllFields() {
-        var episode1 = new Episode(1, 60);
-        var episode2 = new Episode(1, 60);
-        var episode3 = new Episode(2, 60);
+        var episode1 = new Episode(1, 10);
+        var episode2 = new Episode(1, 10);
+        var episode3 = new Episode(2, 20);
 
         assertEquals(episode1.hashCode(), episode2.hashCode());
         assertNotEquals(episode1.hashCode(), episode3.hashCode());

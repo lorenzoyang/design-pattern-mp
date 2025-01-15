@@ -18,13 +18,8 @@ public class Movie extends Content {
     }
 
     @Override
-    public int getDurationMinutes() {
-        return episode.getDurationMinutes();
-    }
-
-    @Override
-    protected String playContent(int timeToWatch) {
-        return String.format("Playing movie '%s' for %d minutes.", getTitle(), timeToWatch);
+    public int getDurationInMinutes() {
+        return episode.getDurationInMinutes();
     }
 
     @Override
@@ -37,12 +32,10 @@ public class Movie extends Content {
 
         public MovieBuilder(String title, Episode episode) {
             super(title);
-
-            Objects.requireNonNull(episode, "Episode cannot be null");
-            if (episode.getEpisodeNumber() != 1) {
+            this.episode = Objects.requireNonNull(episode, "Episode cannot be null");
+            if (this.episode.getEpisodeNumber() != 1) {
                 throw new InvalidContentException("Movie can only have one episode");
             }
-            this.episode = episode;
         }
 
         @Override

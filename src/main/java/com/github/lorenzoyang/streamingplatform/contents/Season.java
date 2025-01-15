@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 public class Season {
     private final int seasonNumber;
     private final List<Episode> episodes;
-    private final int totalDurationMinutes;
+    private final int durationInMinutes;
 
     public Season(int seasonNumber, List<Episode> episodes) {
         if (seasonNumber < 1) {
@@ -24,8 +24,8 @@ public class Season {
             throw new InvalidSeasonException("Episodes must be in order");
         }
 
-        this.totalDurationMinutes = episodes.stream()
-                .mapToInt(Episode::getDurationMinutes)
+        this.durationInMinutes = episodes.stream()
+                .mapToInt(Episode::getDurationInMinutes)
                 .sum();
     }
 
@@ -37,8 +37,8 @@ public class Season {
         return episodes.iterator();
     }
 
-    public int getDurationMinutes() {
-        return totalDurationMinutes;
+    public int getDurationInMinutes() {
+        return durationInMinutes;
     }
 
     @Override
@@ -46,12 +46,12 @@ public class Season {
         if (o == null || getClass() != o.getClass()) return false;
         Season season = (Season) o;
         return seasonNumber == season.seasonNumber &&
-                totalDurationMinutes == season.totalDurationMinutes &&
+                durationInMinutes == season.durationInMinutes &&
                 Objects.equals(episodes, season.episodes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(seasonNumber, episodes, totalDurationMinutes);
+        return Objects.hash(seasonNumber, episodes, durationInMinutes);
     }
 }
