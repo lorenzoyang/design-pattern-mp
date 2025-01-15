@@ -1,27 +1,20 @@
 package com.github.lorenzoyang.streamingplatform;
 
 
-import com.github.lorenzoyang.streamingplatform.contents.Content;
-import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidUserException;
 import com.github.lorenzoyang.streamingplatform.utils.Gender;
-import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 
 
-public class User implements PlatformObserver {
+public class User {
     private final String username;
     private final String password;
     private final String email;
     private final Integer age;
     private final Gender gender;
     private final boolean hasSubscription;
-
-    private final Set<Content> toWatchList;
-    private final Set<Content> watchedList;
 
     private User(UserBuilder builder) {
         this.username = builder.username;
@@ -30,47 +23,6 @@ public class User implements PlatformObserver {
         this.age = builder.age;
         this.gender = builder.gender;
         this.hasSubscription = builder.hasSubscription;
-
-        this.toWatchList = new HashSet<>();
-        this.watchedList = new HashSet<>();
-    }
-
-//    public void watch(Content content, int timeToWatch) {
-//        Objects.requireNonNull(content, "Content cannot be null");
-//        content.play(this, timeToWatch);
-//        toWatchList.add(content);
-//        watchedList.remove(content);
-//    }
-
-    @Override
-    public void update(PlatformEvent event) {
-        event.accept(new PlatformEventVisitor() {
-            @Override
-            public void visitAddContent(AddContentEvent event) {
-                // do nothing
-            }
-
-            @Override
-            public void visitRemoveContent(RemoveContentEvent event) {
-                Content removedContent = event.getRemovedContent();
-                toWatchList.remove(removedContent);
-                watchedList.remove(removedContent);
-            }
-
-            @Override
-            public void visitUpdateContent(UpdateContentEvent event) {
-                Content oldContent = event.getOldContent();
-                Content updatedContent = event.getUpdatedContent();
-                if (toWatchList.contains(oldContent)) {
-                    toWatchList.remove(oldContent);
-                    toWatchList.add(updatedContent);
-                }
-                if (watchedList.contains(oldContent)) {
-                    watchedList.remove(oldContent);
-                    watchedList.add(updatedContent);
-                }
-            }
-        });
     }
 
     public String getUsername() {
@@ -81,12 +33,12 @@ public class User implements PlatformObserver {
         return password;
     }
 
-    public String getEmail() {
-        return email;
+    public Optional<String> getEmail() {
+        return Optional.ofNullable(email);
     }
 
-    public int getAge() {
-        return age;
+    public Optional<Integer> getAge() {
+        return Optional.ofNullable(age);
     }
 
     public Gender getGender() {
@@ -95,16 +47,6 @@ public class User implements PlatformObserver {
 
     public boolean hasSubscription() {
         return hasSubscription;
-    }
-
-    // package-private getter for testing purposes
-    Set<Content> getToWatchList() {
-        return toWatchList;
-    }
-
-    // package-private getter for testing purposes
-    Set<Content> getWatchedList() {
-        return watchedList;
     }
 
     @Override
@@ -136,8 +78,8 @@ public class User implements PlatformObserver {
             }
             this.username = username;
             this.password = password;
-            this.email = "";
-            this.age = 13;
+            this.email = null;
+            this.age = null;
             this.gender = Gender.UNSPECIFIED;
             this.hasSubscription = false;
         }
