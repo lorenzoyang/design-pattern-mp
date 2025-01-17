@@ -1,7 +1,8 @@
 package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidUserException;
-import com.github.lorenzoyang.streamingplatform.utils.Gender;
+import com.github.lorenzoyang.streamingplatform.user.Gender;
+import com.github.lorenzoyang.streamingplatform.user.User;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

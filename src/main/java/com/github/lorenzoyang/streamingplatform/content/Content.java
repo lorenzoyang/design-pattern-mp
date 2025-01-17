@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.contents;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
@@ -60,7 +60,7 @@ public abstract class Content {
 
         protected ContentBuilder(String title) {
             if (title == null || title.isBlank()) {
-                throw new InvalidContentException("Title cannot be null or blank");
+                throw new InvalidContentException("Content title cannot be null or blank");
             }
             this.title = title;
             this.isFree = true;
@@ -74,15 +74,16 @@ public abstract class Content {
         }
 
         public final T withDescription(String description) {
-            this.description = Objects.requireNonNull(description, "Description cannot be null");
+            this.description = Objects
+                    .requireNonNull(description, "Content description cannot be null");
             if (this.description.isBlank()) {
-                throw new InvalidContentException("Description cannot be blank");
+                throw new InvalidContentException("Content description cannot be blank");
             }
             return self();
         }
 
         public final T withReleaseDate(LocalDate releaseDate) {
-            this.releaseDate = Objects.requireNonNull(releaseDate, "Release date cannot be null");
+            this.releaseDate = Objects.requireNonNull(releaseDate, "Content release date cannot be null");
             return self();
         }
 

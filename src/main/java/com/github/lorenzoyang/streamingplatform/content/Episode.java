@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.contents;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
 
@@ -15,7 +15,7 @@ public class Episode {
         this.episodeNumber = episodeNumber;
 
         if (durationInMinutes <= 0) {
-            throw new InvalidEpisodeException("Duration must be a positive integer greater than 0.");
+            throw new InvalidEpisodeException("Episode duration must be a positive integer greater than 0.");
         }
         this.durationInMinutes = durationInMinutes;
     }

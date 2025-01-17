@@ -1,8 +1,7 @@
-package com.github.lorenzoyang.streamingplatform;
+package com.github.lorenzoyang.streamingplatform.user;
 
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidUserException;
-import com.github.lorenzoyang.streamingplatform.utils.Gender;
 
 import java.util.Objects;
 import java.util.Optional;

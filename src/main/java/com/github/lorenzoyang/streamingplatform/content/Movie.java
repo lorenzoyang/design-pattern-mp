@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.contents;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;

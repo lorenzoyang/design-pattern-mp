@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.utils;
+package com.github.lorenzoyang.streamingplatform.user;
 
 public enum Gender {
     UNSPECIFIED("Unspecified"),

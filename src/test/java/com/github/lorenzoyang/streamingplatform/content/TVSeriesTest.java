@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.contents;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import org.junit.Before;
@@ -64,11 +64,11 @@ public class TVSeriesTest {
     public void testTVSeriesBuilderConstructorThrowsInvalidContentExceptionForInvalidTitle() {
         assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(null))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Title cannot be null or blank");
+                .hasMessage("Content title cannot be null or blank");
 
         assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder("    "))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Title cannot be null or blank");
+                .hasMessage("Content title cannot be null or blank");
     }
 
     @Test
@@ -77,7 +77,7 @@ public class TVSeriesTest {
 
         assertThatThrownBy(() -> builder.withDescription(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("Description cannot be null");
+                .hasMessage("Content description cannot be null");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TVSeriesTest {
 
         assertThatThrownBy(() -> builder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Description cannot be blank");
+                .hasMessage("Content description cannot be blank");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TVSeriesTest {
 
         assertThatThrownBy(() -> builder.withReleaseDate(null))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("Release date cannot be null");
+                .hasMessage("Content release date cannot be null");
     }
 
     @Test

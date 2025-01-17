@@ -1,4 +1,4 @@
-package com.github.lorenzoyang.streamingplatform.contents;
+package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
 import org.junit.Test;
@@ -23,11 +23,11 @@ public class EpisodeTest {
     public void testConstructorThrowsInvalidEpisodeExceptionForInvalidDurationInMinutes() {
         assertThatThrownBy(() -> new Episode(1, -1))
                 .isInstanceOf(InvalidEpisodeException.class)
-                .hasMessage("Duration must be a positive integer greater than 0.");
+                .hasMessage("Episode duration must be a positive integer greater than 0.");
 
         assertThatThrownBy(() -> new Episode(1, 0))
                 .isInstanceOf(InvalidEpisodeException.class)
-                .hasMessage("Duration must be a positive integer greater than 0.");
+                .hasMessage("Episode duration must be a positive integer greater than 0.");
     }
 
     @Test
