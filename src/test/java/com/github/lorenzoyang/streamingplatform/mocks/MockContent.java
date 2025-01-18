@@ -1,5 +1,6 @@
-package com.github.lorenzoyang.streamingplatform.content;
+package com.github.lorenzoyang.streamingplatform.mocks;
 
+import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
 public class MockContent extends Content {
@@ -13,12 +14,12 @@ public class MockContent extends Content {
 
     @Override
     public int getDurationInMinutes() {
-        return 0;
+        return 0; // default implementation
     }
 
     @Override
     public <T> T accept(ContentVisitor<T> visitor) {
-        return null;
+        return null; // default implementation
     }
 
     public static class MockContentBuilder extends ContentBuilder<MockContentBuilder> {

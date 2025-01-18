@@ -6,10 +6,7 @@ import com.github.lorenzoyang.streamingplatform.user.User;
 import com.github.lorenzoyang.streamingplatform.utils.ContentProvider;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class StreamingPlatform {
@@ -29,47 +26,51 @@ public final class StreamingPlatform {
         this.observers = new ArrayList<>();
     }
 
-    public void registerUser(User user) {
+    public boolean registerUser(User user) {
         if (users.contains(user)) {
-            throw new IllegalArgumentException("User '" + user.getUsername() + "' is already registered");
+            return false;
         }
-        users.add(user);
+        return users.add(user);
     }
 
-    public void unregisterUser(User user) {
+    public boolean unregisterUser(User user) {
         if (!users.contains(user)) {
-            throw new IllegalArgumentException("User '" + user.getUsername() + "' is not registered");
+            return false;
         }
-        users.remove(user);
+        return users.remove(user);
     }
 
-    public void addContent(Content newContent) {
+    public boolean addContent(Content newContent) {
         if (contents.contains(newContent)) {
-            throw new IllegalArgumentException("Content '" + newContent.getTitle() + "' already exists");
+            return false;
         }
         contents.add(newContent);
         notifyObservers(new AddContentEvent(newContent));
+        return true;
     }
 
-    public void removeContent(Content existingContent) {
+    public boolean removeContent(Content existingContent) {
         if (!contents.contains(existingContent)) {
-            throw new IllegalArgumentException("Content '" + existingContent.getTitle() + "' does not exist");
+            return false;
         }
         contents.remove(existingContent);
         notifyObservers(new RemoveContentEvent(existingContent));
+        return true;
     }
 
-    public void updateContent(Content updatedContent) {
-        Content oldContent = contents.stream()
+    public boolean updateContent(Content updatedContent) {
+        Optional<Content> oldContent = contents.stream()
                 .filter(existingContent -> existingContent.equals(updatedContent))
-                .findFirst()
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Content '" + updatedContent.getTitle() + "' does not exist")
-                );
+                .findFirst();
 
-        contents.remove(oldContent);
+        if (oldContent.isEmpty()) {
+            return false;
+        }
+
+        contents.remove(oldContent.get());
         contents.add(updatedContent);
-        notifyObservers(new UpdateContentEvent(oldContent, updatedContent));
+        notifyObservers(new UpdateContentEvent(oldContent.get(), updatedContent));
+        return true;
     }
 
     public String watchContent(User user, Content content, int timeToWatch) {
@@ -79,23 +80,57 @@ public final class StreamingPlatform {
         if (!contents.contains(content)) {
             throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
         }
+        if (timeToWatch <= 0) {
+            throw new IllegalArgumentException("Time to watch must be greater than 0");
+        }
         notifyObservers(new WatchContentEvent(user, content, timeToWatch));
 
         return "User '" + user.getUsername() + "' watched '" + content.getTitle() + "' for " + timeToWatch + " minutes";
     }
 
-    public void addObserver(PlatformObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
+    public boolean addObserver(PlatformObserver observer) {
+        if (observers.contains(observer)) {
+            return false;
         }
+        return observers.add(observer);
     }
 
-    public void removeObserver(PlatformObserver observer) {
-        observers.remove(observer);
+    public boolean removeObserver(PlatformObserver observer) {
+        if (!observers.contains(observer)) {
+            return false;
+        }
+        return observers.remove(observer);
     }
 
     private void notifyObservers(PlatformEvent event) {
         observers.forEach(observer -> observer.notifyChange(event));
+    }
+
+    public Optional<Content> getContentByTitle(String title) {
+        return contents.stream()
+                .filter(content -> content.getTitle().equals(title))
+                .findFirst();
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return users.stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    // package-private getter for testing purposes
+    List<User> getUsers() {
+        return users;
+    }
+
+    // package-private getter for testing purposes
+    List<Content> getContents() {
+        return contents;
+    }
+
+    // package-private getter for testing purposes
+    Collection<PlatformObserver> getObservers() {
+        return observers;
     }
 
     public String getName() {
