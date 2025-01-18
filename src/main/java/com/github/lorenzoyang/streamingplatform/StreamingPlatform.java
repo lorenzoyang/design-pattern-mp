@@ -2,8 +2,10 @@ package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.events.*;
+import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.user.User;
 import com.github.lorenzoyang.streamingplatform.utils.ContentProvider;
+import com.github.lorenzoyang.streamingplatform.utils.DisplayContentVisitor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,12 +81,34 @@ public final class StreamingPlatform {
         if (!contents.contains(content)) {
             throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
         }
+        if (!user.hasSubscription() && !content.isFree()) {
+            throw new AccessDeniedException("User '" + user.getUsername() + "' does not have a subscription");
+        }
         if (timeToWatch <= 0) {
             throw new IllegalArgumentException("Time to watch must be greater than 0");
         }
         notifyObservers(new WatchContentEvent(user, content, timeToWatch));
 
         return Math.min(timeToWatch, content.getDurationInMinutes()); // return effective time watched
+    }
+
+    public String displayContent(Content content) {
+        if (!contents.contains(content)) {
+            throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
+        }
+        return content.accept(new DisplayContentVisitor());
+    }
+
+    public Optional<Content> getContentByTitle(String title) {
+        return contents.stream()
+                .filter(content -> content.getTitle().equals(title))
+                .findFirst();
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return users.stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     public boolean addObserver(PlatformObserver observer) {
@@ -103,18 +127,6 @@ public final class StreamingPlatform {
 
     private void notifyObservers(PlatformEvent event) {
         observers.forEach(observer -> observer.notifyChange(event));
-    }
-
-    public Optional<Content> getContentByTitle(String title) {
-        return contents.stream()
-                .filter(content -> content.getTitle().equals(title))
-                .findFirst();
-    }
-
-    public Optional<User> getUserByUsername(String username) {
-        return users.stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
     }
 
     // package-private getter for testing purposes

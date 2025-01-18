@@ -19,7 +19,7 @@ public class MockContent extends Content {
 
     @Override
     public <T> T accept(ContentVisitor<T> visitor) {
-        return null; // default implementation
+        return null;
     }
 
     public static class MockContentBuilder extends ContentBuilder<MockContentBuilder> {

@@ -4,6 +4,7 @@ import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
+import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException;
 import com.github.lorenzoyang.streamingplatform.mocks.MockContent;
 import com.github.lorenzoyang.streamingplatform.mocks.MockPlatformObserver;
 import com.github.lorenzoyang.streamingplatform.user.User;
@@ -118,17 +119,25 @@ public class StreamingPlatformTest {
             public int getDurationInMinutes() {
                 return 10;
             }
+
+            @Override
+            public boolean isFree() {
+                return false;
+            }
         };
+        User subscribedUser = new User.UserBuilder("subscribedUser", "password")
+                .subscribe()
+                .build();
         platform.getContents().add(mockContent);
-        platform.getUsers().add(user);
+        platform.getUsers().add(subscribedUser);
 
         int timeToWatch = 5;
         int expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
-        assertEquals(expected, platform.watchContent(user, mockContent, timeToWatch));
+        assertEquals(expected, platform.watchContent(subscribedUser, mockContent, timeToWatch));
 
         timeToWatch = 15;
         expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
-        assertEquals(expected, platform.watchContent(user, mockContent, timeToWatch));
+        assertEquals(expected, platform.watchContent(subscribedUser, mockContent, timeToWatch));
     }
 
     @Test
@@ -149,6 +158,22 @@ public class StreamingPlatformTest {
         assertThatThrownBy(() -> platform.watchContent(user, mockContent, 10))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Content 'Mock Content' does not exist");
+    }
+
+    @Test
+    public void testWatchContentThrowsAccessDeniedExceptionForNonSubscribedUser() {
+        Content mockContent = new MockContent("Mock Content") {
+            @Override
+            public boolean isFree() {
+                return false;
+            }
+        };
+        platform.getContents().add(mockContent);
+        platform.getUsers().add(user);
+
+        assertThatThrownBy(() -> platform.watchContent(user, mockContent, 10))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("User 'user' does not have a subscription");
     }
 
     @Test
