@@ -36,14 +36,17 @@ public class MovieTest {
     }
 
     @Test
-    public void testMovieBuilderConstructorThrowsInvalidContentExceptionForInvalidTitle() {
+    public void testMovieBuilderConstructorThrowsNullPointerExceptionForNullTitle() {
         assertThatThrownBy(() -> new Movie.MovieBuilder(null, episode))
-                .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Content title cannot be null or blank");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Content title cannot be null");
+    }
 
+    @Test
+    public void testMovieBuilderConstructorThrowsInvalidContentExceptionForBlankTitle() {
         assertThatThrownBy(() -> new Movie.MovieBuilder("    ", episode))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Content title cannot be null or blank");
+                .hasMessage("Content title cannot be blank");
     }
 
     @Test
@@ -60,15 +63,6 @@ public class MovieTest {
         assertThatThrownBy(() -> new Movie.MovieBuilder("movie", episode))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Movie can only have one episode");
-    }
-
-    @Test
-    public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
-        var builder = new Movie.MovieBuilder("movie", episode);
-
-        assertThatThrownBy(() -> builder.withDescription(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Content description cannot be null");
     }
 
     @Test

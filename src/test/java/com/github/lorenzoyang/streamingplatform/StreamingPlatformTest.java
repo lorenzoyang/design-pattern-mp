@@ -5,33 +5,30 @@ import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
 import com.github.lorenzoyang.streamingplatform.mocks.MockContent;
-import com.github.lorenzoyang.streamingplatform.mocks.MockInMemoryContentProvider;
 import com.github.lorenzoyang.streamingplatform.mocks.MockPlatformObserver;
 import com.github.lorenzoyang.streamingplatform.user.User;
-import com.github.lorenzoyang.streamingplatform.utils.ContentProvider;
-import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 
 public class StreamingPlatformTest {
-    private ContentProvider<Content> contentProvider;
     private StreamingPlatform platform;
     private User user;
 
     @Before
     public void setUp() {
-        this.contentProvider = new MockInMemoryContentProvider();
-        this.platform = new StreamingPlatform("Streaming Platform", contentProvider);
+        this.platform = new StreamingPlatform("Streaming Platform", Stream::empty);
         this.user = new User.UserBuilder("user", "password").build();
     }
 
     @Test
     public void testConstructorThrowsNullPointerExceptionForNullArguments() {
-        assertThatThrownBy(() -> new StreamingPlatform(null, contentProvider))
+        assertThatThrownBy(() -> new StreamingPlatform(null, Stream::empty))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Streaming platform name cannot be null");
 
@@ -116,12 +113,22 @@ public class StreamingPlatformTest {
 
     @Test
     public void testWatchContentRunsCorrectly() {
-        Content mockContent = new MockContent("Mock Content");
+        Content mockContent = new MockContent("Mock Content") {
+            @Override
+            public int getDurationInMinutes() {
+                return 10;
+            }
+        };
         platform.getContents().add(mockContent);
         platform.getUsers().add(user);
 
-        String excepted = "User 'user' watched 'Mock Content' for 10 minutes";
-        assertEquals(excepted, platform.watchContent(user, mockContent, 10));
+        int timeToWatch = 5;
+        int expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
+        assertEquals(expected, platform.watchContent(user, mockContent, timeToWatch));
+
+        timeToWatch = 15;
+        expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
+        assertEquals(expected, platform.watchContent(user, mockContent, timeToWatch));
     }
 
     @Test

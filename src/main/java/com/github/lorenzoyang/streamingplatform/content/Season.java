@@ -33,7 +33,7 @@ public class Season {
         return seasonNumber;
     }
 
-    public Iterator<Episode> getEpisodes() {
+    public Iterator<Episode> getEpisodesIterator() {
         return episodes.iterator();
     }
 

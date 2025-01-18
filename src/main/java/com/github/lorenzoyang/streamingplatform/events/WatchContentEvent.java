@@ -2,6 +2,7 @@ package com.github.lorenzoyang.streamingplatform.events;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.user.User;
+import com.github.lorenzoyang.streamingplatform.utils.PlatformEventVisitor;
 
 public class WatchContentEvent implements PlatformEvent {
     private final User user;

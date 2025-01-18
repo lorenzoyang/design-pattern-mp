@@ -4,7 +4,6 @@ import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.events.*;
 import com.github.lorenzoyang.streamingplatform.user.User;
 import com.github.lorenzoyang.streamingplatform.utils.ContentProvider;
-import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,7 +72,7 @@ public final class StreamingPlatform {
         return true;
     }
 
-    public String watchContent(User user, Content content, int timeToWatch) {
+    public int watchContent(User user, Content content, int timeToWatch) {
         if (!users.contains(user)) {
             throw new IllegalArgumentException("User '" + user.getUsername() + "' is not registered");
         }
@@ -85,7 +84,7 @@ public final class StreamingPlatform {
         }
         notifyObservers(new WatchContentEvent(user, content, timeToWatch));
 
-        return "User '" + user.getUsername() + "' watched '" + content.getTitle() + "' for " + timeToWatch + " minutes";
+        return Math.min(timeToWatch, content.getDurationInMinutes()); // return effective time watched
     }
 
     public boolean addObserver(PlatformObserver observer) {

@@ -1,7 +1,7 @@
 package com.github.lorenzoyang.streamingplatform.mocks;
 
+import com.github.lorenzoyang.streamingplatform.PlatformObserver;
 import com.github.lorenzoyang.streamingplatform.events.PlatformEvent;
-import com.github.lorenzoyang.streamingplatform.utils.PlatformObserver;
 
 public class MockPlatformObserver implements PlatformObserver {
     private PlatformEvent event;

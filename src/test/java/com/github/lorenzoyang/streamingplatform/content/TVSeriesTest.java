@@ -41,7 +41,7 @@ public class TVSeriesTest {
         assertFalse(tvSeries.isFree());
         assertThat(tvSeries.getDescription()).contains("Description");
         assertThat(tvSeries.getReleaseDate()).contains(releaseDate);
-        assertThat(tvSeries.getEpisodes(1))
+        assertThat(tvSeries.getEpisodesIterator(1))
                 .toIterable()
                 .isEqualTo(episodes);
 
@@ -52,23 +52,26 @@ public class TVSeriesTest {
                 .sum() + newEpisode.getDurationInMinutes();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
 
-        assertThat(tvSeries.getEpisodes(1))
+        assertThat(tvSeries.getEpisodesIterator(1))
                 .toIterable()
                 .isEqualTo(episodes);
-        assertThat(tvSeries.getEpisodes(2))
+        assertThat(tvSeries.getEpisodesIterator(2))
                 .toIterable()
                 .isEqualTo(List.of(newEpisode));
     }
 
     @Test
-    public void testTVSeriesBuilderConstructorThrowsInvalidContentExceptionForInvalidTitle() {
+    public void testTVSeriesBuilderConstructorThrowsNullPointerExceptionForNullTitle() {
         assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(null))
-                .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Content title cannot be null or blank");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Content title cannot be null");
+    }
 
+    @Test
+    public void testTVSeriesBuilderConstructorThrowsInvalidContentExceptionForBlankTitle() {
         assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder("    "))
                 .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Content title cannot be null or blank");
+                .hasMessage("Content title cannot be blank");
     }
 
     @Test
@@ -152,23 +155,23 @@ public class TVSeriesTest {
     }
 
     @Test
-    public void testGetEpisodesRunsCorrectly() {
+    public void testGetEpisodesIteratorRunsCorrectly() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries")
                 .addEpisodes(1, episodes)
                 .build();
 
-        assertThat(tvSeries.getEpisodes(1))
+        assertThat(tvSeries.getEpisodesIterator(1))
                 .toIterable()
                 .isEqualTo(episodes);
     }
 
     @Test
-    public void testGetEpisodesThrowsInvalidContentExceptionForNonExistingSeason() {
+    public void testGetEpisodesIteratorThrowsInvalidContentExceptionForNonExistingSeason() {
         TVSeries tvSeries = new TVSeries.TVSeriesBuilder("tvSeries")
                 .addEpisodes(1, episodes)
                 .build();
 
-        assertThatThrownBy(() -> tvSeries.getEpisodes(2))
+        assertThatThrownBy(() -> tvSeries.getEpisodesIterator(2))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Season 2 does not exist");
     }

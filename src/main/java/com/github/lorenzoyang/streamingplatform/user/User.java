@@ -69,11 +69,13 @@ public class User {
         private boolean hasSubscription;
 
         public UserBuilder(String username, String password) {
-            if (username == null || username.contains(" ")) {
-                throw new InvalidUserException("Username cannot be null or contain spaces");
+            Objects.requireNonNull(username, "Username cannot be null");
+            Objects.requireNonNull(password, "Password cannot be null");
+            if (username.contains(" ") || username.isBlank()) {
+                throw new InvalidUserException("Username cannot contain spaces or be blank");
             }
-            if (password == null || password.contains(" ")) {
-                throw new InvalidUserException("Password cannot be null or contain spaces");
+            if (password.contains(" ") || password.isBlank()) {
+                throw new InvalidUserException("Password cannot contain spaces or be blank");
             }
             this.username = username;
             this.password = password;

@@ -59,8 +59,9 @@ public abstract class Content {
         private LocalDate releaseDate;
 
         protected ContentBuilder(String title) {
-            if (title == null || title.isBlank()) {
-                throw new InvalidContentException("Content title cannot be null or blank");
+            Objects.requireNonNull(title, "Content title cannot be null");
+            if (title.isBlank()) {
+                throw new InvalidContentException("Content title cannot be blank");
             }
             this.title = title;
             this.isFree = true;
@@ -74,11 +75,11 @@ public abstract class Content {
         }
 
         public final T withDescription(String description) {
-            this.description = Objects
-                    .requireNonNull(description, "Content description cannot be null");
-            if (this.description.isBlank()) {
+            Objects.requireNonNull(description, "Content description cannot be null");
+            if (description.isBlank()) {
                 throw new InvalidContentException("Content description cannot be blank");
             }
+            this.description = description;
             return self();
         }
 

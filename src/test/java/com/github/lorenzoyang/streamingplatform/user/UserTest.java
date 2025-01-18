@@ -1,8 +1,6 @@
-package com.github.lorenzoyang.streamingplatform;
+package com.github.lorenzoyang.streamingplatform.user;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidUserException;
-import com.github.lorenzoyang.streamingplatform.user.Gender;
-import com.github.lorenzoyang.streamingplatform.user.User;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,25 +26,44 @@ public class UserTest {
     }
 
     @Test
-    public void testUserBuilderConstructorThrowsInvalidUserExceptionForInvalidUsername() {
+    public void testUserBuilderConstructorThrowsNullPointerExceptionForNullArguments() {
         assertThatThrownBy(() -> new User.UserBuilder(null, "password"))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Username cannot be null");
+
+        assertThatThrownBy(() -> new User.UserBuilder("username", null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Password cannot be null");
+    }
+
+    @Test
+    public void testUserBuilderConstructorThrowsInvalidUserExceptionForInvalidUsername() {
+        assertThatThrownBy(() -> new User.UserBuilder("", "password"))
                 .isInstanceOf(InvalidUserException.class)
-                .hasMessage("Username cannot be null or contain spaces");
+                .hasMessage("Username cannot contain spaces or be blank");
+
+        assertThatThrownBy(() -> new User.UserBuilder("    ", "password"))
+                .isInstanceOf(InvalidUserException.class)
+                .hasMessage("Username cannot contain spaces or be blank");
 
         assertThatThrownBy(() -> new User.UserBuilder("username with spaces", "password"))
                 .isInstanceOf(InvalidUserException.class)
-                .hasMessage("Username cannot be null or contain spaces");
+                .hasMessage("Username cannot contain spaces or be blank");
     }
 
     @Test
     public void testUserBuilderThrowsInvalidUserExceptionForInvalidPassword() {
-        assertThatThrownBy(() -> new User.UserBuilder("username", null))
+        assertThatThrownBy(() -> new User.UserBuilder("username", ""))
                 .isInstanceOf(InvalidUserException.class)
-                .hasMessage("Password cannot be null or contain spaces");
+                .hasMessage("Password cannot contain spaces or be blank");
+
+        assertThatThrownBy(() -> new User.UserBuilder("username", "    "))
+                .isInstanceOf(InvalidUserException.class)
+                .hasMessage("Password cannot contain spaces or be blank");
 
         assertThatThrownBy(() -> new User.UserBuilder("username", "password with spaces"))
                 .isInstanceOf(InvalidUserException.class)
-                .hasMessage("Password cannot be null or contain spaces");
+                .hasMessage("Password cannot contain spaces or be blank");
     }
 
     @Test

@@ -25,11 +25,11 @@ public class TVSeries extends Content {
         return seasons.size();
     }
 
-    public Iterator<Episode> getEpisodes(int seasonNumber) {
+    public Iterator<Episode> getEpisodesIterator(int seasonNumber) {
         if (seasonNumber < 1 || seasonNumber > seasons.size()) {
             throw new InvalidContentException("Season " + seasonNumber + " does not exist");
         }
-        return seasons.get(seasonNumber - 1).getEpisodes();
+        return seasons.get(seasonNumber - 1).getEpisodesIterator();
     }
 
     @Override
