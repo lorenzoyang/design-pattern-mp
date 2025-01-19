@@ -1,6 +1,6 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
+import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidSeasonException;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
@@ -27,7 +27,7 @@ public class TVSeries extends Content {
 
     public Iterator<Episode> getEpisodesIterator(int seasonNumber) {
         if (seasonNumber < 1 || seasonNumber > seasons.size()) {
-            throw new InvalidContentException("Season " + seasonNumber + " does not exist");
+            throw new InvalidSeasonException("Season " + seasonNumber + " does not exist");
         }
         return seasons.get(seasonNumber - 1).getEpisodesIterator();
     }
@@ -44,33 +44,33 @@ public class TVSeries extends Content {
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
         private final Map<Integer, List<Episode>> seasons;
-        private int currentSeason;
+        private int lastSeason;
 
         public TVSeriesBuilder(String title) {
             super(title);
             this.seasons = new LinkedHashMap<>();
             this.seasons.put(1, new ArrayList<>());
-            this.currentSeason = 1;
+            this.lastSeason = 1;
         }
 
         public TVSeriesBuilder addSeason(int seasonNumber) {
-            if (seasonNumber != currentSeason + 1) {
+            if (seasonNumber != lastSeason + 1) {
                 throw new InvalidSeasonException("Season number must be consecutive");
             }
             seasons.put(seasonNumber, new ArrayList<>());
-            currentSeason = seasonNumber;
+            lastSeason = seasonNumber;
             return this;
         }
 
         public TVSeriesBuilder addSingleEpisode(int seasonNumber, Episode episode) {
             if (!seasons.containsKey(seasonNumber)) {
-                throw new InvalidContentException("Season " + seasonNumber + " does not exist");
+                throw new InvalidSeasonException("Season " + seasonNumber + " does not exist");
             }
             Objects.requireNonNull(episode, "Episode cannot be null");
 
             List<Episode> episodes = seasons.get(seasonNumber);
             if (episode.getEpisodeNumber() != episodes.size() + 1) {
-                throw new InvalidContentException("Episode number must be consecutive");
+                throw new InvalidEpisodeException("Episode number must be consecutive");
             }
 
             seasons.get(seasonNumber).add(episode);

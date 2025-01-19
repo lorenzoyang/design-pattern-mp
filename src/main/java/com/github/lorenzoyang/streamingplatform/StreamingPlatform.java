@@ -81,7 +81,7 @@ public final class StreamingPlatform {
         if (!contents.contains(content)) {
             throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
         }
-        if (!user.hasSubscription() && !content.isFree()) {
+        if (!user.hasSubscription() && !content.isPremium()) {
             throw new AccessDeniedException("User '" + user.getUsername() + "' does not have a subscription");
         }
         if (timeToWatch <= 0) {

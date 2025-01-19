@@ -40,6 +40,6 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
                 "  Description: " + content.getDescription().orElse(DEFAULT_DESCRIPTION) + "\n" +
                 "  Release date: " + releaseDate + "\n" +
                 "  Duration: " + content.getDurationInMinutes() + " minutes" + "\n" +
-                "  Requires subscription: " + (content.isFree() ? "No" : "Yes");
+                "  Requires subscription: " + (content.isPremium() ? "No" : "Yes");
     }
 }

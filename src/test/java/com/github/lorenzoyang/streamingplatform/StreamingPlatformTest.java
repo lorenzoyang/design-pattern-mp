@@ -121,7 +121,7 @@ public class StreamingPlatformTest {
             }
 
             @Override
-            public boolean isFree() {
+            public boolean isPremium() {
                 return false;
             }
         };
@@ -164,7 +164,7 @@ public class StreamingPlatformTest {
     public void testWatchContentThrowsAccessDeniedExceptionForNonSubscribedUser() {
         Content mockContent = new MockContent("Mock Content") {
             @Override
-            public boolean isFree() {
+            public boolean isPremium() {
                 return false;
             }
         };

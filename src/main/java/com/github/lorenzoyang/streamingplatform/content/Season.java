@@ -14,7 +14,7 @@ public class Season {
 
     public Season(int seasonNumber, List<Episode> episodes) {
         if (seasonNumber < 1) {
-            throw new InvalidSeasonException("Season number must be a positive integer greater than 0.");
+            throw new InvalidSeasonException("Season number must be a positive integer greater than 0");
         }
         this.seasonNumber = seasonNumber;
 

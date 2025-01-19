@@ -43,7 +43,7 @@ public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
     }
 
     private boolean ensureUserCanDownloadContent(Content content) {
-        return user.hasSubscription() || content.isFree();
+        return user.hasSubscription() || content.isPremium();
     }
 
 }

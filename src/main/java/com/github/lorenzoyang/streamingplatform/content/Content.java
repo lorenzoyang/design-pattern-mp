@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public abstract class Content {
     private final String title;
-    private final boolean isFree;
+    private final boolean premium;
     private final String description;
     private final LocalDate releaseDate;
 
     protected Content(ContentBuilder<?> builder) {
         this.title = builder.title;
-        this.isFree = builder.isFree;
+        this.premium = builder.premium;
         this.description = builder.description;
         this.releaseDate = builder.releaseDate;
     }
@@ -24,8 +24,8 @@ public abstract class Content {
         return title;
     }
 
-    public boolean isFree() {
-        return isFree;
+    public boolean isPremium() {
+        return premium;
     }
 
     public Optional<String> getDescription() {
@@ -54,7 +54,7 @@ public abstract class Content {
 
     protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
         private final String title;
-        private boolean isFree;
+        private boolean premium;
         private String description;
         private LocalDate releaseDate;
 
@@ -64,13 +64,13 @@ public abstract class Content {
                 throw new InvalidContentException("Content title cannot be blank");
             }
             this.title = title;
-            this.isFree = true;
+            this.premium = false;
             this.description = null;
             this.releaseDate = null;
         }
 
-        public T requiresSubscription() {
-            this.isFree = false;
+        public final T requiresSubscription() {
+            this.premium = true;
             return self();
         }
 

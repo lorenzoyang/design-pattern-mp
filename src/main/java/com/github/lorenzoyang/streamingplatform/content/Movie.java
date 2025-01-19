@@ -34,7 +34,7 @@ public class Movie extends Content {
             super(title);
             this.episode = Objects.requireNonNull(episode, "Episode cannot be null");
             if (this.episode.getEpisodeNumber() != 1) {
-                throw new InvalidContentException("Movie can only have one episode");
+                throw new InvalidContentException("A movie can only have one episode with episode number 1");
             }
         }
 

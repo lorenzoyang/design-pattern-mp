@@ -14,11 +14,11 @@ public class SeasonTest {
     public void testConstructorThrowsInvalidSeasonExceptionForInvalidSeasonNumber() {
         assertThatThrownBy(() -> new Season(0, List.of()))
                 .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Season number must be a positive integer greater than 0.");
+                .hasMessage("Season number must be a positive integer greater than 0");
 
         assertThatThrownBy(() -> new Season(-1, List.of()))
                 .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Season number must be a positive integer greater than 0.");
+                .hasMessage("Season number must be a positive integer greater than 0");
     }
 
     @Test
