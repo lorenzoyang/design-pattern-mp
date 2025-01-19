@@ -1,6 +1,9 @@
 package com.github.lorenzoyang.streamingplatform;
 
 import com.github.lorenzoyang.streamingplatform.content.Content;
+import com.github.lorenzoyang.streamingplatform.content.Episode;
+import com.github.lorenzoyang.streamingplatform.content.Movie;
+import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 import com.github.lorenzoyang.streamingplatform.events.AddContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
@@ -11,6 +14,8 @@ import com.github.lorenzoyang.streamingplatform.user.User;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,26 +63,26 @@ public class StreamingPlatformTest {
 
     @Test
     public void testAddContentAndRemoveContentRunCorrectly() {
-        Content mockContent = new MockContent("Mock Content");
+        Content content = new MockContent("Mock Content");
         int initialSize = platform.getContents().size();
-        boolean isAdded = platform.addContent(mockContent);
+        boolean isAdded = platform.addContent(content);
 
         assertTrue(isAdded);
         assertThat(platform.getContents())
                 .hasSize(initialSize + 1)
-                .contains(mockContent);
+                .contains(content);
 
-        boolean failedToAdd = platform.addContent(mockContent);
+        boolean failedToAdd = platform.addContent(content);
         assertFalse(failedToAdd);
         assertThat(platform.getContents()).hasSize(initialSize + 1);
 
-        boolean isRemoved = platform.removeContent(mockContent);
+        boolean isRemoved = platform.removeContent(content);
         assertTrue(isRemoved);
         assertThat(platform.getContents())
                 .hasSize(initialSize)
-                .doesNotContain(mockContent);
+                .doesNotContain(content);
 
-        boolean failedToRemove = platform.removeContent(mockContent);
+        boolean failedToRemove = platform.removeContent(content);
         assertFalse(failedToRemove);
         assertThat(platform.getContents()).hasSize(initialSize);
     }
@@ -107,132 +112,34 @@ public class StreamingPlatformTest {
         assertThat(content).isNotNull();
         assertThat(content.getDescription()).contains("Updated description");
 
-        Content mockContent = new MockContent("Not existing content");
-        boolean failedToUpdate = platform.updateContent(mockContent);
+        Content notExistingContent = new MockContent("Not existing content");
+        boolean failedToUpdate = platform.updateContent(notExistingContent);
         assertFalse(failedToUpdate);
-    }
-
-    @Test
-    public void testWatchContentRunsCorrectly() {
-        Content mockContent = new MockContent("Mock Content") {
-            @Override
-            public int getDurationInMinutes() {
-                return 10;
-            }
-
-            @Override
-            public boolean isPremium() {
-                return false;
-            }
-        };
-        User subscribedUser = new User.UserBuilder("subscribedUser", "password")
-                .subscribe()
-                .build();
-        platform.getContents().add(mockContent);
-        platform.getUsers().add(subscribedUser);
-
-        int timeToWatch = 5;
-        int expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
-        assertEquals(expected, platform.watchContent(subscribedUser, mockContent, timeToWatch));
-
-        timeToWatch = 15;
-        expected = Math.min(timeToWatch, mockContent.getDurationInMinutes());
-        assertEquals(expected, platform.watchContent(subscribedUser, mockContent, timeToWatch));
-    }
-
-    @Test
-    public void testWatchContentThrowsIllegalArgumentExceptionForNonExistingUser() {
-        Content mockContent = new MockContent("Mock Content");
-        platform.getContents().add(mockContent);
-
-        assertThatThrownBy(() -> platform.watchContent(user, mockContent, 10))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("User 'user' is not registered");
-    }
-
-    @Test
-    public void testWatchContentThrowsIllegalArgumentExceptionForNonExistingContent() {
-        Content mockContent = new MockContent("Mock Content");
-        platform.getUsers().add(user);
-
-        assertThatThrownBy(() -> platform.watchContent(user, mockContent, 10))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Content 'Mock Content' does not exist");
-    }
-
-    @Test
-    public void testWatchContentThrowsAccessDeniedExceptionForNonSubscribedUser() {
-        Content mockContent = new MockContent("Mock Content") {
-            @Override
-            public boolean isPremium() {
-                return false;
-            }
-        };
-        platform.getContents().add(mockContent);
-        platform.getUsers().add(user);
-
-        assertThatThrownBy(() -> platform.watchContent(user, mockContent, 10))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessage("User 'user' does not have a subscription");
-    }
-
-    @Test
-    public void testWatchContentThrowsIllegalArgumentExceptionForNegativeTimeToWatch() {
-        Content mockContent = new MockContent("Mock Content");
-        platform.getContents().add(mockContent);
-        platform.getUsers().add(user);
-
-        assertThatThrownBy(() -> platform.watchContent(user, mockContent, 0))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Time to watch must be greater than 0");
-        assertThatThrownBy(() -> platform.watchContent(user, mockContent, -1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Time to watch must be greater than 0");
-    }
-
-    @Test
-    public void testAddObserverAndRemoveObserverRunCorrectly() {
-        PlatformObserver observer = new MockPlatformObserver();
-
-        boolean isAdded = platform.addObserver(observer);
-        assertTrue(isAdded);
-        assertThat(platform.getObservers()).containsExactly(observer);
-
-        boolean failedToAdd = platform.addObserver(observer);
-        assertFalse(failedToAdd);
-        assertThat(platform.getObservers()).containsExactly(observer);
-
-        boolean isRemoved = platform.removeObserver(observer);
-        assertTrue(isRemoved);
-        assertThat(platform.getObservers()).isEmpty();
-
-        boolean failedToRemove = platform.removeObserver(observer);
-        assertFalse(failedToRemove);
     }
 
     @Test
     public void testAddContentEvent() {
         var observer = new MockPlatformObserver();
-        Content mockContent = new MockContent("Mock Content");
+        Content content = new MockContent("Mock Content");
 
         platform.addObserver(observer);
-        platform.addContent(mockContent);
+        platform.addContent(content);
 
         AddContentEvent event = (AddContentEvent) observer.getEvent();
-        assertThat(event.getAddedContent()).isSameAs(mockContent);
+        assertThat(event.getAddedContent()).isSameAs(content);
     }
 
     @Test
     public void testRemoveContentEvent() {
         var observer = new MockPlatformObserver();
-        Content mockContent = new MockContent("Mock Content");
-        platform.getContents().add(mockContent);
+        Content content = new MockContent("Mock Content");
+        platform.getContents().add(content);
 
         platform.addObserver(observer);
-        platform.removeContent(mockContent);
+        platform.removeContent(content);
 
         RemoveContentEvent event = (RemoveContentEvent) observer.getEvent();
-        assertThat(event.getRemovedContent()).isSameAs(mockContent);
+        assertThat(event.getRemovedContent()).isSameAs(content);
     }
 
     @Test
@@ -256,12 +163,138 @@ public class StreamingPlatformTest {
     }
 
     @Test
-    public void testGetContentByTitleRunsCorrectly() {
-        Content mockContent = new MockContent("Mock Content");
-        platform.getContents().add(mockContent);
+    public void testWatchContentRunsCorrectly() {
+        Content content = new MockContent("Mock Content") {
+            @Override
+            public int getDurationInMinutes() {
+                return 10;
+            }
 
-        assertThat(platform.getContentByTitle(mockContent.getTitle()))
-                .contains(mockContent);
+            @Override
+            public boolean isPremium() {
+                return false;
+            }
+        };
+        User subscribedUser = new User.UserBuilder("subscribedUser", "password")
+                .subscribe()
+                .build();
+        platform.getContents().add(content);
+        platform.getUsers().add(subscribedUser);
+
+        int timeToWatch = 5;
+        int expected = Math.min(timeToWatch, content.getDurationInMinutes());
+        assertEquals(expected, platform.watchContent(subscribedUser, content, timeToWatch));
+
+        timeToWatch = 15;
+        expected = Math.min(timeToWatch, content.getDurationInMinutes());
+        assertEquals(expected, platform.watchContent(subscribedUser, content, timeToWatch));
+    }
+
+    @Test
+    public void testWatchContentThrowsIllegalArgumentExceptionForNonExistingUser() {
+        Content content = new MockContent("Mock Content");
+        platform.getContents().add(content);
+
+        assertThatThrownBy(() -> platform.watchContent(user, content, 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User 'user' is not registered");
+    }
+
+    @Test
+    public void testWatchContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        Content content = new MockContent("Mock Content");
+        platform.getUsers().add(user);
+
+        assertThatThrownBy(() -> platform.watchContent(user, content, 10))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Content 'Mock Content' does not exist");
+    }
+
+    @Test
+    public void testWatchContentThrowsAccessDeniedExceptionForNonSubscribedUser() {
+        Content content = new MockContent("Mock Content") {
+            @Override
+            public boolean isPremium() {
+                return true;
+            }
+        };
+        platform.getContents().add(content);
+        platform.getUsers().add(user);
+
+        assertThatThrownBy(() -> platform.watchContent(user, content, 10))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("User 'user' does not have a subscription");
+    }
+
+    @Test
+    public void testWatchContentThrowsIllegalArgumentExceptionForNegativeTimeToWatch() {
+        Content content = new MockContent("Mock Content");
+        platform.getContents().add(content);
+        platform.getUsers().add(user);
+
+        assertThatThrownBy(() -> platform.watchContent(user, content, 0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Time to watch must be greater than 0");
+        assertThatThrownBy(() -> platform.watchContent(user, content, -1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Time to watch must be greater than 0");
+    }
+
+    @Test
+    public void testDisplayContentRunsCorrectly() {
+        Content movie = new Movie.MovieBuilder("Movie", new Episode(1, 120))
+                .requiresSubscription()
+                .withDescription("Movie description")
+                .withReleaseDate(LocalDate.of(2025, 1, 1))
+                .build();
+        platform.getContents().add(movie);
+
+        String expected = "Movie:\n" +
+                "  Title: Movie\n" +
+                "  Description: Movie description\n" +
+                "  Release date: 01-01-2025\n" +
+                "  Duration: 120 minutes\n" +
+                "  Requires subscription: No";
+        assertEquals(expected, platform.displayContent(movie));
+
+        Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
+                .addEpisodes(1, List.of(
+                        new Episode(1, 30),
+                        new Episode(2, 30),
+                        new Episode(3, 30)
+                ))
+                .withDescription("TVSeries description")
+                .withReleaseDate(LocalDate.of(2025, 1, 1))
+                .build();
+        platform.getContents().add(tvSeries);
+        expected = "TV Series:\n" +
+                "  Title: TVSeries\n" +
+                "  Description: TVSeries description\n" +
+                "  Release date: 01-01-2025\n" +
+                "  Duration: 90 minutes\n" +
+                "  Requires subscription: Yes\n" +
+                "  Season 1:\n" +
+                "    Episodes: 1 2 3 ";
+        assertEquals(expected, platform.displayContent(tvSeries));
+    }
+
+    @Test
+    public void testDisplayContentThrowsIllegalArgumentExceptionForNonExistingContent() {
+        Content content = new MockContent("Mock Content");
+
+        assertThatThrownBy(() -> platform.displayContent(content))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Content 'Mock Content' does not exist");
+    }
+
+
+    @Test
+    public void testGetContentByTitleRunsCorrectly() {
+        Content content = new MockContent("Mock Content");
+        platform.getContents().add(content);
+
+        assertThat(platform.getContentByTitle(content.getTitle()))
+                .contains(content);
 
         assertThat(platform.getContentByTitle("Not existing content"))
                 .isEmpty();
@@ -277,4 +310,25 @@ public class StreamingPlatformTest {
         assertThat(platform.getUserByUsername("not existing user"))
                 .isEmpty();
     }
+
+    @Test
+    public void testAddObserverAndRemoveObserverRunCorrectly() {
+        PlatformObserver observer = new MockPlatformObserver();
+
+        boolean isAdded = platform.addObserver(observer);
+        assertTrue(isAdded);
+        assertThat(platform.getObservers()).containsExactly(observer);
+
+        boolean failedToAdd = platform.addObserver(observer);
+        assertFalse(failedToAdd);
+        assertThat(platform.getObservers()).containsExactly(observer);
+
+        boolean isRemoved = platform.removeObserver(observer);
+        assertTrue(isRemoved);
+        assertThat(platform.getObservers()).isEmpty();
+
+        boolean failedToRemove = platform.removeObserver(observer);
+        assertFalse(failedToRemove);
+    }
+
 }

@@ -69,7 +69,7 @@ public class UserTest {
     @Test
     public void testWithEmailThrowsInvalidUserExceptionForInvalidEmail() {
         var builder = new User.UserBuilder("username", "password");
-        var msg = "Email must be a valid format containing '@' and '.'";
+        String msg = "Email must be a valid format containing '@' and '.'";
 
         assertThatThrownBy(() -> builder.withEmail(null))
                 .isInstanceOf(InvalidUserException.class)
@@ -91,7 +91,7 @@ public class UserTest {
     @Test
     public void testWithAgeThrowsInvalidUserExceptionForInvalidAge() {
         var builder = new User.UserBuilder("username", "password");
-        var msg = "Age must be between 13 and 150.";
+        String msg = "Age must be between 13 and 150.";
 
         assertThatThrownBy(() -> builder.withAge(12))
                 .isInstanceOf(InvalidUserException.class)
@@ -105,6 +105,7 @@ public class UserTest {
     @Test
     public void testWithGenderThrowsNullPointerExceptionForNullGender() {
         var builder = new User.UserBuilder("username", "password");
+
         assertThatThrownBy(() -> builder.withGender(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Gender cannot be null");
@@ -115,6 +116,7 @@ public class UserTest {
         User user = new User.UserBuilder("username", "password")
                 .subscribe()
                 .build();
+        
         assertTrue(user.hasSubscription());
     }
 
