@@ -34,39 +34,44 @@ public class DownloadContentVisitorTest {
                 .build();
 
         DownloadResult result = movie.accept(new DownloadContentVisitor(subscribedUser));
-        String expectedMessage = "Downloading movie Movie...";
+        String expected = "User 'subscribedUser': Downloading movie 'Movie'...";
         assertTrue(result.isSuccess());
-        assertEquals(expectedMessage, result.getMessage());
+        assertEquals(expected, result.getMessage());
 
         result = movie.accept(new DownloadContentVisitor(user));
-        expectedMessage = "User 'username' cannot download movie 'Movie'";
+        expected = "User 'username' cannot download movie 'Movie'";
         assertFalse(result.isSuccess());
-        assertEquals(expectedMessage, result.getMessage());
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     public void testVisitTVSeriesRunsCorrectly() {
+        List<Episode> episodes = List.of(
+                new Episode(1, 20),
+                new Episode(2, 20),
+                new Episode(3, 20)
+        );
         Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
                 .requiresSubscription()
                 .withDescription("TVSeries description")
                 .withReleaseDate(LocalDate.of(2025, 1, 1))
-                .addEpisodes(1, List.of(
-                        new Episode(1, 20),
-                        new Episode(2, 20),
-                        new Episode(3, 20))
-                )
+                .addEpisodes(1, episodes)
+                .addSeason(2)
+                .addEpisodes(2, episodes)
                 .build();
 
         DownloadResult result = tvSeries.accept(new DownloadContentVisitor(subscribedUser));
-        String expectedMessage = "Downloading TV series TVSeries...\n" +
+        String expected = "User 'subscribedUser': Downloading TV series 'TVSeries'...\n" +
                 "  Downloading season 1...\n" +
-                "    Downloading episodes: 1 2 3 ";
+                "    Downloading episodes: 1 2 3 \n" +
+                "  Downloading season 2...\n" +
+                "    Downloading episodes: 1 2 3 \n";
         assertTrue(result.isSuccess());
-        assertEquals(expectedMessage, result.getMessage());
+        assertEquals(expected, result.getMessage());
 
         result = tvSeries.accept(new DownloadContentVisitor(user));
-        expectedMessage = "User 'username' cannot download TV series 'TVSeries'";
+        expected = "User 'username' cannot download TV series 'TVSeries'";
         assertFalse(result.isSuccess());
-        assertEquals(expectedMessage, result.getMessage());
+        assertEquals(expected, result.getMessage());
     }
 }

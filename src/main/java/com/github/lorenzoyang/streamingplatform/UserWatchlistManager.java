@@ -1,11 +1,11 @@
-package com.github.lorenzoyang.streamingplatform.user;
+package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.PlatformObserver;
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.events.PlatformEvent;
 import com.github.lorenzoyang.streamingplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.UpdateContentEvent;
 import com.github.lorenzoyang.streamingplatform.events.WatchContentEvent;
+import com.github.lorenzoyang.streamingplatform.user.User;
 import com.github.lorenzoyang.streamingplatform.utils.PlatformEventVisitorAdapter;
 
 import java.util.*;

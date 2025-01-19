@@ -1,12 +1,14 @@
 package com.github.lorenzoyang.streamingplatform.utils;
 
-import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.content.Movie;
 import com.github.lorenzoyang.streamingplatform.content.TVSeries;
 import com.github.lorenzoyang.streamingplatform.user.User;
 
+import java.util.stream.IntStream;
+
 public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
     private final User user;
+    private static final String INDENT = "  ";
 
     public DownloadContentVisitor(User user) {
         this.user = user;
@@ -14,36 +16,34 @@ public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
 
     @Override
     public DownloadResult visitMovie(Movie movie) {
-        String downloadMessage = "Downloading movie " + movie.getTitle() + "...";
-        String accessDeniedMessage =
-                "User '" + user.getUsername() + "' cannot download movie '" + movie.getTitle() + "'";
+        String downloadMsg = "User '" + user.getUsername() + "': Downloading movie '" + movie.getTitle() + "'...";
+        String accessDeniedMsg = "User '" + user.getUsername() + "' cannot download movie '" + movie.getTitle() + "'";
 
-        return ensureUserCanDownloadContent(movie)
-                ? new DownloadResult(true, downloadMessage)
-                : new DownloadResult(false, accessDeniedMessage);
+        return user.hasSubscription()
+                ? new DownloadResult(true, downloadMsg)
+                : new DownloadResult(false, accessDeniedMsg);
     }
 
     @Override
     public DownloadResult visitTVSeries(TVSeries tvSeries) {
-        var downloadMessage = new StringBuilder();
-        downloadMessage.append("Downloading TV series ").append(tvSeries.getTitle()).append("...\n");
-        for (int i = 1; i <= tvSeries.getSeasonsCount(); i++) {
-            downloadMessage.append("  Downloading season ").append(i).append("...\n");
-            downloadMessage.append("    Downloading episodes: ");
-            tvSeries.getEpisodesIterator(i).forEachRemaining(
-                    episode -> downloadMessage.append(episode.getEpisodeNumber()).append(" ")
-            );
+        if (!user.hasSubscription()) {
+            String accessDeniedMsg = "User '" + user.getUsername() +
+                    "' cannot download TV series '" + tvSeries.getTitle() + "'";
+
+            return new DownloadResult(false, accessDeniedMsg);
         }
-        String accessDeniedMessage =
-                "User '" + user.getUsername() + "' cannot download TV series '" + tvSeries.getTitle() + "'";
 
-        return ensureUserCanDownloadContent(tvSeries)
-                ? new DownloadResult(true, downloadMessage.toString())
-                : new DownloadResult(false, accessDeniedMessage);
+        var sb = new StringBuilder("User '" + user.getUsername() + "': Downloading TV series '")
+                .append(tvSeries.getTitle()).append("'...\n");
+        IntStream.rangeClosed(1, tvSeries.getSeasonsCount())
+                .forEach(seasonNumber -> {
+                    sb.append(INDENT).append("Downloading season ").append(seasonNumber).append("...\n");
+                    sb.append(INDENT).append(INDENT).append("Downloading episodes: ");
+                    tvSeries.getEpisodesIterator(seasonNumber)
+                            .forEachRemaining(episode -> sb.append(episode.getEpisodeNumber()).append(" "));
+                    sb.append("\n");
+                });
+
+        return new DownloadResult(true, sb.toString());
     }
-
-    private boolean ensureUserCanDownloadContent(Content content) {
-        return user.hasSubscription() || content.isPremium();
-    }
-
 }

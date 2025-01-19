@@ -6,6 +6,8 @@ import com.github.lorenzoyang.streamingplatform.exceptions.AccessDeniedException
 import com.github.lorenzoyang.streamingplatform.user.User;
 import com.github.lorenzoyang.streamingplatform.utils.ContentProvider;
 import com.github.lorenzoyang.streamingplatform.utils.DisplayContentVisitor;
+import com.github.lorenzoyang.streamingplatform.utils.DownloadContentVisitor;
+import com.github.lorenzoyang.streamingplatform.utils.DownloadResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ public final class StreamingPlatform {
     private final List<Content> contents;
     private final List<User> users;
     private final Collection<PlatformObserver> observers;
+    private final Map<User, List<DownloadResult>> downloadHistory;
 
     public StreamingPlatform(String name, ContentProvider<Content> contentProvider) {
         this.name = Objects.requireNonNull(name, "Streaming platform name cannot be null");
@@ -25,6 +28,7 @@ public final class StreamingPlatform {
 
         this.users = new ArrayList<>();
         this.observers = new ArrayList<>();
+        this.downloadHistory = new HashMap<>();
     }
 
     public boolean registerUser(User user) {
@@ -96,7 +100,26 @@ public final class StreamingPlatform {
         if (!contents.contains(content)) {
             throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
         }
-        return content.accept(new DisplayContentVisitor());
+        return "From '" + getName() + "' platform:\n" + content.accept(new DisplayContentVisitor());
+    }
+
+    public DownloadResult downloadContent(User user, Content content) {
+        if (!users.contains(user)) {
+            throw new IllegalArgumentException("User '" + user.getUsername() + "' is not registered");
+        }
+        if (!contents.contains(content)) {
+            throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
+        }
+        DownloadResult result = content.accept(new DownloadContentVisitor(user));
+        downloadHistory.computeIfAbsent(user, u -> new ArrayList<>()).add(result);
+        return result;
+    }
+
+    public Iterator<DownloadResult> getDownloadHistoryIterator(User user) {
+        if (!users.contains(user)) {
+            throw new IllegalArgumentException("User '" + user.getUsername() + "' is not registered");
+        }
+        return downloadHistory.getOrDefault(user, Collections.emptyList()).iterator();
     }
 
     public Optional<Content> getContentByTitle(String title) {

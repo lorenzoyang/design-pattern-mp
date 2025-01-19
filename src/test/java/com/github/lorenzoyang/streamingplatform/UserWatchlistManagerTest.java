@@ -1,8 +1,8 @@
-package com.github.lorenzoyang.streamingplatform.user;
+package com.github.lorenzoyang.streamingplatform;
 
-import com.github.lorenzoyang.streamingplatform.StreamingPlatform;
 import com.github.lorenzoyang.streamingplatform.content.Content;
 import com.github.lorenzoyang.streamingplatform.mocks.MockContent;
+import com.github.lorenzoyang.streamingplatform.user.User;
 import org.junit.Before;
 import org.junit.Test;
 

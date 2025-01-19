@@ -31,12 +31,15 @@ public class DisplayContentVisitorTest {
 
     @Test
     public void testVisitTVSeriesRunsCorrectly() {
+        List<Episode> episodes = List.of(
+                new Episode(1, 20),
+                new Episode(2, 20),
+                new Episode(3, 20)
+        );
         Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-                .addEpisodes(1, List.of(
-                        new Episode(1, 20),
-                        new Episode(2, 20),
-                        new Episode(3, 20))
-                )
+                .addEpisodes(1, episodes)
+                .addSeason(2)
+                .addEpisodes(2, episodes)
                 .withDescription("TVSeries description")
                 .withReleaseDate(LocalDate.of(2025, 1, 1))
                 .build();
@@ -45,10 +48,12 @@ public class DisplayContentVisitorTest {
                 "  Title: TVSeries\n" +
                 "  Description: TVSeries description\n" +
                 "  Release date: 01-01-2025\n" +
-                "  Duration: 60 minutes\n" +
+                "  Duration: 120 minutes\n" +
                 "  Requires subscription: No\n" +
                 "  Season 1:\n" +
-                "    Episodes: 1 2 3 ";
+                "    Episodes: 1 2 3 \n" +
+                "  Season 2:\n" +
+                "    Episodes: 1 2 3 \n";
         assertEquals(expected, tvSeries.accept(new DisplayContentVisitor()));
     }
 }
