@@ -69,12 +69,12 @@ public abstract class Content {
             this.releaseDate = null;
         }
 
-        public final T requiresSubscription() {
+        public T requiresSubscription() {
             this.premium = true;
             return self();
         }
 
-        public final T withDescription(String description) {
+        public T withDescription(String description) {
             Objects.requireNonNull(description, "Content description cannot be null");
             if (description.isBlank()) {
                 throw new InvalidContentException("Content description cannot be blank");
@@ -83,7 +83,7 @@ public abstract class Content {
             return self();
         }
 
-        public final T withReleaseDate(LocalDate releaseDate) {
+        public T withReleaseDate(LocalDate releaseDate) {
             this.releaseDate = Objects.requireNonNull(releaseDate, "Content release date cannot be null");
             return self();
         }
