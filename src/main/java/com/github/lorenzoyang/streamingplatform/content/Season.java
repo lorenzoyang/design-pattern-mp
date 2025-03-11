@@ -2,7 +2,6 @@ package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidSeasonException;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -18,11 +17,12 @@ public class Season {
         }
         this.seasonNumber = seasonNumber;
 
-        this.episodes = Objects.requireNonNull(episodes, "Episodes cannot be null");
+        Objects.requireNonNull(episodes, "Episodes cannot be null");
         if (!IntStream.range(0, episodes.size())
                 .allMatch(i -> episodes.get(i).getEpisodeNumber() == i + 1)) {
             throw new InvalidSeasonException("Episodes must be in order");
         }
+        this.episodes = List.copyOf(episodes);
 
         this.durationInMinutes = episodes.stream()
                 .mapToInt(Episode::getDurationInMinutes)
@@ -33,8 +33,8 @@ public class Season {
         return seasonNumber;
     }
 
-    public Iterator<Episode> getEpisodesIterator() {
-        return episodes.iterator();
+    public List<Episode> getEpisodes() {
+        return episodes; // already immutable because of List.copyOf
     }
 
     public int getDurationInMinutes() {

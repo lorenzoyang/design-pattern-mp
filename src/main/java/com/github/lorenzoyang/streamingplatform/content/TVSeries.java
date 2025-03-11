@@ -1,10 +1,12 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
-import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
-import com.github.lorenzoyang.streamingplatform.exceptions.InvalidSeasonException;
+import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
 import com.github.lorenzoyang.streamingplatform.utils.ContentVisitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 public class TVSeries extends Content {
     private final List<Season> seasons;
@@ -12,10 +14,7 @@ public class TVSeries extends Content {
 
     private TVSeries(TVSeriesBuilder builder) {
         super(builder);
-        this.seasons = new ArrayList<>();
-        builder.seasons.forEach(
-                (seasonNumber, episodes) -> this.seasons.add(new Season(seasonNumber, episodes))
-        );
+        this.seasons = new ArrayList<>(builder.seasons);
         this.durationInMinutes = seasons.stream()
                 .mapToInt(Season::getDurationInMinutes)
                 .sum();
@@ -27,9 +26,9 @@ public class TVSeries extends Content {
 
     public Iterator<Episode> getEpisodesIterator(int seasonNumber) {
         if (seasonNumber < 1 || seasonNumber > seasons.size()) {
-            throw new InvalidSeasonException("Season " + seasonNumber + " does not exist");
+            throw new InvalidContentException("Invalid TV series season number");
         }
-        return seasons.get(seasonNumber - 1).getEpisodesIterator();
+        return seasons.get(seasonNumber - 1).getEpisodes().iterator();
     }
 
     @Override
@@ -43,43 +42,24 @@ public class TVSeries extends Content {
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final Map<Integer, List<Episode>> seasons;
-        private int lastSeason;
+        private final List<Season> seasons;
+        private int lastSeasonNumber;
 
         public TVSeriesBuilder(String title) {
             super(title);
-            this.seasons = new LinkedHashMap<>();
-            this.seasons.put(1, new ArrayList<>());
-            this.lastSeason = 1;
+            this.seasons = new ArrayList<>();
+            this.lastSeasonNumber = 0;
         }
 
-        public TVSeriesBuilder addSeason(int seasonNumber) {
-            if (seasonNumber != lastSeason + 1) {
-                throw new InvalidSeasonException("Season number must be consecutive");
-            }
-            seasons.put(seasonNumber, new ArrayList<>());
-            lastSeason = seasonNumber;
-            return this;
-        }
+        public TVSeriesBuilder withSeason(Season season) {
+            Objects.requireNonNull(season, "Season cannot be null");
 
-        public TVSeriesBuilder addSingleEpisode(int seasonNumber, Episode episode) {
-            if (!seasons.containsKey(seasonNumber)) {
-                throw new InvalidSeasonException("Season " + seasonNumber + " does not exist");
-            }
-            Objects.requireNonNull(episode, "Episode cannot be null");
-
-            List<Episode> episodes = seasons.get(seasonNumber);
-            if (episode.getEpisodeNumber() != episodes.size() + 1) {
-                throw new InvalidEpisodeException("Episode number must be consecutive");
+            if (season.getSeasonNumber() != lastSeasonNumber + 1) {
+                throw new InvalidContentException("TV series season numbers must be consecutive");
             }
 
-            seasons.get(seasonNumber).add(episode);
-
-            return this;
-        }
-
-        public TVSeriesBuilder addEpisodes(int seasonNumber, List<Episode> episodes) {
-            episodes.forEach(e -> addSingleEpisode(seasonNumber, e));
+            seasons.add(season);
+            lastSeasonNumber = season.getSeasonNumber();
             return this;
         }
 
@@ -90,6 +70,9 @@ public class TVSeries extends Content {
 
         @Override
         public TVSeries build() {
+            if (seasons.isEmpty()) {
+                throw new InvalidContentException("A TV series must have at least one season");
+            }
             return new TVSeries(this);
         }
     }

@@ -1,6 +1,9 @@
 # Streaming Platform
 
-This project simulates a Streaming Platform, developed for the Design Patterns course at UniFi (Metodologie di Programmazione).
+MediaStreamingPlatform
+TODO
+This project simulates a Streaming Platform, developed for the Design Patterns course at UniFi (Metodologie di
+Programmazione).
 
 ## Features
 

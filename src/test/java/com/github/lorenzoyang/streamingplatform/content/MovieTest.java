@@ -8,7 +8,8 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class MovieTest {
     private Episode episode;
@@ -22,14 +23,12 @@ public class MovieTest {
     public void testMovieBuilderCreatesMovieWithValidArguments() {
         LocalDate releaseDate = LocalDate.of(2025, 1, 1);
         Movie movie = new Movie.MovieBuilder("Movie", episode)
-                .requiresSubscription()
                 .withDescription("Movie description")
                 .withReleaseDate(releaseDate)
                 .build();
 
         assertEquals("Movie", movie.getTitle());
         assertEquals(episode, movie.getEpisode());
-        assertTrue(movie.isPremium());
         assertThat(movie.getDescription()).contains("Movie description");
         assertThat(movie.getReleaseDate()).contains(releaseDate);
         assertEquals(120, movie.getDurationInMinutes());

@@ -1,64 +1,65 @@
 package com.github.lorenzoyang.streamingplatform.content;
 
 import com.github.lorenzoyang.streamingplatform.exceptions.InvalidContentException;
-import com.github.lorenzoyang.streamingplatform.exceptions.InvalidEpisodeException;
-import com.github.lorenzoyang.streamingplatform.exceptions.InvalidSeasonException;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class TVSeriesTest {
-    private List<Episode> episodes;
+    private List<Season> seasons;
     private TVSeries.TVSeriesBuilder builder;
 
     @Before
     public void setUp() {
-        this.episodes = new ArrayList<>(List.of(
-                new Episode(1, 20),
-                new Episode(2, 20),
-                new Episode(3, 20)
-        ));
+        this.seasons = Stream.of(
+                new Season(1, List.of(
+                        new Episode(1, 20),
+                        new Episode(2, 20)
+                )),
+                new Season(2, List.of(
+                        new Episode(1, 20),
+                        new Episode(2, 20)
+                ))
+        ).collect(Collectors.toList());
         this.builder = new TVSeries.TVSeriesBuilder("TVSeries");
     }
 
     @Test
     public void testTVSeriesBuilderCreatesTVSeriesWithValidArguments() {
         LocalDate releaseDate = LocalDate.of(2025, 1, 1);
-        var newEpisode = new Episode(1, 20);
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-                .requiresSubscription()
+        TVSeries tvSeries = builder
                 .withDescription("TVSeries Description")
                 .withReleaseDate(releaseDate)
-                .addEpisodes(1, episodes)
-                .addSeason(2)
-                .addSingleEpisode(2, newEpisode)
+                .withSeason(seasons.get(0))
+                .withSeason(seasons.get(1))
                 .build();
 
         assertEquals("TVSeries", tvSeries.getTitle());
-        assertTrue(tvSeries.isPremium());
         assertThat(tvSeries.getDescription()).contains("TVSeries Description");
         assertThat(tvSeries.getReleaseDate()).contains(releaseDate);
         assertEquals(2, tvSeries.getSeasonsCount());
 
-        int expectedDuration = episodes.stream()
-                .mapToInt(Episode::getDurationInMinutes)
-                .sum() +
-                newEpisode.getDurationInMinutes();
+        int expectedDuration = seasons.stream()
+                .mapToInt(Season::getDurationInMinutes)
+                .sum();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
 
         assertThat(tvSeries.getEpisodesIterator(1))
                 .toIterable()
-                .isEqualTo(episodes);
+                .isEqualTo(seasons.get(0).getEpisodes());
+
         assertThat(tvSeries.getEpisodesIterator(2))
                 .toIterable()
-                .isEqualTo(List.of(newEpisode));
+                .isEqualTo(seasons.get(1).getEpisodes());
     }
 
     @Test
@@ -80,8 +81,6 @@ public class TVSeriesTest {
 
     @Test
     public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
-        var builder = new TVSeries.TVSeriesBuilder("TVSeries");
-
         assertThatThrownBy(() -> builder.withDescription(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content description cannot be null");
@@ -105,93 +104,79 @@ public class TVSeriesTest {
     }
 
     @Test
-    public void testAddSeasonThrowsInvalidContentExceptionForNonConsecutiveSeasonNumber() {
-        assertThatThrownBy(() -> builder.addSeason(3))
-                .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Season number must be consecutive");
-    }
-
-    @Test
-    public void testAddSingleEpisodeThrowsInvalidSeasonExceptionForNonExistingSeason() {
-        var episode = new Episode(1, 20);
-
-        assertThatThrownBy(() -> builder.addSingleEpisode(2, episode))
-                .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Season 2 does not exist");
-    }
-
-    @Test
-    public void testAddSingleEpisodeThrowsNullPointerExceptionForNullEpisode() {
-        assertThatThrownBy(() -> builder.addSingleEpisode(1, null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Episode cannot be null");
-    }
-
-    @Test
-    public void testAddSingleEpisodeThrowsInvalidEpisodeExceptionForNonConsecutiveEpisodeNumber() {
-        builder.addSingleEpisode(1, new Episode(1, 20));
-        assertThatThrownBy(
-                () -> builder.addSingleEpisode(1, new Episode(1, 30))
-        )
-                .isInstanceOf(InvalidEpisodeException.class)
-                .hasMessage("Episode number must be consecutive");
+    public void testWithSeasonThrowsInvalidContentExceptionForNonConsecutiveSeasonNumbers() {
+        assertThatThrownBy(() -> builder.withSeason(new Season(2, List.of())))
+                .isInstanceOf(InvalidContentException.class)
+                .hasMessage("TV series season numbers must be consecutive");
     }
 
     @Test
     public void testGetDurationInMinutesRunsCorrectly() {
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-                .addEpisodes(1, episodes)
+        TVSeries tvSeries = builder
+                .withSeason(seasons.get(0))
                 .build();
 
-        int expected = episodes.stream()
-                .mapToInt(Episode::getDurationInMinutes)
-                .sum();
+        int expected = seasons.get(0).getDurationInMinutes();
         assertEquals(expected, tvSeries.getDurationInMinutes());
     }
 
     @Test
     public void testGetEpisodesIteratorRunsCorrectly() {
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-                .addEpisodes(1, episodes)
+        TVSeries tvSeries = builder
+                .withSeason(seasons.get(0))
                 .build();
 
         assertThat(tvSeries.getEpisodesIterator(1))
                 .toIterable()
-                .isEqualTo(episodes);
+                .isEqualTo(seasons.get(0).getEpisodes());
     }
 
     @Test
-    public void testGetEpisodesIteratorThrowsInvalidSeasonExceptionForNonExistingSeason() {
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-                .addEpisodes(1, episodes)
+    public void testGetEpisodesIteratorThrowsInvalidContentExceptionForNonExistingSeason() {
+        TVSeries tvSeries = builder
+                .withSeason(seasons.get(0))
                 .build();
 
         assertThatThrownBy(() -> tvSeries.getEpisodesIterator(2))
-                .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Season 2 does not exist");
+                .isInstanceOf(InvalidContentException.class)
+                .hasMessage("Invalid TV series season number");
     }
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries").build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries").build();
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries")
+                .withSeason(seasons.get(0))
+                .build();
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries")
+                .withSeason(seasons.get(0))
+                .build();
 
         assertEquals(tvSeries1, tvSeries2);
     }
 
     @Test
     public void testEqualsReturnsFalseForDifferentTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1").build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2").build();
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1")
+                .withSeason(seasons.get(0))
+                .build();
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2")
+                .withSeason(seasons.get(0))
+                .build();
 
         assertNotEquals(tvSeries1, tvSeries2);
     }
 
     @Test
     public void testHashCodeIsBasedOnTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1").build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1").build();
-        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2").build();
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1")
+                .withSeason(seasons.get(0))
+                .build();
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1")
+                .withSeason(seasons.get(0))
+                .build();
+        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2")
+                .withSeason(seasons.get(0))
+                .build();
 
         assertEquals(tvSeries1.hashCode(), tvSeries2.hashCode());
         assertNotEquals(tvSeries1.hashCode(), tvSeries3.hashCode());
