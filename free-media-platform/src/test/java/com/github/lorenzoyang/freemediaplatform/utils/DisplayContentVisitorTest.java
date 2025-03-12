@@ -1,59 +1,63 @@
-//package com.github.lorenzoyang.freemediaplatform.utils;
-//
-//import com.github.lorenzoyang.freemediaplatform.content.Content;
-//import com.github.lorenzoyang.freemediaplatform.content.Episode;
-//import com.github.lorenzoyang.freemediaplatform.content.Movie;
-//import com.github.lorenzoyang.freemediaplatform.content.TVSeries;
-//import org.junit.Test;
-//
-//import java.time.LocalDate;
-//import java.util.List;
-//
-//import static org.junit.Assert.assertEquals;
-//
-//public class DisplayContentVisitorTest {
-//    @Test
-//    public void testVisitMovieRunsCorrectly() {
-//        Content movie = new Movie.MovieBuilder("Movie", new Episode(1, 120))
-//                .withPremium()
-//                .withDescription("Movie description")
-//                .withReleaseDate(LocalDate.of(2025, 1, 1))
-//                .build();
-//
-//        String expected = "Movie:\n" +
-//                "  Title: Movie\n" +
-//                "  Description: Movie description\n" +
-//                "  Release date: 01-01-2025\n" +
-//                "  Duration: 120 minutes\n" +
-//                "  Requires subscription: Yes";
-//        assertEquals(expected, movie.accept(new DisplayContentVisitor()));
-//    }
-//
-//    @Test
-//    public void testVisitTVSeriesRunsCorrectly() {
-//        List<Episode> episodes = List.of(
-//                new Episode(1, 20),
-//                new Episode(2, 20),
-//                new Episode(3, 20)
-//        );
-//        Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
-//                .addEpisodes(1, episodes)
-//                .withSeason(2)
-//                .addEpisodes(2, episodes)
-//                .withDescription("TVSeries description")
-//                .withReleaseDate(LocalDate.of(2025, 1, 1))
-//                .build();
-//
-//        String expected = "TV Series:\n" +
-//                "  Title: TVSeries\n" +
-//                "  Description: TVSeries description\n" +
-//                "  Release date: 01-01-2025\n" +
-//                "  Duration: 120 minutes\n" +
-//                "  Requires subscription: No\n" +
-//                "  Season 1:\n" +
-//                "    Episodes: 1 2 3 \n" +
-//                "  Season 2:\n" +
-//                "    Episodes: 1 2 3 \n";
-//        assertEquals(expected, tvSeries.accept(new DisplayContentVisitor()));
-//    }
-//}
+package com.github.lorenzoyang.freemediaplatform.utils;
+
+import com.github.lorenzoyang.freemediaplatform.content.*;
+import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+
+public class DisplayContentVisitorTest {
+    @Test
+    public void testVisitMovieRunsCorrectly() {
+        Content movie = new Movie.MovieBuilder("Movie", new Episode(1, 120))
+                .withDescription("Movie description")
+                .withReleaseDate(LocalDate.of(2025, 1, 1))
+                .build();
+
+        String expected = "Movie: Movie\n" +
+                "  Description: Movie description\n" +
+                "  Release Date: 01-01-2025\n" +
+                "  Total Duration: 120 minutes\n";
+
+        assertEquals(expected, movie.accept(new DisplayContentVisitor()));
+    }
+
+    @Test
+    public void testVisitTVSeriesRunsCorrectly() {
+        var season1 = new Season(1, List.of(
+                new Episode(1, 20),
+                new Episode(2, 20),
+                new Episode(3, 20)));
+
+        var season2 = new Season(2, List.of(
+                new Episode(1, 20),
+                new Episode(2, 20),
+                new Episode(3, 20)));
+
+        Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
+                .withDescription("TVSeries description")
+                .withReleaseDate(LocalDate.of(2025, 1, 1))
+                .withSeason(season1)
+                .withSeason(season2)
+                .build();
+
+        String expected = "TV Series: TVSeries\n" +
+                "  Description: TVSeries description\n" +
+                "  Release Date: 01-01-2025\n" +
+                "  Total Duration: 120 minutes\n" +
+                "Season 1\n" +
+                "  Total Duration: 60 minutes\n" +
+                "  Episode 1, Duration: 20 minutes\n" +
+                "  Episode 2, Duration: 20 minutes\n" +
+                "  Episode 3, Duration: 20 minutes\n" +
+                "Season 2\n" +
+                "  Total Duration: 60 minutes\n" +
+                "  Episode 1, Duration: 20 minutes\n" +
+                "  Episode 2, Duration: 20 minutes\n" +
+                "  Episode 3, Duration: 20 minutes\n";
+
+        assertEquals(expected, tvSeries.accept(new DisplayContentVisitor()));
+    }
+}

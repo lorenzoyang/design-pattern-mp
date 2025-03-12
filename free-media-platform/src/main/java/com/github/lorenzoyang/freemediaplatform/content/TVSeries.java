@@ -4,7 +4,7 @@ import com.github.lorenzoyang.freemediaplatform.exceptions.InvalidContentExcepti
 import com.github.lorenzoyang.freemediaplatform.utils.ContentVisitor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,11 +24,8 @@ public class TVSeries extends Content {
         return seasons.size();
     }
 
-    public Iterator<Episode> getEpisodesIterator(int seasonNumber) {
-        if (seasonNumber < 1 || seasonNumber > seasons.size()) {
-            throw new InvalidContentException("Invalid TV series season number");
-        }
-        return seasons.get(seasonNumber - 1).getEpisodes().iterator();
+    public List<Season> getSeasons() {
+        return Collections.unmodifiableList(seasons);
     }
 
     @Override

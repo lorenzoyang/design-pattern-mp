@@ -53,13 +53,9 @@ public class TVSeriesTest {
                 .sum();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
 
-        assertThat(tvSeries.getEpisodesIterator(1))
-                .toIterable()
-                .isEqualTo(seasons.get(0).getEpisodes());
-
-        assertThat(tvSeries.getEpisodesIterator(2))
-                .toIterable()
-                .isEqualTo(seasons.get(1).getEpisodes());
+        assertEquals(2, tvSeries.getSeasons().size());
+        assertEquals(seasons.get(0), tvSeries.getSeasons().get(0));
+        assertEquals(seasons.get(1), tvSeries.getSeasons().get(1));
     }
 
     @Test
@@ -118,28 +114,6 @@ public class TVSeriesTest {
 
         int expected = seasons.get(0).getDurationInMinutes();
         assertEquals(expected, tvSeries.getDurationInMinutes());
-    }
-
-    @Test
-    public void testGetEpisodesIteratorRunsCorrectly() {
-        TVSeries tvSeries = builder
-                .withSeason(seasons.get(0))
-                .build();
-
-        assertThat(tvSeries.getEpisodesIterator(1))
-                .toIterable()
-                .isEqualTo(seasons.get(0).getEpisodes());
-    }
-
-    @Test
-    public void testGetEpisodesIteratorThrowsInvalidContentExceptionForNonExistingSeason() {
-        TVSeries tvSeries = builder
-                .withSeason(seasons.get(0))
-                .build();
-
-        assertThatThrownBy(() -> tvSeries.getEpisodesIterator(2))
-                .isInstanceOf(InvalidContentException.class)
-                .hasMessage("Invalid TV series season number");
     }
 
     @Test
