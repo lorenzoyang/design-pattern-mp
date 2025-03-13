@@ -39,13 +39,12 @@ public class TVSeries extends Content {
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final List<Season> seasons;
-        private int lastSeasonNumber;
+        private final List<Season> seasons = new ArrayList<>();
+        private int lastSeasonNumber = 0;
 
-        public TVSeriesBuilder(String title) {
+        public TVSeriesBuilder(String title, Season season) {
             super(title);
-            this.seasons = new ArrayList<>();
-            this.lastSeasonNumber = 0;
+            withSeason(season);
         }
 
         public TVSeriesBuilder withSeason(Season season) {
@@ -57,6 +56,7 @@ public class TVSeries extends Content {
 
             seasons.add(season);
             lastSeasonNumber = season.getSeasonNumber();
+
             return this;
         }
 
@@ -67,9 +67,6 @@ public class TVSeries extends Content {
 
         @Override
         public TVSeries build() {
-            if (seasons.isEmpty()) {
-                throw new InvalidContentException("A TV series must have at least one season");
-            }
             return new TVSeries(this);
         }
     }

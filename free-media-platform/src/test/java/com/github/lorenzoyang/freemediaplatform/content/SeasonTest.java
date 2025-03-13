@@ -35,7 +35,7 @@ public class SeasonTest {
 
         assertThatThrownBy(() -> new Season(1, List.of(episode1, episode2)))
                 .isInstanceOf(InvalidSeasonException.class)
-                .hasMessage("Episodes must be in order");
+                .hasMessage("Episodes must be consecutive and start from 1");
     }
 
     @Test

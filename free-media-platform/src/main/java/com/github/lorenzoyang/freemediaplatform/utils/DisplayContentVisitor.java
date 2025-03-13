@@ -3,6 +3,7 @@ package com.github.lorenzoyang.freemediaplatform.utils;
 import com.github.lorenzoyang.freemediaplatform.content.Content;
 import com.github.lorenzoyang.freemediaplatform.content.Movie;
 import com.github.lorenzoyang.freemediaplatform.content.TVSeries;
+import com.github.lorenzoyang.freemediaplatform.content.VideoResolution;
 
 import java.time.format.DateTimeFormatter;
 
@@ -46,9 +47,13 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
         String releaseDate = content.getReleaseDate()
                 .map(DATE_FORMATTER::format)
                 .orElse(DEFAULT_RELEASE_DATE);
+        String resolution = content.getResolution()
+                .map(VideoResolution::getDisplayName)
+                .orElse("Resolution not specified");
 
         sb.append(INDENT).append("Description: ").append(description).append("\n");
         sb.append(INDENT).append("Release Date: ").append(releaseDate).append("\n");
+        sb.append(INDENT).append("Resolution: ").append(resolution).append("\n");
         sb.append(INDENT).append("Total Duration: ").append(content.getDurationInMinutes()).append(" minutes\n");
     }
 }

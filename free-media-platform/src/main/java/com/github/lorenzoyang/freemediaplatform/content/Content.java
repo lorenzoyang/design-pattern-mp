@@ -11,11 +11,13 @@ public abstract class Content {
     private final String title;
     private final String description;
     private final LocalDate releaseDate;
+    private final VideoResolution resolution;
 
     protected Content(ContentBuilder<?> builder) {
         this.title = builder.title;
         this.description = builder.description;
         this.releaseDate = builder.releaseDate;
+        this.resolution = builder.resolution;
     }
 
     public String getTitle() {
@@ -28,6 +30,10 @@ public abstract class Content {
 
     public Optional<LocalDate> getReleaseDate() {
         return Optional.ofNullable(releaseDate);
+    }
+
+    public Optional<VideoResolution> getResolution() {
+        return Optional.ofNullable(resolution);
     }
 
     public abstract int getDurationInMinutes();
@@ -48,8 +54,9 @@ public abstract class Content {
 
     protected abstract static class ContentBuilder<T extends ContentBuilder<T>> {
         private final String title;
-        private String description;
-        private LocalDate releaseDate;
+        private String description = null;
+        private LocalDate releaseDate = null;
+        private VideoResolution resolution = null;
 
         protected ContentBuilder(String title) {
             Objects.requireNonNull(title, "Content title cannot be null");
@@ -57,13 +64,10 @@ public abstract class Content {
                 throw new InvalidContentException("Content title cannot be blank");
             }
             this.title = title;
-            this.description = null;
-            this.releaseDate = null;
         }
 
         public T withDescription(String description) {
-            Objects.requireNonNull(description, "Content description cannot be null");
-            if (description.isBlank()) {
+            if (description != null && description.isBlank()) {
                 throw new InvalidContentException("Content description cannot be blank");
             }
             this.description = description;
@@ -71,7 +75,12 @@ public abstract class Content {
         }
 
         public T withReleaseDate(LocalDate releaseDate) {
-            this.releaseDate = Objects.requireNonNull(releaseDate, "Content release date cannot be null");
+            this.releaseDate = releaseDate;
+            return self();
+        }
+
+        public T withResolution(VideoResolution resolution) {
+            this.resolution = resolution;
             return self();
         }
 

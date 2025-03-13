@@ -25,12 +25,14 @@ public class MovieTest {
         Movie movie = new Movie.MovieBuilder("Movie", episode)
                 .withDescription("Movie description")
                 .withReleaseDate(releaseDate)
+                .withResolution(VideoResolution.FULL_HD_1080P)
                 .build();
 
         assertEquals("Movie", movie.getTitle());
         assertEquals(episode, movie.getEpisode());
         assertThat(movie.getDescription()).contains("Movie description");
         assertThat(movie.getReleaseDate()).contains(releaseDate);
+        assertThat(movie.getResolution()).contains(VideoResolution.FULL_HD_1080P);
         assertEquals(120, movie.getDurationInMinutes());
     }
 
@@ -68,15 +70,6 @@ public class MovieTest {
     }
 
     @Test
-    public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
-        var builder = new Movie.MovieBuilder("Movie", episode);
-
-        assertThatThrownBy(() -> builder.withDescription(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Content description cannot be null");
-    }
-
-    @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
         var builder = new Movie.MovieBuilder("Movie", episode);
 
@@ -86,15 +79,6 @@ public class MovieTest {
         assertThatThrownBy(() -> builder.withDescription(""))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content description cannot be blank");
-    }
-
-    @Test
-    public void testWithReleaseDateThrowsNullPointerExceptionForNullReleaseDate() {
-        var builder = new Movie.MovieBuilder("Movie", episode);
-
-        assertThatThrownBy(() -> builder.withReleaseDate(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Content release date cannot be null");
     }
 
     @Test

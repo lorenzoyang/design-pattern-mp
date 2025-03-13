@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,11 +14,11 @@ import static org.junit.Assert.assertNotEquals;
 
 public class TVSeriesTest {
     private List<Season> seasons;
-    private TVSeries.TVSeriesBuilder builder;
+    private TVSeries.TVSeriesBuilder defaultBuilder;
 
     @Before
     public void setUp() {
-        this.seasons = Stream.of(
+        this.seasons = List.of(
                 new Season(1, List.of(
                         new Episode(1, 20),
                         new Episode(2, 20)
@@ -29,23 +27,24 @@ public class TVSeriesTest {
                         new Episode(1, 20),
                         new Episode(2, 20)
                 ))
-        ).collect(Collectors.toList());
-        this.builder = new TVSeries.TVSeriesBuilder("TVSeries");
+        );
+        this.defaultBuilder = new TVSeries.TVSeriesBuilder("TVSeries", new Season(1, List.of()));
     }
 
     @Test
     public void testTVSeriesBuilderCreatesTVSeriesWithValidArguments() {
         LocalDate releaseDate = LocalDate.of(2025, 1, 1);
-        TVSeries tvSeries = builder
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
                 .withDescription("TVSeries Description")
                 .withReleaseDate(releaseDate)
-                .withSeason(seasons.get(0))
+                .withResolution(VideoResolution.FULL_HD_1080P)
                 .withSeason(seasons.get(1))
                 .build();
 
         assertEquals("TVSeries", tvSeries.getTitle());
         assertThat(tvSeries.getDescription()).contains("TVSeries Description");
         assertThat(tvSeries.getReleaseDate()).contains(releaseDate);
+        assertThat(tvSeries.getResolution()).contains(VideoResolution.FULL_HD_1080P);
         assertEquals(2, tvSeries.getSeasonsCount());
 
         int expectedDuration = seasons.stream()
@@ -60,56 +59,41 @@ public class TVSeriesTest {
 
     @Test
     public void testTVSeriesBuilderConstructorThrowsNullPointerExceptionForNullTitle() {
-        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(null))
+        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(null, new Season(1, List.of())))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content title cannot be null");
     }
 
     @Test
     public void testTVSeriesBuilderConstructorThrowsInvalidContentExceptionForBlankTitle() {
-        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder("    "))
+        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder("    ", new Season(1, List.of())))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content title cannot be blank");
-        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder(""))
+        assertThatThrownBy(() -> new TVSeries.TVSeriesBuilder("", new Season(1, List.of())))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content title cannot be blank");
-    }
-
-    @Test
-    public void testWithDescriptionThrowsNullPointerExceptionForNullDescription() {
-        assertThatThrownBy(() -> builder.withDescription(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Content description cannot be null");
     }
 
     @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
-        assertThatThrownBy(() -> builder.withDescription("    "))
+        assertThatThrownBy(() -> defaultBuilder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content description cannot be blank");
-        assertThatThrownBy(() -> builder.withDescription(""))
+        assertThatThrownBy(() -> defaultBuilder.withDescription(""))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content description cannot be blank");
-    }
-
-    @Test
-    public void testWithReleaseDateThrowsNullPointerExceptionForNullReleaseDate() {
-        assertThatThrownBy(() -> builder.withReleaseDate(null))
-                .isInstanceOf(NullPointerException.class)
-                .hasMessage("Content release date cannot be null");
     }
 
     @Test
     public void testWithSeasonThrowsInvalidContentExceptionForNonConsecutiveSeasonNumbers() {
-        assertThatThrownBy(() -> builder.withSeason(new Season(2, List.of())))
+        assertThatThrownBy(() -> defaultBuilder.withSeason(new Season(3, List.of())))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("TV series season numbers must be consecutive");
     }
 
     @Test
     public void testGetDurationInMinutesRunsCorrectly() {
-        TVSeries tvSeries = builder
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
                 .build();
 
         int expected = seasons.get(0).getDurationInMinutes();
@@ -118,11 +102,9 @@ public class TVSeriesTest {
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
                 .build();
 
         assertEquals(tvSeries1, tvSeries2);
@@ -130,11 +112,9 @@ public class TVSeriesTest {
 
     @Test
     public void testEqualsReturnsFalseForDifferentTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2", seasons.get(0))
                 .build();
 
         assertNotEquals(tvSeries1, tvSeries2);
@@ -142,14 +122,11 @@ public class TVSeriesTest {
 
     @Test
     public void testHashCodeIsBasedOnTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
                 .build();
-        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2")
-                .withSeason(seasons.get(0))
+        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2", seasons.get(0))
                 .build();
 
         assertEquals(tvSeries1.hashCode(), tvSeries2.hashCode());

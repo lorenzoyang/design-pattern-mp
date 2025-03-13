@@ -14,11 +14,13 @@ public class DisplayContentVisitorTest {
         Content movie = new Movie.MovieBuilder("Movie", new Episode(1, 120))
                 .withDescription("Movie description")
                 .withReleaseDate(LocalDate.of(2025, 1, 1))
+                .withResolution(VideoResolution.FULL_HD_1080P)
                 .build();
 
         String expected = "Movie: Movie\n" +
                 "  Description: Movie description\n" +
                 "  Release Date: 01-01-2025\n" +
+                "  Resolution: 1080p\n" +
                 "  Total Duration: 120 minutes\n";
 
         assertEquals(expected, movie.accept(new DisplayContentVisitor()));
@@ -36,16 +38,17 @@ public class DisplayContentVisitorTest {
                 new Episode(2, 20),
                 new Episode(3, 20)));
 
-        Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries")
+        Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", season1)
                 .withDescription("TVSeries description")
                 .withReleaseDate(LocalDate.of(2025, 1, 1))
-                .withSeason(season1)
+                .withResolution(VideoResolution.FULL_HD_1080P)
                 .withSeason(season2)
                 .build();
 
         String expected = "TV Series: TVSeries\n" +
                 "  Description: TVSeries description\n" +
                 "  Release Date: 01-01-2025\n" +
+                "  Resolution: 1080p\n" +
                 "  Total Duration: 120 minutes\n" +
                 "Season 1\n" +
                 "  Total Duration: 60 minutes\n" +

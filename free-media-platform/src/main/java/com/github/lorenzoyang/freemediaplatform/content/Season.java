@@ -20,7 +20,7 @@ public class Season {
         Objects.requireNonNull(episodes, "Episodes cannot be null");
         if (!IntStream.range(0, episodes.size())
                 .allMatch(i -> episodes.get(i).getEpisodeNumber() == i + 1)) {
-            throw new InvalidSeasonException("Episodes must be in order");
+            throw new InvalidSeasonException("Episodes must be consecutive and start from 1");
         }
         this.episodes = List.copyOf(episodes);
 
