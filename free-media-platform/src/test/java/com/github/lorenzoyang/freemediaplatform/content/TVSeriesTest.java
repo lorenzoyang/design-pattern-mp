@@ -52,9 +52,7 @@ public class TVSeriesTest {
                 .sum();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
 
-        assertEquals(2, tvSeries.getSeasons().size());
-        assertEquals(seasons.get(0), tvSeries.getSeasons().get(0));
-        assertEquals(seasons.get(1), tvSeries.getSeasons().get(1));
+        assertThat(tvSeries).contains(seasons.get(0), seasons.get(1));
     }
 
     @Test

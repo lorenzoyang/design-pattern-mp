@@ -66,6 +66,7 @@ public abstract class Content {
             this.title = title;
         }
 
+        // TODO: Rendere i metodi final o no?
         public T withDescription(String description) {
             if (description != null && description.isBlank()) {
                 throw new InvalidContentException("Content description cannot be blank");

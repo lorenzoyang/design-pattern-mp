@@ -4,11 +4,11 @@ import com.github.lorenzoyang.freemediaplatform.exceptions.InvalidContentExcepti
 import com.github.lorenzoyang.freemediaplatform.utils.ContentVisitor;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class TVSeries extends Content {
+public class TVSeries extends Content implements Iterable<Season> {
     private final List<Season> seasons;
     private final int durationInMinutes;
 
@@ -24,10 +24,6 @@ public class TVSeries extends Content {
         return seasons.size();
     }
 
-    public List<Season> getSeasons() {
-        return Collections.unmodifiableList(seasons);
-    }
-
     @Override
     public int getDurationInMinutes() {
         return durationInMinutes;
@@ -36,6 +32,11 @@ public class TVSeries extends Content {
     @Override
     public <T> T accept(ContentVisitor<T> visitor) {
         return visitor.visitTVSeries(this);
+    }
+
+    @Override
+    public Iterator<Season> iterator() {
+        return seasons.iterator();
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {

@@ -2,11 +2,12 @@ package com.github.lorenzoyang.freemediaplatform.content;
 
 import com.github.lorenzoyang.freemediaplatform.exceptions.InvalidSeasonException;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-public class Season {
+public class Season implements Iterable<Episode> {
     private final int seasonNumber;
     private final List<Episode> episodes;
     private final int durationInMinutes;
@@ -33,8 +34,8 @@ public class Season {
         return seasonNumber;
     }
 
-    public List<Episode> getEpisodes() {
-        return episodes; // already immutable because of List.copyOf
+    public int getEpisodesCount() {
+        return episodes.size();
     }
 
     public int getDurationInMinutes() {
@@ -53,5 +54,10 @@ public class Season {
     @Override
     public int hashCode() {
         return Objects.hash(seasonNumber, episodes, durationInMinutes);
+    }
+
+    @Override
+    public Iterator<Episode> iterator() {
+        return episodes.iterator();
     }
 }

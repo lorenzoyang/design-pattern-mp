@@ -1,9 +1,10 @@
 package com.github.lorenzoyang.freemediaplatform.utils;
 
 import com.github.lorenzoyang.freemediaplatform.content.Movie;
+import com.github.lorenzoyang.freemediaplatform.content.Season;
 import com.github.lorenzoyang.freemediaplatform.content.TVSeries;
 
-public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
+public class DownloadContentVisitor implements ContentVisitor<String> {
     private final String downloadPath;
 
     public DownloadContentVisitor(String downloadPath) {
@@ -11,24 +12,22 @@ public class DownloadContentVisitor implements ContentVisitor<DownloadResult> {
     }
 
     @Override
-    public DownloadResult visitMovie(Movie movie) {
-        if (isInvalidDownloadPath()) {
-            return new DownloadResult(false, "Invalid download path");
-        }
-        String msg = "Downloading movie " + movie.getTitle() + " to '" + downloadPath + "'";
-        return new DownloadResult(true, msg);
+    public String visitMovie(Movie movie) {
+        return "Successfully downloaded movie " + movie.getTitle() + " to: " + downloadPath + "/" + movie.getTitle()
+                + movie.getResolution().map(resolution -> "." + resolution).orElse("");
     }
 
     @Override
-    public DownloadResult visitTVSeries(TVSeries tvSeries) {
-        if (isInvalidDownloadPath()) {
-            return new DownloadResult(false, "Invalid download path");
+    public String visitTVSeries(TVSeries tvSeries) {
+        StringBuilder result = new StringBuilder();
+        result.append("Successfully downloaded TV series ").append(tvSeries.getTitle()).append(" to: ")
+                .append(downloadPath).append("/").append(tvSeries.getTitle())
+                .append(tvSeries.getResolution().map(resolution -> "." + resolution).orElse(""));
+        result.append("\nDownloaded the following:");
+        for (Season season : tvSeries) {
+            result.append("\n- Season ").append(season.getSeasonNumber())
+                    .append(" with ").append(season.getEpisodesCount()).append(" episodes");
         }
-        String msg = "Downloading TV series " + tvSeries.getTitle() + " to '" + downloadPath + "'";
-        return new DownloadResult(true, msg);
-    }
-
-    private boolean isInvalidDownloadPath() {
-        return downloadPath == null || downloadPath.isBlank();
+        return result.toString();
     }
 }

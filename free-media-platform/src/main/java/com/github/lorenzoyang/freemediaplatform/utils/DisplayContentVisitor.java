@@ -27,11 +27,11 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
         sb.append("TV Series: ").append(tvSeries.getTitle()).append("\n");
         appendCommonContent(sb, tvSeries);
 
-        for (var season : tvSeries.getSeasons()) {
+        for (var season : tvSeries) {
             sb.append("Season ").append(season.getSeasonNumber()).append("\n");
             sb.append(INDENT).append("Total Duration: ").append(season.getDurationInMinutes()).append(" minutes\n");
 
-            for (var episode : season.getEpisodes()) {
+            for (var episode : season) {
                 sb.append(INDENT)
                         .append("Episode ").append(episode.getEpisodeNumber())
                         .append(", Duration: ").append(episode.getDurationInMinutes())
