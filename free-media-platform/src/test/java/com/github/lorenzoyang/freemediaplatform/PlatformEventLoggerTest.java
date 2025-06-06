@@ -52,6 +52,24 @@ public class PlatformEventLoggerTest {
     }
 
     @Test
+    public void testNotifyChangeForUpdateContentEvent() {
+        Content contentToUpdate = platform.contentIterator().next();
+        Content updatedContent = new Movie.MovieBuilder(contentToUpdate.getTitle(),
+                new Episode(1, 1))
+                .build();
+        platform.updateContent(updatedContent);
+
+        String expected = "Content Updated: \n" +
+                "\tfrom: {Title='Movie', Description='No description available', " +
+                "Release Date='Release date not specified', " +
+                "Resolution='Resolution not specified'}\n" +
+                "\tto: {Title='Movie', Description='No description available', " +
+                "Release Date='Release date not specified', " +
+                "Resolution='Resolution not specified'}";
+        assertEquals(expected, platformEventLogger.logMessagesIterator().next());
+    }
+
+    @Test
     public void testClearLogMessagesRunsCorrectly() {
         this.platformEventLogger.getLogMessages().add("Test log message");
         this.platformEventLogger.clearLogs();

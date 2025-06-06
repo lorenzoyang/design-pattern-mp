@@ -74,7 +74,7 @@ public class StreamingPlatformTest {
         int initialContentCount = platform.getContents().size();
         Content updatedContent = new Movie.MovieBuilder(contentToUpdate.getTitle(),
                 new Episode(1, 1))
-                .withDescription("Updated content")
+                .withDescription("Updated description")
                 .build();
 
         boolean updated = platform.updateContent(updatedContent);
