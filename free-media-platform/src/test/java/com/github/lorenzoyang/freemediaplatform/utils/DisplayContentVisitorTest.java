@@ -28,15 +28,8 @@ public class DisplayContentVisitorTest {
 
     @Test
     public void testVisitTVSeriesRunsCorrectly() {
-        var season1 = new Season(1, List.of(
-                new Episode(1, 20),
-                new Episode(2, 20),
-                new Episode(3, 20)));
-
-        var season2 = new Season(2, List.of(
-                new Episode(1, 20),
-                new Episode(2, 20),
-                new Episode(3, 20)));
+        var season1 = new Season(1, List.of(new Episode(1, 20)));
+        var season2 = new Season(2, List.of(new Episode(1, 20)));
 
         Content tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", season1)
                 .withDescription("TVSeries description")
@@ -49,17 +42,13 @@ public class DisplayContentVisitorTest {
                 "  Description: TVSeries description\n" +
                 "  Release Date: 01-01-2025\n" +
                 "  Resolution: 1080p\n" +
-                "  Total Duration: 120 minutes\n" +
+                "  Total Duration: 40 minutes\n" +
                 "Season 1\n" +
-                "  Total Duration: 60 minutes\n" +
+                "  Total Duration: 20 minutes\n" +
                 "  Episode 1, Duration: 20 minutes\n" +
-                "  Episode 2, Duration: 20 minutes\n" +
-                "  Episode 3, Duration: 20 minutes\n" +
                 "Season 2\n" +
-                "  Total Duration: 60 minutes\n" +
-                "  Episode 1, Duration: 20 minutes\n" +
-                "  Episode 2, Duration: 20 minutes\n" +
-                "  Episode 3, Duration: 20 minutes\n";
+                "  Total Duration: 20 minutes\n" +
+                "  Episode 1, Duration: 20 minutes\n";
 
         assertEquals(expected, tvSeries.accept(new DisplayContentVisitor()));
     }

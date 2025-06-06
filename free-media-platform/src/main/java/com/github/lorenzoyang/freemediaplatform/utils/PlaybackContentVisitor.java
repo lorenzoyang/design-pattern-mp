@@ -6,6 +6,7 @@ import com.github.lorenzoyang.freemediaplatform.content.Season;
 import com.github.lorenzoyang.freemediaplatform.content.TVSeries;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PlaybackContentVisitor implements ContentVisitor<Iterable<Episode>> {
@@ -16,7 +17,7 @@ public class PlaybackContentVisitor implements ContentVisitor<Iterable<Episode>>
 
     @Override
     public Iterable<Episode> visitTVSeries(TVSeries tvSeries) {
-        List<Episode> allEpisodes = new ArrayList<>();
+        Collection<Episode> allEpisodes = new ArrayList<>();
         for (Season season : tvSeries) {
             season.iterator().forEachRemaining(allEpisodes::add);
         }

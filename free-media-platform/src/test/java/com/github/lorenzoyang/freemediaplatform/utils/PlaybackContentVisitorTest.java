@@ -5,14 +5,13 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlaybackContentVisitorTest {
     @Test
     public void testVisitMovieRunsCorrectly() {
         var episode = new Episode(1, 120);
-        Content movie = new Movie.MovieBuilder("Movie", episode)
-                .build();
+        Content movie = new Movie.MovieBuilder("Movie", episode).build();
         Iterable<Episode> episodes = movie.accept(new PlaybackContentVisitor());
 
         assertThat(episodes).containsExactly(episode);

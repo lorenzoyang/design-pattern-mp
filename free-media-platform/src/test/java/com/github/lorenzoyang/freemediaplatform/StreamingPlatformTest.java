@@ -1,6 +1,7 @@
 package com.github.lorenzoyang.freemediaplatform;
 
 import com.github.lorenzoyang.freemediaplatform.content.*;
+import com.github.lorenzoyang.freemediaplatform.exceptions.StreamingPlatformException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,11 +39,18 @@ public class StreamingPlatformTest {
     }
 
     @Test
+    public void testConstructorThrowsStreamingPlatformExceptionForBlankName() {
+        assertThatThrownBy(() -> new StreamingPlatform(" ", List::of))
+                .isInstanceOf(StreamingPlatformException.class)
+                .hasMessage("Streaming platform name cannot be blank");
+    }
+
+    @Test
     public void testGetContentByTitleRunsCorrectly() {
-        Optional<Content> content = platform.getContentByTitle("Movie1");
+        Optional<Content> content = this.platform.getContentByTitle("Movie1");
         assertThat(content).isPresent();
         assertEquals("Movie1", content.get().getTitle());
-        Optional<Content> nonExistentContent = platform.getContentByTitle("NonExistent");
+        Optional<Content> nonExistentContent = this.platform.getContentByTitle("NonExistent");
         assertThat(nonExistentContent).isEmpty();
     }
 
@@ -51,44 +59,44 @@ public class StreamingPlatformTest {
         Content newMovie = new Movie.MovieBuilder("NewMovie", new Episode(1, 1))
                 .build();
 
-        boolean added = platform.addContent(newMovie);
+        boolean added = this.platform.addContent(newMovie);
         assertTrue(added);
-        assertThat(platform.contentIterator())
+        assertThat(this.platform.contentIterator())
                 .toIterable()
                 .contains(newMovie);
-        added = platform.addContent(newMovie);
+        added = this.platform.addContent(newMovie);
         assertFalse(added);
 
-        boolean removed = platform.removeContent(newMovie);
+        boolean removed = this.platform.removeContent(newMovie);
         assertTrue(removed);
-        assertThat(platform.contentIterator())
+        assertThat(this.platform.contentIterator())
                 .toIterable()
                 .doesNotContain(newMovie);
-        removed = platform.removeContent(newMovie);
+        removed = this.platform.removeContent(newMovie);
         assertFalse(removed);
     }
 
     @Test
     public void testUpdateContentCorrectly() {
-        Content contentToUpdate = platform.contentIterator().next();
-        int initialContentCount = platform.getContents().size();
-        Content updatedContent = new Movie.MovieBuilder(contentToUpdate.getTitle(),
+        Content oldContent = this.platform.contentIterator().next();
+        int initialContentCount = this.platform.getContents().size();
+        Content updatedContent = new Movie.MovieBuilder(oldContent.getTitle(),
                 new Episode(1, 1))
                 .withDescription("Updated description")
                 .build();
 
-        boolean updated = platform.updateContent(updatedContent);
+        boolean updated = this.platform.updateContent(updatedContent);
         assertTrue(updated);
-        assertEquals(initialContentCount, platform.getContents().size());
-        assertThat(platform.contentIterator())
+        assertEquals(initialContentCount, this.platform.getContents().size());
+        assertThat(this.platform.contentIterator())
                 .toIterable()
                 .contains(updatedContent);
     }
 
     @Test
     public void testDisplayContentRunsCorrectly() {
-        Content content = platform.contentIterator().next();
-        String displayedContent = platform.displayContent(content);
+        Content content = this.platform.contentIterator().next();
+        String displayedContent = this.platform.displayContent(content);
 
         String expected = "From 'Streaming Platform' platform:\n" +
                 "Movie: Movie1\n" +
@@ -101,53 +109,54 @@ public class StreamingPlatformTest {
 
     @Test
     public void testDisplayContentThrowsNullPointerExceptionForNullContent() {
-        assertThatThrownBy(() -> platform.displayContent(null))
+        assertThatThrownBy(() -> this.platform.displayContent(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content cannot be null");
     }
 
     @Test
-    public void testDisplayContentThrowsIllegalArgumentExceptionForNonExistentContent() {
+    public void testDisplayContentThrowsStreamingPlatformExceptionForNonExistentContent() {
         Content nonExistentContent = new Movie.MovieBuilder("NonExistent",
                 new Episode(1, 1))
                 .build();
-        assertThatThrownBy(() -> platform.displayContent(nonExistentContent))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> this.platform.displayContent(nonExistentContent))
+                .isInstanceOf(StreamingPlatformException.class)
                 .hasMessage("Content 'NonExistent' does not exist");
     }
 
     @Test
     public void testWatchContentRunsCorrectly() {
-        Iterator<Content> contentIterator = platform.contentIterator();
+        Iterator<Content> contentIterator = this.platform.contentIterator();
 
         Content movie = contentIterator.next();
-        Iterable<Episode> episodes = platform.watchContent(movie);
+        Iterable<Episode> episodes = this.platform.watchContent(movie);
         assertEquals(List.of(new Episode(1, 1)), episodes);
 
         Content tvSeries = contentIterator.next();
-        episodes = platform.watchContent(tvSeries);
+        episodes = this.platform.watchContent(tvSeries);
         assertEquals(List.of(new Episode(1, 1), new Episode(2, 1)), episodes);
     }
 
     @Test
     public void testWatchContentThrowsNullPointerExceptionForNullContent() {
-        assertThatThrownBy(() -> platform.watchContent(null))
+        assertThatThrownBy(() -> this.platform.watchContent(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content cannot be null");
     }
 
     @Test
-    public void testWatchContentThrowsIllegalArgumentExceptionForNonExistentContent() {
+    public void testWatchContentThrowsStreamingPlatformExceptionForNonExistentContent() {
         Content nonExistentContent = new Movie.MovieBuilder("NonExistent",
                 new Episode(1, 1))
                 .build();
-        assertThatThrownBy(() -> platform.watchContent(nonExistentContent))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> this.platform.watchContent(nonExistentContent))
+                .isInstanceOf(StreamingPlatformException.class)
                 .hasMessage("Content 'NonExistent' does not exist");
     }
 
     @Test
     public void testAddObserverAndRemoveObserver() {
+        // mock observer for testing
         PlatformObserver observer = e -> {
         };
 

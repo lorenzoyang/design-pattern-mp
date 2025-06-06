@@ -15,34 +15,30 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
 
     @Override
     public String visitMovie(Movie movie) {
-        var sb = new StringBuilder();
-        sb.append("Movie: ").append(movie.getTitle()).append("\n");
-        appendCommonContent(sb, movie);
-        return sb.toString();
+        return String.format("Movie: %s\n%s",
+                movie.getTitle(),
+                formatCommonContent(movie));
     }
 
     @Override
     public String visitTVSeries(TVSeries tvSeries) {
         var sb = new StringBuilder();
         sb.append("TV Series: ").append(tvSeries.getTitle()).append("\n");
-        appendCommonContent(sb, tvSeries);
+        sb.append(formatCommonContent(tvSeries));
 
-        for (var season : tvSeries) {
+        tvSeries.forEach(season -> {
             sb.append("Season ").append(season.getSeasonNumber()).append("\n");
             sb.append(INDENT).append("Total Duration: ").append(season.getDurationInMinutes()).append(" minutes\n");
 
-            for (var episode : season) {
-                sb.append(INDENT)
-                        .append("Episode ").append(episode.getEpisodeNumber())
-                        .append(", Duration: ").append(episode.getDurationInMinutes())
-                        .append(" minutes\n");
-            }
-        }
+            season.forEach(episode -> sb.append(String.format("%sEpisode %d, Duration: %d minutes\n",
+                    INDENT, episode.getEpisodeNumber(), episode.getDurationInMinutes())));
+        });
+
         return sb.toString();
     }
 
 
-    private void appendCommonContent(StringBuilder sb, Content content) {
+    private String formatCommonContent(Content content) {
         String description = content.getDescription().orElse(DEFAULT_DESCRIPTION);
         String releaseDate = content.getReleaseDate()
                 .map(DATE_FORMATTER::format)
@@ -51,9 +47,14 @@ public class DisplayContentVisitor implements ContentVisitor<String> {
                 .map(VideoResolution::getDisplayName)
                 .orElse("Resolution not specified");
 
-        sb.append(INDENT).append("Description: ").append(description).append("\n");
-        sb.append(INDENT).append("Release Date: ").append(releaseDate).append("\n");
-        sb.append(INDENT).append("Resolution: ").append(resolution).append("\n");
-        sb.append(INDENT).append("Total Duration: ").append(content.getDurationInMinutes()).append(" minutes\n");
+        return String.format("%sDescription: %s\n" +
+                        "%sRelease Date: %s\n" +
+                        "%sResolution: %s\n" +
+                        "%sTotal Duration: %d minutes\n",
+                INDENT, description,
+                INDENT, releaseDate,
+                INDENT, resolution,
+                INDENT, content.getDurationInMinutes()
+        );
     }
 }

@@ -34,11 +34,11 @@ public class TVSeriesTest {
     @Test
     public void testTVSeriesBuilderCreatesTVSeriesWithValidArguments() {
         LocalDate releaseDate = LocalDate.of(2025, 1, 1);
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", this.seasons.get(0))
                 .withDescription("TVSeries Description")
                 .withReleaseDate(releaseDate)
                 .withResolution(VideoResolution.FULL_HD_1080P)
-                .withSeason(seasons.get(1))
+                .withSeason(this.seasons.get(1))
                 .build();
 
         assertEquals("TVSeries", tvSeries.getTitle());
@@ -50,9 +50,9 @@ public class TVSeriesTest {
         Season firstSeason = tvSeries.iterator().next();
         assertEquals(2, firstSeason.getEpisodesCount());
 
-        assertThat(tvSeries).containsExactly(seasons.get(0), seasons.get(1));
-        
-        int expectedDuration = seasons.stream()
+        assertThat(tvSeries).containsExactly(this.seasons.get(0), this.seasons.get(1));
+
+        int expectedDuration = this.seasons.stream()
                 .mapToInt(Season::getDurationInMinutes)
                 .sum();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
@@ -77,35 +77,35 @@ public class TVSeriesTest {
 
     @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
-        assertThatThrownBy(() -> defaultBuilder.withDescription("    "))
+        assertThatThrownBy(() -> this.defaultBuilder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content description cannot be blank");
-        assertThatThrownBy(() -> defaultBuilder.withDescription(""))
+        assertThatThrownBy(() -> this.defaultBuilder.withDescription(""))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content description cannot be blank");
     }
 
     @Test
     public void testWithSeasonThrowsInvalidContentExceptionForNonConsecutiveSeasonNumbers() {
-        assertThatThrownBy(() -> defaultBuilder.withSeason(new Season(3, List.of())))
+        assertThatThrownBy(() -> this.defaultBuilder.withSeason(new Season(3, List.of())))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("TV series season numbers must be consecutive");
     }
 
     @Test
     public void testGetDurationInMinutesRunsCorrectly() {
-        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
+        TVSeries tvSeries = new TVSeries.TVSeriesBuilder("TVSeries", this.seasons.get(0))
                 .build();
 
-        int expected = seasons.get(0).getDurationInMinutes();
+        int expected = this.seasons.get(0).getDurationInMinutes();
         assertEquals(expected, tvSeries.getDurationInMinutes());
     }
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries", this.seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries", seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries", this.seasons.get(0))
                 .build();
 
         assertEquals(tvSeries1, tvSeries2);
@@ -113,9 +113,9 @@ public class TVSeriesTest {
 
     @Test
     public void testEqualsReturnsFalseForDifferentTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", this.seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2", seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries2", this.seasons.get(0))
                 .build();
 
         assertNotEquals(tvSeries1, tvSeries2);
@@ -123,11 +123,11 @@ public class TVSeriesTest {
 
     @Test
     public void testHashCodeIsBasedOnTitle() {
-        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
+        TVSeries tvSeries1 = new TVSeries.TVSeriesBuilder("TVSeries1", this.seasons.get(0))
                 .build();
-        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1", seasons.get(0))
+        TVSeries tvSeries2 = new TVSeries.TVSeriesBuilder("TVSeries1", this.seasons.get(0))
                 .build();
-        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2", seasons.get(0))
+        TVSeries tvSeries3 = new TVSeries.TVSeriesBuilder("TVSeries2", this.seasons.get(0))
                 .build();
 
         assertEquals(tvSeries1.hashCode(), tvSeries2.hashCode());

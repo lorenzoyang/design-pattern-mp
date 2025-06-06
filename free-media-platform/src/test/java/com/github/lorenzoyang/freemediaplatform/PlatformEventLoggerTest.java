@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class PlatformEventLoggerTest {
@@ -26,38 +27,38 @@ public class PlatformEventLoggerTest {
 
     @Test
     public void testNotifyChangeForAddContentEvent() {
-        Content contentToAdd = new Movie.MovieBuilder("contentToAdd", new Episode(1, 120))
+        Content contentToAdd = new Movie.MovieBuilder("contentToAdd", new Episode(1, 1))
                 .build();
-        platform.addContent(contentToAdd);
+        this.platform.addContent(contentToAdd);
         String expected = "Content Added: {" +
                 "Title='contentToAdd', " +
                 "Description='No description available', " +
                 "Release Date='Release date not specified', " +
                 "Resolution='Resolution not specified'" +
                 "}";
-        assertEquals(expected, platformEventLogger.logMessagesIterator().next());
+        assertEquals(expected, this.platformEventLogger.logMessagesIterator().next());
     }
 
     @Test
     public void testNotifyChangeForRemoveContentEvent() {
-        Content contentToRemove = platform.contentIterator().next();
-        platform.removeContent(contentToRemove);
+        Content contentToRemove = this.platform.contentIterator().next();
+        this.platform.removeContent(contentToRemove);
         String expected = "Content Removed: {" +
                 "Title='Movie', " +
                 "Description='No description available', " +
                 "Release Date='Release date not specified', " +
                 "Resolution='Resolution not specified'" +
                 "}";
-        assertEquals(expected, platformEventLogger.logMessagesIterator().next());
+        assertEquals(expected, this.platformEventLogger.logMessagesIterator().next());
     }
 
     @Test
     public void testNotifyChangeForUpdateContentEvent() {
-        Content contentToUpdate = platform.contentIterator().next();
-        Content updatedContent = new Movie.MovieBuilder(contentToUpdate.getTitle(),
+        Content oldContent = this.platform.contentIterator().next();
+        Content updatedContent = new Movie.MovieBuilder(oldContent.getTitle(),
                 new Episode(1, 1))
                 .build();
-        platform.updateContent(updatedContent);
+        this.platform.updateContent(updatedContent);
 
         String expected = "Content Updated: \n" +
                 "\tfrom: {Title='Movie', Description='No description available', " +
@@ -66,13 +67,13 @@ public class PlatformEventLoggerTest {
                 "\tto: {Title='Movie', Description='No description available', " +
                 "Release Date='Release date not specified', " +
                 "Resolution='Resolution not specified'}";
-        assertEquals(expected, platformEventLogger.logMessagesIterator().next());
+        assertEquals(expected, this.platformEventLogger.logMessagesIterator().next());
     }
 
     @Test
     public void testClearLogMessagesRunsCorrectly() {
         this.platformEventLogger.getLogMessages().add("Test log message");
         this.platformEventLogger.clearLogs();
-        assertEquals(0, this.platformEventLogger.getLogMessages().size());
+        assertThat(this.platformEventLogger.getLogMessages()).isEmpty();
     }
 }

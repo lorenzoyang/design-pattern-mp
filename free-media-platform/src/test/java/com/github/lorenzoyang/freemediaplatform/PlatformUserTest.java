@@ -29,7 +29,7 @@ public class PlatformUserTest {
 
     @Test
     public void testConstructorThrowsNullPointerExceptionForNullArguments() {
-        assertThatThrownBy(() -> new PlatformUser(null, emailNotificationService))
+        assertThatThrownBy(() -> new PlatformUser(null, this.emailNotificationService))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Email cannot be null");
 
@@ -39,10 +39,21 @@ public class PlatformUserTest {
     }
 
     @Test
+    public void testConstructorThrowsIllegalArgumentExceptionForInvalidEmail() {
+        assertThatThrownBy(() -> new PlatformUser("", this.emailNotificationService))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid email address");
+
+        assertThatThrownBy(() -> new PlatformUser("invalid-email", this.emailNotificationService))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Invalid email address");
+    }
+
+    @Test
     public void testNotifyChangeForAddContentEvent() {
-        Content contentToAdd = new Movie.MovieBuilder("contentToAdd", new Episode(1, 120))
+        Content contentToAdd = new Movie.MovieBuilder("contentToAdd", new Episode(1, 1))
                 .build();
-        platform.addContent(contentToAdd);
+        this.platform.addContent(contentToAdd);
 
         String expected = "To: lorenzoyang@gmail.com\n" +
                 "Subject: New Content Added\n" +
@@ -52,12 +63,12 @@ public class PlatformUserTest {
 
     @Test
     public void testNotifyChangeForUpdateContentEvent() {
-        Content contentToUpdate = platform.contentIterator().next();
-        Content updatedContent = new Movie.MovieBuilder(contentToUpdate.getTitle(),
+        Content oldContent = this.platform.contentIterator().next();
+        Content updatedContent = new Movie.MovieBuilder(oldContent.getTitle(),
                 new Episode(1, 1))
                 .withDescription("Updated description")
                 .build();
-        platform.updateContent(updatedContent);
+        this.platform.updateContent(updatedContent);
 
         String expected = "To: lorenzoyang@gmail.com\n" +
                 "Subject: Content Updated\n" +

@@ -18,7 +18,7 @@ public class Season implements Iterable<Episode> {
 
         Objects.requireNonNull(episodes, "Episodes cannot be null");
         if (!IntStream.range(0, episodes.size())
-                .allMatch(i -> episodes.get(i).getEpisodeNumber() == i + 1)) {
+                .allMatch(i -> episodes.get(i).getEpisodeNumber() == (i + 1))) {
             throw new InvalidSeasonException("Episodes must be consecutive and start from 1");
         }
         this.episodes = new ArrayList<>(episodes);
@@ -41,12 +41,13 @@ public class Season implements Iterable<Episode> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Season season = (Season) o;
-        return seasonNumber == season.seasonNumber &&
-                durationInMinutes == season.durationInMinutes &&
-                Objects.equals(episodes, season.episodes);
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Season other = (Season) obj;
+        return (seasonNumber == other.seasonNumber) &&
+                (durationInMinutes == other.durationInMinutes) &&
+                Objects.equals(episodes, other.episodes);
     }
 
     @Override

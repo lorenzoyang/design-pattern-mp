@@ -29,10 +29,11 @@ public class Episode {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Episode episode = (Episode) o;
-        return episodeNumber == episode.episodeNumber && durationInMinutes == episode.durationInMinutes;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Episode other = (Episode) obj;
+        return (episodeNumber == other.episodeNumber) && (durationInMinutes == other.durationInMinutes);
     }
 
     @Override

@@ -41,10 +41,11 @@ public abstract class Content {
     public abstract <T> T accept(ContentVisitor<T> visitor);
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Content content = (Content) o;
-        return Objects.equals(getTitle(), content.getTitle());
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Content)) return false;
+        Content other = (Content) obj;
+        return Objects.equals(getTitle(), other.getTitle());
     }
 
     @Override
@@ -65,7 +66,7 @@ public abstract class Content {
             }
             this.title = title;
         }
-        
+
         public T withDescription(String description) {
             if (description != null && description.isBlank()) {
                 throw new InvalidContentException("Content description cannot be blank");

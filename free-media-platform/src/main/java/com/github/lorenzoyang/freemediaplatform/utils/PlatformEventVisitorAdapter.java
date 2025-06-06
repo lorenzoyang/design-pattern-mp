@@ -7,16 +7,16 @@ import com.github.lorenzoyang.freemediaplatform.events.UpdateContentEvent;
 public abstract class PlatformEventVisitorAdapter implements PlatformEventVisitor {
     @Override
     public void visitAddContent(AddContentEvent event) {
-        // Do nothing
+        // default implementation
     }
 
     @Override
     public void visitRemoveContent(RemoveContentEvent event) {
-        // Do nothing
+        // default implementation
     }
 
     @Override
     public void visitUpdateContent(UpdateContentEvent event) {
-        // Do nothing
+        // default implementation
     }
 }

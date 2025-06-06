@@ -14,7 +14,11 @@ public class PlatformUser implements PlatformObserver {
 
     public PlatformUser(String email, EmailNotificationService emailNotificationService) {
         Objects.requireNonNull(email, "Email cannot be null");
+        if (email.isBlank() || !email.contains("@")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
         this.email = email;
+        
         Objects.requireNonNull(emailNotificationService, "EmailNotificationService cannot be null");
         this.emailNotificationService = emailNotificationService;
     }

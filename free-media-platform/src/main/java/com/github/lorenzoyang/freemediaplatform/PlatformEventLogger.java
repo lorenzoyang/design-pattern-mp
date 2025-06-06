@@ -34,11 +34,9 @@ public class PlatformEventLogger implements PlatformObserver {
 
             @Override
             public void visitUpdateContent(UpdateContentEvent event) {
-                String logMsg = "Content Updated: \n"
-                        + "\tfrom: "
-                        + formatContentMessage(event.getOldContent())
-                        + "\n\tto: "
-                        + formatContentMessage(event.getUpdatedContent());
+                String logMsg = String.format("Content Updated: \n\tfrom: %s\n\tto: %s",
+                        formatContentMessage(event.getOldContent()),
+                        formatContentMessage(event.getUpdatedContent()));
                 log(logMsg);
             }
         });

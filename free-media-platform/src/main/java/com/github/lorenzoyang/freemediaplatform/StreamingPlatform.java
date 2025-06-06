@@ -6,6 +6,7 @@ import com.github.lorenzoyang.freemediaplatform.events.AddContentEvent;
 import com.github.lorenzoyang.freemediaplatform.events.PlatformEvent;
 import com.github.lorenzoyang.freemediaplatform.events.RemoveContentEvent;
 import com.github.lorenzoyang.freemediaplatform.events.UpdateContentEvent;
+import com.github.lorenzoyang.freemediaplatform.exceptions.StreamingPlatformException;
 import com.github.lorenzoyang.freemediaplatform.utils.DisplayContentVisitor;
 import com.github.lorenzoyang.freemediaplatform.utils.PlaybackContentVisitor;
 
@@ -20,12 +21,13 @@ public class StreamingPlatform {
     public StreamingPlatform(String name, Supplier<Collection<Content>> contentProvider) {
         Objects.requireNonNull(name, "Streaming platform name cannot be null");
         if (name.isBlank()) {
-            throw new IllegalArgumentException("Streaming platform name cannot be blank");
+            throw new StreamingPlatformException("Streaming platform name cannot be blank");
         }
         this.name = name;
 
         Objects.requireNonNull(contentProvider, "Content provider cannot be null");
         this.contents = new ArrayList<>(contentProvider.get());
+
         this.observers = new ArrayList<>();
     }
 
@@ -78,7 +80,7 @@ public class StreamingPlatform {
     public String displayContent(Content content) {
         Objects.requireNonNull(content, "Content cannot be null");
         if (!contents.contains(content)) {
-            throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
+            throw new StreamingPlatformException("Content '" + content.getTitle() + "' does not exist");
         }
         return "From '" + getName() + "' platform:\n" + content.accept(new DisplayContentVisitor());
     }
@@ -86,7 +88,7 @@ public class StreamingPlatform {
     public Iterable<Episode> watchContent(Content content) {
         Objects.requireNonNull(content, "Content cannot be null");
         if (!contents.contains(content)) {
-            throw new IllegalArgumentException("Content '" + content.getTitle() + "' does not exist");
+            throw new StreamingPlatformException("Content '" + content.getTitle() + "' does not exist");
         }
         return content.accept(new PlaybackContentVisitor());
     }
@@ -105,11 +107,11 @@ public class StreamingPlatform {
 
     // package-private getter for testing purposes
     Collection<Content> getContents() {
-        return contents;
+        return Collections.unmodifiableCollection(contents);
     }
 
     // package-private getter for testing purposes
     Collection<PlatformObserver> getObservers() {
-        return observers;
+        return Collections.unmodifiableCollection(observers);
     }
 }

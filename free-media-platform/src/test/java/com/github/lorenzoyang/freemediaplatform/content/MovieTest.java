@@ -22,33 +22,33 @@ public class MovieTest {
     @Test
     public void testMovieBuilderCreatesMovieWithValidArguments() {
         LocalDate releaseDate = LocalDate.of(2025, 1, 1);
-        Movie movie = new Movie.MovieBuilder("Movie", episode)
+        Movie movie = new Movie.MovieBuilder("Movie", this.episode)
                 .withDescription("Movie description")
                 .withReleaseDate(releaseDate)
                 .withResolution(VideoResolution.FULL_HD_1080P)
                 .build();
 
         assertEquals("Movie", movie.getTitle());
-        assertEquals(episode, movie.getEpisode());
+        assertEquals(this.episode, movie.getEpisode());
         assertThat(movie.getDescription()).contains("Movie description");
         assertThat(movie.getReleaseDate()).contains(releaseDate);
         assertThat(movie.getResolution()).contains(VideoResolution.FULL_HD_1080P);
-        assertEquals(120, movie.getDurationInMinutes());
+        assertEquals(this.episode.getDurationInMinutes(), movie.getDurationInMinutes());
     }
 
     @Test
     public void testMovieBuilderConstructorThrowsNullPointerExceptionForNullTitle() {
-        assertThatThrownBy(() -> new Movie.MovieBuilder(null, episode))
+        assertThatThrownBy(() -> new Movie.MovieBuilder(null, this.episode))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Content title cannot be null");
     }
 
     @Test
     public void testMovieBuilderConstructorThrowsInvalidContentExceptionForBlankTitle() {
-        assertThatThrownBy(() -> new Movie.MovieBuilder("    ", episode))
+        assertThatThrownBy(() -> new Movie.MovieBuilder("    ", this.episode))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content title cannot be blank");
-        assertThatThrownBy(() -> new Movie.MovieBuilder("", episode))
+        assertThatThrownBy(() -> new Movie.MovieBuilder("", this.episode))
                 .isInstanceOf(InvalidContentException.class)
                 .hasMessage("Content title cannot be blank");
     }
@@ -71,7 +71,7 @@ public class MovieTest {
 
     @Test
     public void testWithDescriptionThrowsInvalidContentExceptionForBlankDescription() {
-        var builder = new Movie.MovieBuilder("Movie", episode);
+        var builder = new Movie.MovieBuilder("Movie", this.episode);
 
         assertThatThrownBy(() -> builder.withDescription("    "))
                 .isInstanceOf(InvalidContentException.class)
@@ -83,32 +83,32 @@ public class MovieTest {
 
     @Test
     public void testGetDurationInMinutesRunsCorrectly() {
-        Movie movie = new Movie.MovieBuilder("Movie", episode).build();
+        Movie movie = new Movie.MovieBuilder("Movie", this.episode).build();
 
-        assertEquals(episode.getDurationInMinutes(), movie.getDurationInMinutes());
+        assertEquals(this.episode.getDurationInMinutes(), movie.getDurationInMinutes());
     }
 
     @Test
     public void testEqualsReturnsTrueForSameTitle() {
-        Movie movie1 = new Movie.MovieBuilder("Movie", episode).build();
-        Movie movie2 = new Movie.MovieBuilder("Movie", episode).build();
+        Movie movie1 = new Movie.MovieBuilder("Movie", this.episode).build();
+        Movie movie2 = new Movie.MovieBuilder("Movie", this.episode).build();
 
         assertEquals(movie1, movie2);
     }
 
     @Test
     public void testEqualsReturnsFalseForDifferentTitle() {
-        Movie movie1 = new Movie.MovieBuilder("Movie1", episode).build();
-        Movie movie2 = new Movie.MovieBuilder("Movie2", episode).build();
+        Movie movie1 = new Movie.MovieBuilder("Movie1", this.episode).build();
+        Movie movie2 = new Movie.MovieBuilder("Movie2", this.episode).build();
 
         assertNotEquals(movie1, movie2);
     }
 
     @Test
     public void testHashCodeIsBasedOnTitle() {
-        Movie movie1 = new Movie.MovieBuilder("Movie1", episode).build();
-        Movie movie2 = new Movie.MovieBuilder("Movie1", episode).build();
-        Movie movie3 = new Movie.MovieBuilder("Movie2", episode).build();
+        Movie movie1 = new Movie.MovieBuilder("Movie1", this.episode).build();
+        Movie movie2 = new Movie.MovieBuilder("Movie1", this.episode).build();
+        Movie movie3 = new Movie.MovieBuilder("Movie2", this.episode).build();
 
         assertEquals(movie1.hashCode(), movie2.hashCode());
         assertNotEquals(movie1.hashCode(), movie3.hashCode());
