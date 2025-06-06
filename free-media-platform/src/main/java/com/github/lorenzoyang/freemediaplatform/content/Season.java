@@ -2,14 +2,12 @@ package com.github.lorenzoyang.freemediaplatform.content;
 
 import com.github.lorenzoyang.freemediaplatform.exceptions.InvalidSeasonException;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Season implements Iterable<Episode> {
     private final int seasonNumber;
-    private final List<Episode> episodes;
+    private final Collection<Episode> episodes;
     private final int durationInMinutes;
 
     public Season(int seasonNumber, List<Episode> episodes) {
@@ -23,7 +21,7 @@ public class Season implements Iterable<Episode> {
                 .allMatch(i -> episodes.get(i).getEpisodeNumber() == i + 1)) {
             throw new InvalidSeasonException("Episodes must be consecutive and start from 1");
         }
-        this.episodes = List.copyOf(episodes);
+        this.episodes = new ArrayList<>(episodes);
 
         this.durationInMinutes = episodes.stream()
                 .mapToInt(Episode::getDurationInMinutes)

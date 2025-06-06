@@ -4,12 +4,12 @@ import com.github.lorenzoyang.freemediaplatform.exceptions.InvalidContentExcepti
 import com.github.lorenzoyang.freemediaplatform.utils.ContentVisitor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
 public class TVSeries extends Content implements Iterable<Season> {
-    private final List<Season> seasons;
+    private final Collection<Season> seasons;
     private final int durationInMinutes;
 
     private TVSeries(TVSeriesBuilder builder) {
@@ -40,7 +40,7 @@ public class TVSeries extends Content implements Iterable<Season> {
     }
 
     public static class TVSeriesBuilder extends ContentBuilder<TVSeriesBuilder> {
-        private final List<Season> seasons = new ArrayList<>();
+        private final Collection<Season> seasons = new ArrayList<>();
         private int lastSeasonNumber = 0;
 
         public TVSeriesBuilder(String title, Season season) {

@@ -47,12 +47,15 @@ public class TVSeriesTest {
         assertThat(tvSeries.getResolution()).contains(VideoResolution.FULL_HD_1080P);
         assertEquals(2, tvSeries.getSeasonsCount());
 
+        Season firstSeason = tvSeries.iterator().next();
+        assertEquals(2, firstSeason.getEpisodesCount());
+
+        assertThat(tvSeries).containsExactly(seasons.get(0), seasons.get(1));
+        
         int expectedDuration = seasons.stream()
                 .mapToInt(Season::getDurationInMinutes)
                 .sum();
         assertEquals(expectedDuration, tvSeries.getDurationInMinutes());
-
-        assertThat(tvSeries).contains(seasons.get(0), seasons.get(1));
     }
 
     @Test
