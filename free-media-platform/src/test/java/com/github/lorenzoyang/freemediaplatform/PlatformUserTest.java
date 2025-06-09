@@ -76,4 +76,13 @@ public class PlatformUserTest {
         assertEquals(expected, this.emailNotificationService.getLastNotificationMessage());
 
     }
+
+    @Test
+    public void testNotifyChangeForRemoveContentEvent() {
+        Content contentToRemove = this.platform.contentIterator().next();
+        this.platform.removeContent(contentToRemove);
+
+        String expected = "";
+        assertEquals(expected, this.emailNotificationService.getLastNotificationMessage());
+    }
 }
