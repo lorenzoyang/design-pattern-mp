@@ -114,3 +114,4 @@ Nell'implementazione dell'Observer, ho notato che alcuni osservatori potrebbero 
 
 ### UML
 
+![DIAGRAMMA UML](./freemediaplatform_UML_PROGETTO_IMG.png)
