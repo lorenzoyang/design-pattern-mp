@@ -23,8 +23,7 @@ This project utilizes the following design patterns:
 
 ## How to Run
 
-There are three ways to run this project:
-
-1. IntelliJ Users: Clone the repository and import it as a new project in IntelliJ IDEA.
-2. Eclipse Users (Option 1): Clone the repository and import it into Eclipse as a Maven project.
-3. Eclipse Users (Option 2): Download the [zipped projec]() file and import it into Eclipse.
+First, navigate to the "Releases" section in the upper right of the repository page and select the latest version. From there, you have three options to run the project:
+1. **For IntelliJ IDEA users:** Download the source code (zip), unzip it, and then import it as a new project in IntelliJ IDEA.
+2. **For Eclipse users:** Download the pre-zipped project file and import it into Eclipse.
+3. **For Eclipse users familiar with Maven:** Download the source code and import it into Eclipse as a Maven project.
