@@ -20,3 +20,11 @@ This project utilizes the following design patterns:
 - "Watch" content, which returns a list of episodes.
 - Users receive email notifications when new content is added or existing content is updated.
 - Events on the platform (such as adding, removing, and updating content) are logged.
+
+## How to Run
+
+There are three ways to run this project:
+
+1. IntelliJ Users: Clone the repository and import it as a new project in IntelliJ IDEA.
+2. Eclipse Users (Option 1): Clone the repository and import it into Eclipse as a Maven project.
+3. Eclipse Users (Option 2): Download the [zipped projec]() file and import it into Eclipse.
