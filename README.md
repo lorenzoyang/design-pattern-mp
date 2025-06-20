@@ -23,7 +23,23 @@ This project utilizes the following design patterns:
 
 ## How to Run
 
-First, navigate to the "Releases" section in the upper right of the repository page and select the latest version. From there, you have three options to run the project:
-1. **For IntelliJ IDEA users:** Download the source code (zip), unzip it, and then import it as a new project in IntelliJ IDEA.
-2. **For Eclipse users:** Download the pre-zipped project file and import it into Eclipse.
-3. **For Eclipse users familiar with Maven:** Download the source code and import it into Eclipse as a Maven project.
+You can run this project in a few ways. Please choose the option that best suits your setup. You can find all the necessary files on the [GitHub Releases page](https://github.com/lorenzoyang/design-pattern-mp/releases/tag/v1.0.0).
+
+1. **For IntelliJ IDEA users:**
+   - Download the source code ([zip](https://github.com/lorenzoyang/design-pattern-mp/archive/refs/tags/v1.0.0.zip) | [tar.gz](https://github.com/lorenzoyang/design-pattern-mp/archive/refs/tags/v1.0.0.tar.gz))
+   - Unzip the file.
+   - In IntelliJ IDEA, select "File" > "Open" and choose the extracted folder.
+2. **For Eclipse users (pre-packaged project):**
+   - [Download the pre-zipped project file (progetto.mp.yang.lorenzo.zip)](https://github.com/lorenzoyang/design-pattern-mp/releases/download/v1.0.0/progetto.mp.yang.lorenzo.zip).
+   - In Eclipse, select "File" \> "Import...".
+   - Choose "Existing Projects into Workspace" from the "General" category.
+   - Select the "Select archive file" option and browse to the downloaded zip file.
+   - Click "Finish".
+3. **For Eclipse users (Maven project):**
+   - Download the source code ([zip](https://github.com/lorenzoyang/design-pattern-mp/archive/refs/tags/v1.0.0.zip) | [tar.gz](https://github.com/lorenzoyang/design-pattern-mp/archive/refs/tags/v1.0.0.tar.gz))
+   - Unzip the file.
+   - In Eclipse, select "File" \> "Import...".
+   - Choose "Existing Maven Projects" from the "Maven" category.
+   - Browse to the root directory of the extracted source code and click "Finish".
+
+
